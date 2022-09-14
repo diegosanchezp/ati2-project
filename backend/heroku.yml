@@ -1,0 +1,16 @@
+# https://devcenter.heroku.com/articles/build-docker-images-heroku-yml
+setup:
+  addons:
+    - plan: heroku-postgresql:hobby-dev
+      as: DATABASE
+  config:
+    DJANGO_SETTINGS_MODULE: django_src.settings.heroku
+build:
+  docker:
+    web: ./docker/heroku/Dockerfile.web
+  config:
+    REPOID: diegosanchezp/django-boilerplate-test
+release:
+  image: web
+  command:
+    - bash release-tasks.sh

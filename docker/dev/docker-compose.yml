@@ -1,0 +1,40 @@
+version: "3.7"
+
+volumes:
+  ati2p_postgres_data: {}
+  ati2p_postgres_data_backups: {}
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: django_ati2p_image
+    container_name: django_dev
+    working_dir: /app
+    depends_on:
+      - postgres
+    volumes:
+      - type: bind
+        source: ../..
+        target: /app
+    user: "${UID}:${GID}"
+    env_file:
+      - ../../envs/dev/django
+      - ../../envs/dev/postgres
+    entrypoint: ["bash", "shscripts/init_docker_dev.sh"]
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+      - "localhost:172.17.0.1"
+    ports:
+      - "8000:8000"
+  postgres:
+    image: postgres:14.4
+    container_name: ati2p_postgres
+    volumes:
+      - ati2p_postgres_data:/var/lib/postgresql/data:Z
+      - ati2p_postgres_data_backups:/backups:z
+    env_file:
+      - ../../envs/dev/postgres
+    ports:
+      - "5432:5432"

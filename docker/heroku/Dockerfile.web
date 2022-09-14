@@ -1,0 +1,6 @@
+ARG REPOID
+FROM ghcr.io/$REPOID:latest
+
+# Run the app.  CMD is required to run on Heroku
+# $PORT is set by Heroku
+CMD gunicorn --log-level DEBUG --bind 0.0.0.0:$PORT django_src.wsgi
