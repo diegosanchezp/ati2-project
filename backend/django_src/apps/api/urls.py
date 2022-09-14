@@ -19,7 +19,8 @@ else:
 urlpatterns = [
     path("hello/", HelloWorld.as_view(), name="greet"),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
-    path('auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
     path(
         "docs/",
         SpectacularSwaggerView.as_view(url_name="schema"),
