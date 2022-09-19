@@ -32,7 +32,6 @@ INSTALLED_APPS = [
     # ---- Third party ----
     # API REST
     "rest_framework",
-    "djoser",
     "drf_spectacular",
     # JS
     # CSS
@@ -121,13 +120,6 @@ STATIC_URL = "/static/"
 REST_FRAMEWORK = {
     # YOUR SETTINGS
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-}
-
-SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('JWT',),
 }
 
 SPECTACULAR_SETTINGS = {

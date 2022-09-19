@@ -22,8 +22,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='api-logout'),
     path('session/', views.SessionView.as_view(), name='api-session'),  # new
     path('whoami/', views.WhoAmIView.as_view(), name='api-whoami'),  # new
-    path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.jwt')),
     path(
         "docs/",
         SpectacularSwaggerView.as_view(url_name="schema"),
