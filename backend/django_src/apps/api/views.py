@@ -1,10 +1,19 @@
 import json
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework import serializers
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+
 from django.middleware.csrf import get_token
 from django.views.decorators.http import require_POST
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
+from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth.forms import AuthenticationForm
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        exclude = ['password']
 
 # Create your views here.
 def get_csrf(request):
@@ -12,24 +21,23 @@ def get_csrf(request):
     response['X-CSRFToken'] = get_token(request)
     return response
 
-from django.contrib.auth import authenticate, login, logout
 
 @require_POST
 def login_view(request):
     data = json.loads(request.body)
-    username = data.get('username')
-    password = data.get('password')
 
-    if username is None or password is None:
-        return JsonResponse({'detail': 'Please provide username and password.'}, status=400)
+    form = AuthenticationForm(request=request,data={
+        "username": data.get('username'),
+        "password": data.get('password')
+    })
 
-    user = authenticate(username=username, password=password)
+    if not form.is_valid():
+        return JsonResponse(form.errors.get_json_data(), status=400)
 
-    if user is None:
-        return JsonResponse({'detail': 'Invalid credentials.'}, status=400)
-
+    user = form.get_user()
     login(request, user)
-    return JsonResponse({'detail': 'Successfully logged in.'})
+    s_user = UserSerializer(user)
+    return JsonResponse(s_user.data)
 
 
 def logout_view(request):
@@ -54,4 +62,6 @@ class WhoAmIView(APIView):
 
     @staticmethod
     def get(request, format=None):
-        return JsonResponse({'username': request.user.username})
+
+        s_user = UserSerializer(request.user)
+        return JsonResponse(s_user.data)
