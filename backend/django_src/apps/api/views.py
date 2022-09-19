@@ -27,7 +27,7 @@ def login_view(request):
     data = json.loads(request.body)
 
     form = AuthenticationForm(request=request,data={
-        "username": data.get('username'),
+        "username": data.get('email'),
         "password": data.get('password')
     })
 
