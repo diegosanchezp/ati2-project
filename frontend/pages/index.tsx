@@ -1,4 +1,3 @@
-import * as React from 'react';
 import type { NextPage } from 'next';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -6,8 +5,16 @@ import Box from '@mui/material/Box';
 import Link from '../src/Link';
 import ProTip from '../src/ProTip';
 import Copyright from '../src/Copyright';
+import {djRequest} from "utils/apirest";
+import {withAuth, useSession} from "auth";
+
+type HomePageProps = {};
 
 const Home: NextPage = () => {
+
+  const {session, dispatch} = useSession();
+  console.log(session);
+
   return (
     <Container maxWidth="lg">
       <Box
@@ -26,6 +33,10 @@ const Home: NextPage = () => {
           Go to the about page
         </Link>
         <ProTip />
+        <button onClick={async ()=>{
+          await djRequest("logout");
+          dispatch({type: "setUser", user: null });
+        }}>logout</button>
         <Copyright />
       </Box>
     </Container>
@@ -33,3 +44,12 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+export const getServerSideProps = withAuth<HomePageProps>({
+
+	async getServerSideProps({user}){
+    return {
+      props: {},
+    }
+  }
+})

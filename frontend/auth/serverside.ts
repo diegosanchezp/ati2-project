@@ -1,10 +1,14 @@
-import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next'
+import type { GetServerSidePropsContext, GetServerSidePropsResult, NextApiRequest } from 'next'
 
-import {createRequester, fRequest} from "utils/apirest";
+import {createRequester, djRequest} from "utils/apirest";
 import {splitCookiesString} from "./cookies";
 
 // serversideprops fetch client
 
+export type User = {username: string};
+export type Session = {
+  user: User,
+};
 const client = async (context: GetServerSidePropsContext) => {
 
   let csrfCookie = splitCookiesString(context.req.headers.cookie as string);
@@ -30,32 +34,31 @@ const client = async (context: GetServerSidePropsContext) => {
 
 // get logged in user
 // meant to be used in get serverside props
-const getSession = async (context: GetServerSidePropsContext)=> {
+export const getSession = async (req: GetServerSidePropsContext["req"] | NextApiRequest)=> {
 
-  console.log(context.req.cookies);
-  const {sessionid, csrftoken} = context.req.cookies;
+  const {sessionid, csrftoken} = req.cookies;
   // No session we are not logged in
   if(!sessionid){
     return
   }
 
   // Get user with the session cookies
-  const whoRes = await fRequest("whoami", {
+  const whoRes = await djRequest("whoami", {
     headers: {
       "Cookie": `sessionid=${sessionid}; csrftoken=${csrftoken}`
     }
   });
 
   if(!whoRes.ok){return}
-  const user = await whoRes.json();
+  const user: User = await whoRes.json();
 
   return {
     user: user,
-  };
+  } as Session;
 }
 
 type SSPandSession = GetServerSidePropsContext & {
-  fRequest: any
+  djRequest: any
   user: any
 };
 
@@ -68,14 +71,14 @@ export function withAuth<P>(params: AuthRequiredParams<P>){
   const {redirect, getServerSideProps} = params;
 
   return async function decoratedFn(context: GetServerSidePropsContext){
-    const session = await getSession(context);
+    const session = await getSession(context.req);
 
     // If the user is not authenticated redirect to
     // login page
     if(!session){
       return {
         redirect: {
-          destination: redirect || '/',
+          destination: redirect || '/login',
           permanent: false,
         }
       } as GetServerSidePropsResult<P>
@@ -83,13 +86,22 @@ export function withAuth<P>(params: AuthRequiredParams<P>){
 
     // Axios client with Auth header
     if (getServerSideProps){
-      return getServerSideProps(
+      const pageProps = await getServerSideProps(
         {
           ...context,
           ...session,
-          fRequest: await client(context), // this probably has to change
+          djRequest: await client(context), // this probably has to change
         }
       );
+      const {props} = pageProps;
+      console.log(props);
+      return {
+        ...pageProps,
+        props: {
+          ...props,
+          session: session,
+        },
+      }
     }else{
       return {
         props: {}
