@@ -123,8 +123,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Distribuidor API",
-    "DESCRIPTION": "Comercio electrónico 2-2021, Distribuidor API",
+    "TITLE": "ATI 2 Project API",
+    "DESCRIPTION": "ATI Project 2-2022 API",
     "VERSION": "1.0.0",
     # OTHER SETTINGS
 }
