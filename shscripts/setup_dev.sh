@@ -10,8 +10,11 @@ export COMPOSE_FILE
 
 echo "SETUP DJANGO IN DOCKER"
 docker-compose up -d postgres && \
-docker-compose run -w /app --entrypoint bash --rm django shscripts/setup_docker_dev.sh && \
-docker-compose up -d django
+docker-compose run -w /app --entrypoint bash --rm django shscripts/setup_docker_dev.sh
+# docker-compose up -d django && \
+
+echo "=== Installing Nodejs dependencies === "
+yarn install
 
 echo "=== LOAD COMMAND UTILITIES with command ===" && \
 
