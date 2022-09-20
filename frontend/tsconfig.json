@@ -2,6 +2,9 @@
   "compilerOptions": {
     "target": "es5",
     "baseUrl": ".",
+    "paths": {
+      "djtypes/*": ["../backend/tstypes/*"]
+    },
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -16,6 +19,6 @@
     "jsx": "preserve",
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "../backend/tstypes/*.ts"],
   "exclude": ["node_modules"]
 }

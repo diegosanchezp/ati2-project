@@ -1,11 +1,12 @@
 import type { GetServerSidePropsContext, GetServerSidePropsResult, NextApiRequest } from 'next'
 
+import {UserSerializer as User} from "djtypes/auth";
+
 import {createRequester, djRequest} from "utils/apirest";
 import {splitCookiesString} from "./cookies";
 
 // serversideprops fetch client
 
-export type User = {username: string};
 export type Session = {
   user: User,
 };

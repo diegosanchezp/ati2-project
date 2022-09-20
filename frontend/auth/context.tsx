@@ -1,5 +1,6 @@
 import React from 'react'
-import type {User, Session} from "auth";
+import type {Session} from "auth";
+import {UserSerializer as User} from "djtypes/auth";
 
 
 type Action = {type: 'setUser', user: User | null}

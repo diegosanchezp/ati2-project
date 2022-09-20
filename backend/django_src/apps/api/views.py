@@ -9,11 +9,19 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.forms import AuthenticationForm
+from django.conf import settings
 
+from django_typomatic import ts_interface, generate_ts
+from rest_framework import serializers
+
+@ts_interface(context="auth")
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         exclude = ['password']
+
+if settings.DEBUG:
+    generate_ts(settings.TS_TYPES_DIR / "auth.ts", context='auth')
 
 # Create your views here.
 def get_csrf(request):

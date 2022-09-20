@@ -10,6 +10,7 @@
     "post-update": "echo \"codesandbox preview only, need an update\" && yarn upgrade --latest"
   },
   "dependencies": {
+    "backend": "*",
     "css-loader": "^6.7.1",
     "less": "^4.1.3",
     "less-loader": "^11.0.0",

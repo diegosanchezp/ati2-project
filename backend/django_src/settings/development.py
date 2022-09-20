@@ -16,6 +16,7 @@ from .base import *  # noqa
 
 # read environment files
 ENV_DIR = BASE_DIR / "envs" / "dev"  # noqa F405
+TS_TYPES_DIR = BASE_DIR / "tstypes"
 env.read_env(str(ENV_DIR / "django"))  # noqa F405
 env.read_env(str(ENV_DIR / "postgres"))  # noqa F405
 
