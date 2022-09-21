@@ -13,3 +13,8 @@ export interface UserSerializer {
     user_permissions?: number | string[];
 }
 
+export interface LoginRequestBody {
+    email: string;
+    password: string;
+}
+
