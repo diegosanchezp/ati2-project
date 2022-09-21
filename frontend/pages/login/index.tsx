@@ -1,16 +1,34 @@
+import React from "react";
 import type { NextPage } from 'next';
 import {useRouter} from "next/router";
 import {nextRequest} from "utils/apirest";
 import {useSession} from "auth";
 import {routes} from "utils/routes";
+import type {UserSerializer as User} from "djtypes/auth";
 
-import {Form, FlexboxGrid, ButtonToolbar, Panel, Button} from "rsuite";
+import {
+  Form, FlexboxGrid, ButtonToolbar, Panel,
+  Button, Message, useToaster,
+} from "rsuite";
 
+type errorMsg = {
+    message: string,
+    code: string,
+};
+
+type formError = {
+  [key: string]: errorMsg[]
+}
 
 const LoginPage: NextPage = () => {
-  const {session, dispatch} = useSession();
+  const {dispatch} = useSession();
   const router = useRouter();
-  console.log(session);
+
+  const toaster = useToaster();
+  const toasterPlacement = {
+    placement: "bottomCenter",
+  }
+
 
   async function login(checkStatus: boolean, e: React.FormEvent<HTMLFormElement>){
     const formData = new FormData(e.target as HTMLFormElement);
@@ -19,15 +37,28 @@ const LoginPage: NextPage = () => {
       body: JSON.stringify(Object.fromEntries(formData))
     });
 
-    console.log(res);
-
     if(!res.ok){
       // TODO: Render on view Could not login message
-      const errors = await res.json();
-      console.log(errors)
-      return 
+      const errors: formError = await res.json();
+      errors["__all__"].forEach(err => {
+        toaster.push(
+          <Message duration={6000} closable type="error">
+            {err.message}
+          </Message>,
+          toasterPlacement
+        );
+      })
+      return
     }
-    const user = await res.json();
+    const user: User = await res.json();
+    console.log(user);
+
+    toaster.push(
+      <Message duration={6000} closable type="success">
+        Welcome back {user?.last_name || user?.username}
+      </Message>,
+      toasterPlacement,
+    )
     dispatch({type: "setUser",user: user })
     // SPA like route change
     router.push(routes.home);
