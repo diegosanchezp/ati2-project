@@ -73,7 +73,7 @@ connection.close()
 
 # === Rung Django manage.py commands ===
 
-MANAGE = str(BASE_DIR / "manage.py")
+MANAGE = str(BASE_DIR/ "backend" / "manage.py")
 
 
 # Apply migrations
@@ -89,6 +89,6 @@ sp.run(
         MANAGE,
         "loaddata",
     ] + [
-        f"fixtures/{fname}.json" for fname in FIXTURES
+        f"backend/fixtures/{fname}.json" for fname in FIXTURES
     ]
 )

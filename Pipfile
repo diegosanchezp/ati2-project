@@ -14,8 +14,7 @@ drf-spectacular = "~=0.23.1"
 whitenoise = "*"
 django-widget-tweaks = "*"
 argon2-cffi = "*"
-djangorestframework-simplejwt = "*"
-djoser = "*"
+django-typomatic = "*"
 
 [dev-packages]
 django-stubs = "*"

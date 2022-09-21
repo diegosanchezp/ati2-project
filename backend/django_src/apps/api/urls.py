@@ -6,10 +6,10 @@ from drf_spectacular.views import (
 from rest_framework import routers
 
 from django.urls import path, include
-
+from . import views
 from rest_framework.routers import DefaultRouter, SimpleRouter
-from .views import HelloWorld
 from django.conf import settings
+from django_src.apps.auth.urls import urlpatterns as authurls
 
 if settings.DEBUG:
     router = DefaultRouter()
@@ -17,10 +17,7 @@ else:
     router = SimpleRouter()
 
 urlpatterns = [
-    path("hello/", HelloWorld.as_view(), name="greet"),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
-    path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.jwt')),
     path(
         "docs/",
         SpectacularSwaggerView.as_view(url_name="schema"),
@@ -34,4 +31,5 @@ urlpatterns = [
     ),
 ]
 
+urlpatterns += authurls
 urlpatterns += router.urls

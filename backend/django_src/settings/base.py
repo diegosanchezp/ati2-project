@@ -28,10 +28,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # ---- Our apps ----
     "django_src.apps.api.apps.ApiConfig",
+    "django_src.apps.auth.apps.AuthConfig",
     # ---- Third party ----
     # API REST
     "rest_framework",
-    "djoser",
     "drf_spectacular",
     # JS
     # CSS
@@ -92,6 +92,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL="customauth.User"
+AUTHENTICATION_BACKENDS=["django_src.apps.auth.backends.EmailBackend"]
+
 # Internationalization
 # https://docs.djangoproject.com/en/stable/topics/i18n/
 
@@ -117,22 +120,19 @@ STATIC_URL = "/static/"
 REST_FRAMEWORK = {
     # YOUR SETTINGS
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-}
-
-SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('JWT',),
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Distribuidor API",
-    "DESCRIPTION": "Comercio electrónico 2-2021, Distribuidor API",
+    "TITLE": "ATI 2 Project API",
+    "DESCRIPTION": "ATI Project 2-2022 API",
     "VERSION": "1.0.0",
     # OTHER SETTINGS
 }
 
-# https://pypi.org/project/django-cors-headers/
-CORS_ALLOW_ALL_ORIGINS = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_HTTPONLY = True
 
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+CORS_ALLOW_CREDENTIALS = True

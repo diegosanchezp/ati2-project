@@ -24,11 +24,11 @@ dockerpy(){
 }
 
 managepy(){
-  dockerpy python manage.py "$@"
+  dockerpy python backend/manage.py "$@"
 }
 
 helpmanage(){
-  dockerpy python manage.py "$1" --help
+  dockerpy python backend/manage.py "$1" --help
 }
 
 create-app(){
