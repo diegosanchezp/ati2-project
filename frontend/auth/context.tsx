@@ -1,5 +1,7 @@
 import React from 'react'
 import type {Session} from "auth";
+import {nextRequest} from "utils/apirest";
+
 import {UserSerializer as User} from "djtypes/auth";
 
 
@@ -29,6 +31,18 @@ function SessionProvider({children, session}: SessionProviderProps) {
   // NOTE: you *might* need to memoize this value
   // Learn more in http://kcd.im/optimize-context
   const value = {session: state, dispatch}
+  React.useEffect(()=>{
+    if(!session){
+      (async()=>{
+        const res = await nextRequest("auth/getSession");
+        const resSession: Session | null = await res.json();
+        if(resSession){
+          dispatch({type: "setUser", user: resSession.user});
+        }
+      })();
+    }
+  },[])
+
   return (
     <SessionStateContext.Provider value={value}>
       {children}

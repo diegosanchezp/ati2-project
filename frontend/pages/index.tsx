@@ -1,9 +1,10 @@
-import type { NextPage } from 'next';
 import {withAuth, useSession} from "auth";
+import type {PageWithSession} from "types"
 
 type HomePageProps = {};
 
-const Home: NextPage = () => {
+const Home: PageWithSession<HomePageProps> = (props) => {
+  console.log(props.session)
   return (
     <></>
   );
@@ -15,7 +16,9 @@ export const getServerSideProps = withAuth<HomePageProps>({
 
 	async getServerSideProps({user}){
     return {
-      props: {},
+      props: {
+        a: "a",
+      },
     }
   }
 })

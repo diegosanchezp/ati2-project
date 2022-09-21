@@ -21,9 +21,10 @@ type formError = {
 }
 
 const LoginPage: NextPage = () => {
-  const {dispatch} = useSession();
+  const {dispatch, session} = useSession();
   const router = useRouter();
 
+  console.log(session);
   const toaster = useToaster();
   const toasterPlacement = {
     placement: "bottomCenter",
@@ -91,10 +92,3 @@ const LoginPage: NextPage = () => {
 };
 
 export default LoginPage;
-export const getServerSideProps = () => {
-  return {
-    props: {
-      test: "test",
-    }
-  }
-}
