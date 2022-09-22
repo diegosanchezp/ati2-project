@@ -12,13 +12,13 @@ interface MyAppProps extends AppProps {
 }
 
 export default function MyApp(props: MyAppProps) {
-  const { Component, pageProps: { session, ...pageProps }  } = props;
+  const { Component, pageProps } = props;
   return (
      <>
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <SessionProvider session={session}>
+      <SessionProvider session={pageProps?.session}>
         <CustomProvider theme="dark" >
           <Layout>
             <Component {...pageProps} />

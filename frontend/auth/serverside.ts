@@ -94,15 +94,16 @@ export function withAuth<P>(params: AuthRequiredParams<P>){
           djRequest: await client(context), // this probably has to change
         }
       );
-      const {props} = pageProps;
-      console.log(props);
-      return {
-        ...pageProps,
+      console.log(pageProps);
+      const {props, ...restPageProps} = pageProps;
+      const propsResults = {
         props: {
           ...props,
           session: session,
         },
-      }
+        ...restPageProps,
+      } as GetServerSidePropsResult<P>
+      return propsResults;
     }else{
       return {
         props: {}
