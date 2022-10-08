@@ -33,6 +33,9 @@ DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "host.docker.internal"]
 
+EMAIL_HOST = 'smtp-server'  # Your Mailhog Host
+EMAIL_PORT = '1025'
+
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = [str(BASE_DIR / "static")]  # noqa F405
 
