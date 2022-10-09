@@ -5,20 +5,14 @@ import {nextRequest} from "utils/apirest";
 import {useSession} from "auth";
 import {routes} from "utils/routes";
 import type {UserSerializer as User} from "djtypes/auth";
-
+import type {errorMsg, formError} from "types"
 import {
   Form, FlexboxGrid, ButtonToolbar, Panel,
   Button, Message, useToaster,
 } from "rsuite";
+import Link from "next/link";
 
-type errorMsg = {
-    message: string,
-    code: string,
-};
 
-type formError = {
-  [key: string]: errorMsg[]
-}
 
 const LoginPage: NextPage = () => {
   const {dispatch, session} = useSession();
@@ -81,7 +75,11 @@ const LoginPage: NextPage = () => {
             <Form.Group>
               <ButtonToolbar>
                 <Button appearance="primary" type="submit">Sign in</Button>
-                <Button appearance="link">Forgot password?</Button>
+                <Link href={routes.recoverPassword}>
+                  <a>
+                    <Button appearance="link">Forgot password?</Button>
+                  </a>
+                </Link>
               </ButtonToolbar>
             </Form.Group>
           </Form>
