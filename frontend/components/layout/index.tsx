@@ -5,7 +5,7 @@ import {djRequest} from "utils/apirest";
 import { Container, Header, Content, Navbar, Nav, Button } from 'rsuite';
 import {routes} from "utils/routes";
 import {useSession} from "auth";
-
+import {NavLink} from "components/NavLink";
 export type LayoutProps = {
   children: React.ReactNode
 }
@@ -20,14 +20,14 @@ export function Layout(props: LayoutProps){
       <Header>
         <Navbar appearance="inverse">
           <Nav>
-            <Nav.Item>Inicio</Nav.Item>
-            <Nav.Item>Vehículos</Nav.Item>
-            <Nav.Item>Servicios</Nav.Item>
-            <Nav.Item>Empleo</Nav.Item>
-            <Nav.Item>Ayuda</Nav.Item>
-            <Nav.Item>Contáctenos</Nav.Item>
-            <Nav.Item>Conócenos más</Nav.Item>
-            <Nav.Item>Idioma</Nav.Item>
+            <Nav.Item as={NavLink} href={routes.home}>Inicio</Nav.Item>
+            <Nav.Item as={NavLink} href="">Vehículos</Nav.Item>
+            <Nav.Item as={NavLink} href="">Servicios</Nav.Item>
+            <Nav.Item as={NavLink} href="">Empleo</Nav.Item>
+            <Nav.Item as={NavLink} href="">Ayuda</Nav.Item>
+            <Nav.Item as={NavLink} href="">Contáctenos</Nav.Item>
+            <Nav.Item as={NavLink} href="">Conócenos más</Nav.Item>
+            <Nav.Item as={NavLink} href="">Idioma</Nav.Item>
           </Nav>
 
           <Nav pullRight>
@@ -46,11 +46,9 @@ export function Layout(props: LayoutProps){
             </Nav.Menu>
             :
             <>
-              <Link href={routes.login}>
-                <Nav.Item>
-                  <Button color="orange" appearance="primary">Iniciar sessión</Button>
-                </Nav.Item>
-              </Link>
+              <Nav.Item as={NavLink} href={routes.login}>
+                <Button color="orange" appearance="primary">Iniciar sessión</Button>
+              </Nav.Item>
               <Nav.Item>
                 <Button color="orange" appearance="primary">Registrarse</Button>
               </Nav.Item>
