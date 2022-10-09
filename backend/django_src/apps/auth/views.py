@@ -8,11 +8,21 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
+from django.http import HttpRequest, QueryDict
 from django.middleware.csrf import get_token
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model, login, logout
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordChangeForm,
+    PasswordResetForm,
+    SetPasswordForm,
+)
+from django.contrib.auth.views import (
+    PasswordResetConfirmView
+)
 from django.conf import settings
 
 from django_typomatic import ts_interface, generate_ts
@@ -93,6 +103,59 @@ class WhoAmIView(APIView):
 
         s_user = UserSerializer(request.user)
         return JsonResponse(s_user.data)
+
+class PasswordResetView(APIView):
+
+    def post(self, request, format=None):
+        form = PasswordResetForm(data=request.data)
+
+        if not form.is_valid():
+            return Response(data=form.errors.get_json_data(), status=400)
+
+        opts = {
+            "use_https": request.is_secure(),
+            "token_generator": default_token_generator,
+            "domain_override": "localhost:3000",
+            "from_email": "noreply@company.com",
+            "email_template_name": "e_mail/password_reset_email.txt",
+            "subject_template_name": "registration/password_reset_subject.txt",
+            "request": request,
+            "html_email_template_name": "e_mail/password_reset_email.html",
+            "extra_email_context": None,
+        }
+        form.save(**opts)
+        return Response(data={"message": "success"})
+
+class SetNewPasswordView(APIView):
+    def post(self, request, format=None, **kwargs):
+
+        # Convert DRF request to django HttpRequest
+        req = HttpRequest()
+        req.method = request.method
+        req.session = request.session
+        req.META = request.META
+        req.COOKIES = request.COOKIES
+        req.path = request.path
+        req.encoding = request.encoding
+        # Pass request data as post
+        postData = QueryDict(mutable=True)
+        postData.update(request.data)
+        req.POST = postData
+
+        view = PasswordResetConfirmView(
+            success_url="/"
+        )
+        view.setup(req, **kwargs)
+        res = view.dispatch(req, **kwargs)
+
+        # res = view(req, **kwargs)
+        if(res.status_code != 302):
+            form = view.get_form()
+            if not form.is_valid():
+                return Response(data=form.errors.get_json_data(), status=400)
+
+        return Response(data={"message": "success"})
+
 
 if settings.DEBUG:
     generate_ts(settings.TS_TYPES_DIR / "auth.ts", context='auth')
