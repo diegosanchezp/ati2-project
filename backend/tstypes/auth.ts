@@ -9,6 +9,9 @@ export interface UserSerializer {
     is_active?: boolean;
     date_joined?: string;
     email: string;
+    user_type: "NATURAL" | "ENTERPRISE";
+    language?: "ES" | "EN";
+    keep_informed?: boolean;
     groups?: number | string[];
     user_permissions?: number | string[];
 }
