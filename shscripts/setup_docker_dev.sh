@@ -33,3 +33,7 @@ pushd - && \
 python manage.py migrate && \
 # Add predefined admin superuser for development
 python manage.py loaddata ./fixtures/admin.json
+
+# back on root
+pushd - && \
+python shscripts/importcountries.py

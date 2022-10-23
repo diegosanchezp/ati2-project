@@ -6,8 +6,8 @@ import subprocess as sp
 import psycopg2
 from psycopg2 import errors
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-
 from pathlib import Path
+from importcountries import main as import_countries
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # Parent Directory of this file
 
@@ -92,3 +92,6 @@ sp.run(
         f"backend/fixtures/{fname}.json" for fname in FIXTURES
     ]
 )
+
+# Import countries
+import_countries()
