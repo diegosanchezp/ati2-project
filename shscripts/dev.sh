@@ -45,8 +45,7 @@ create-app(){
 
 resetdb(){
   docker-compose stop django && \
-  dockerpy python shscripts/reset_db.py && \
-  docker-compose start django
+  dockerpy python shscripts/reset_db.py
 }
 
 # Docker related
