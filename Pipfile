@@ -15,6 +15,7 @@ whitenoise = "*"
 django-widget-tweaks = "*"
 argon2-cffi = "*"
 django-typomatic = "*"
+pillow = "*"
 
 [dev-packages]
 django-stubs = "*"

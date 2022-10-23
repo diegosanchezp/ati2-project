@@ -27,9 +27,13 @@ pip install --cache-dir "$PIPCACHE_DIR" pipenv && \
 pipenv install -d && \
 # Apply django migrations
 
+python shscripts/importcountries.py
+
 # back on backend dir
 pushd - && \
 
 python manage.py migrate && \
+
+pushd ./fixtures && \
 # Add predefined admin superuser for development
-python manage.py loaddata ./fixtures/admin.json
+python ../manage.py loaddata admin.json vehicle_model_brands.json
