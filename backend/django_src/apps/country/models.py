@@ -50,7 +50,7 @@ class Country(models.Model):
         blank=True,
     )
     def __str__(self) -> str:
-        return f"{self.continent} {self.name}"
+        return f"{self.continent} > {self.name}"
 
 class State(models.Model):
 
@@ -72,7 +72,7 @@ class State(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.name}"
+        return f"{self.country.name} > {self.name}"
 
 class City(models.Model):
 
@@ -89,4 +89,4 @@ class City(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.name}"
+        return f"{self.state.country.name} > {self.state.name} > {self.name}"
