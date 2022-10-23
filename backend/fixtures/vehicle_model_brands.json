@@ -1,0 +1,72 @@
+[
+{
+    "model": "vehicle.vehiclemodel",
+    "pk": 1,
+    "fields": {
+        "name": "Bronco",
+        "brand": 1
+    }
+},
+{
+    "model": "vehicle.vehiclemodel",
+    "pk": 2,
+    "fields": {
+        "name": "B-MAX",
+        "brand": 1
+    }
+},
+{
+    "model": "vehicle.vehiclemodel",
+    "pk": 3,
+    "fields": {
+        "name": "Cybertruck",
+        "brand": 2
+    }
+},
+{
+    "model": "vehicle.vehiclemodel",
+    "pk": 4,
+    "fields": {
+        "name": "Model S",
+        "brand": 2
+    }
+},
+{
+    "model": "vehicle.vehiclemodel",
+    "pk": 5,
+    "fields": {
+        "name": "Model 3",
+        "brand": 2
+    }
+},
+{
+    "model": "vehicle.vehiclemodel",
+    "pk": 6,
+    "fields": {
+        "name": "Model X",
+        "brand": 2
+    }
+},
+{
+    "model": "vehicle.vehiclemodel",
+    "pk": 7,
+    "fields": {
+        "name": "Model Y",
+        "brand": 2
+    }
+},
+{
+    "model": "vehicle.vehiclebrand",
+    "pk": 1,
+    "fields": {
+        "name": "Ford"
+    }
+},
+{
+    "model": "vehicle.vehiclebrand",
+    "pk": 2,
+    "fields": {
+        "name": "Tesla"
+    }
+}
+]

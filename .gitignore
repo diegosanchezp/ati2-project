@@ -269,7 +269,7 @@ Session.vim
 tags
 
 ### Project template
-lab_ati/media/
+backend/media/
 
 .pytest_cache/
 .ipython/
