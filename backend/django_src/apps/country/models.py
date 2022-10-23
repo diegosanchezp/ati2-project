@@ -36,9 +36,21 @@ class Country(models.Model):
         max_length=255,
         blank=True,
     )
-    
+
+    # Continent
+    continent=models.CharField(
+        verbose_name=_("Continent"),
+        max_length=255,
+        blank=True,
+    )
+
+    subregion=models.CharField(
+        verbose_name=_("Sub region"),
+        max_length=255,
+        blank=True,
+    )
     def __str__(self) -> str:
-        return f"{self.name}"
+        return f"{self.continent} {self.name}"
 
 class State(models.Model):
 

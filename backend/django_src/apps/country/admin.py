@@ -12,7 +12,7 @@ class StateInline(admin.StackedInline):
 class CountryAdmin(admin.ModelAdmin):
     """
     """
-    list_display = ("name", "iso3", "phonecode")
+    list_display = ("continent", "name", "iso3", "phonecode")
     inlines = [
         StateInline
     ]
