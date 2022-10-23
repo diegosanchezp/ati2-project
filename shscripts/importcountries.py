@@ -28,6 +28,7 @@ from django.apps import apps
 Country = apps.get_model('country', 'Country')
 State = apps.get_model('country', 'State')
 City = apps.get_model('country', 'City')
+Currency = apps.get_model('finance', 'Currency')
 
 def main(filename="countries+states+cities-small"):
     with open(settings.BASE_DIR / "fixtures" / f"{filename}.json", mode="r", encoding="utf-8") as f:
@@ -49,6 +50,13 @@ def main(filename="countries+states+cities-small"):
                 )
 
                 ctry.save()
+
+                # Currency
+                Currency.objects.get_or_create(
+                    name=country.get("currency_name"),
+                    code=country.get("currency"),
+                    country=ctry
+                )
 
                 for state in country["states"]:
                     s = State(
