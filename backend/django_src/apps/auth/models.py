@@ -45,6 +45,7 @@ class NaturalPerson(models.Model):
         on_delete=models.CASCADE,
         related_name="natural_person",
     )
+
     # cedula/pasaporte/DNI
     id_code = models.TextField(
         unique=True,
@@ -52,7 +53,14 @@ class NaturalPerson(models.Model):
     )
     email = models.EmailField(unique=True)
 
-    # country = 
+    # Pais de procedencia
+    country = models.ForeignKey(
+        to="country.Country",
+        on_delete=models.CASCADE,
+        verbose_name=_("Country of precedence"),
+        related_name="natural_people",
+    )
+
     def __str__(self) -> str:
         return f"{self.id_code} {self.user.first_name}"
     # country =  # Foreing Key
