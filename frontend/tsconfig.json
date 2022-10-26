@@ -3,7 +3,8 @@
     "target": "es5",
     "baseUrl": ".",
     "paths": {
-      "djtypes/*": ["../backend/tstypes/*"]
+      "djtypes/*": ["../backend/tstypes/*"],
+      "@/styles/*": ["styles/*"]
     },
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
