@@ -94,10 +94,11 @@ export function withAuth<P>(params: AuthRequiredParams<P>){
           djRequest: await client(context), // this probably has to change
         }
       );
-      console.log(pageProps);
+
       const {props, ...restPageProps} = pageProps;
       const propsResults = {
         props: {
+          locales: context.locales,
           ...props,
           session: session,
         },

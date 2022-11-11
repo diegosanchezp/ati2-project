@@ -1,11 +1,12 @@
 import React from "react";
-import Link from 'next/link';
 import {useRouter} from "next/router";
 import {djRequest} from "utils/apirest";
 import { Container, Header, Content, Navbar, Nav, Button } from 'rsuite';
 import {routes} from "utils/routes";
 import {useSession} from "auth";
+
 import {NavLink} from "components/NavLink";
+import { Dropdown } from 'rsuite';
 export type LayoutProps = {
   children: React.ReactNode
 }
@@ -14,6 +15,11 @@ export function Layout(props: LayoutProps){
   const {children} = props;
   const {session, dispatch} = useSession();
   const router = useRouter();
+
+
+  function switchLocale(eventKey: string){
+    router.push(router.route, router.route, {locale: eventKey})
+  }
 
   return (
     <Container>
@@ -27,12 +33,19 @@ export function Layout(props: LayoutProps){
             <Nav.Item as={NavLink} href="">Ayuda</Nav.Item>
             <Nav.Item as={NavLink} href="">Contáctenos</Nav.Item>
             <Nav.Item as={NavLink} href="">Conócenos más</Nav.Item>
-            <Nav.Item as={NavLink} href="">Idioma</Nav.Item>
+            <Dropdown title="Idioma" placement="bottomEnd" trigger={['click', 'hover']} >
+              <Dropdown.Item eventKey="es" onSelect={switchLocale}>
+                Español
+              </Dropdown.Item>
+              <Dropdown.Item eventKey="en" onSelect={switchLocale}>
+                Ingles
+              </Dropdown.Item>
+            </Dropdown>
           </Nav>
 
           <Nav pullRight>
             {session.user ?
-            <Nav.Menu title="Usuario">
+            <Nav.Menu title="Usuario" placement="bottomEnd" trigger="hover">
               <Nav.Item>Datos de usuario</Nav.Item>
               <Nav.Item
                 onClick={async ()=>{
