@@ -95,4 +95,6 @@ const LoginPage: NextPage = () => {
 export default LoginPage;
 
 
-export const getServerSideProps = withTranslations({});
+export const getServerSideProps = withTranslations({
+  folderPath: "auth"
+});

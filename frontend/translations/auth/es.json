@@ -1,0 +1,9 @@
+{
+  "LoginPage": {
+    "welcomeBack": "Bienvenido de vuelta",
+    "emailField": "Dirección de Email",
+    "passWordField": "Contraseña",
+    "forgotPass": "¿ Olvidaste tu contraseña ?",
+    "logIn": "Iniciar sesión"
+  }
+}

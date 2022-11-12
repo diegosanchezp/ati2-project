@@ -23,7 +23,7 @@
     "rsuite": "^5.18.1"
   },
   "devDependencies": {
-    "@types/node": "latest",
+    "@types/node": "^18.11.9",
     "@types/react": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",

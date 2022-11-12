@@ -16,12 +16,5 @@
     "register":"Sign in",
     "usuarioNavTitle": "User",
     "datosUsuario": "Your data"
-  },
-  "LoginPage": {
-    "welcomeBack": "Welcome back",
-    "emailField": "Email address",
-    "passWordField": "Password",
-    "forgotPass": "Forgot password ?",
-    "logIn": "Log in"
   }
 }

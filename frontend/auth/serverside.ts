@@ -1,6 +1,7 @@
 import type { GetServerSidePropsContext, GetServerSidePropsResult, NextApiRequest } from 'next'
 
 import {UserSerializer as User} from "djtypes/auth";
+import * as path from 'path';
 
 import {createRequester, djRequest} from "utils/apirest";
 import {splitCookiesString} from "./cookies";
@@ -66,14 +67,30 @@ type SSPandSession = GetServerSidePropsContext & {
 export type AuthRequiredParams<P> = {
   redirect?: string,
   getServerSideProps?: (context: SSPandSession) => GetServerSidePropsResult<P> | Promise<GetServerSidePropsResult<P>>
+  i18nFolder?: string,
 }
 
-async function getTransMessages(locale?: string){
-  return (await import(`../translations/${locale}.json`)).default;
+type getTransMessagesParams = {
+  folderPath?: string
+  locale?: string
+}
+
+async function getTransMessages(params: getTransMessagesParams){
+  const {folderPath = "", locale} = params;
+
+  const globalMessages = (
+    await import(`../translations/${locale}.json`)
+  ).default
+
+  const messages = (
+    await import(`../translations/${path.join(folderPath, `${locale}.json`)}`)
+  ).default
+
+  return {...globalMessages, ...messages};
 }
 
 export function withAuth<P>(params: AuthRequiredParams<P>){
-  const {redirect, getServerSideProps} = params;
+  const {redirect, getServerSideProps, i18nFolder} = params;
 
   return async function decoratedFn(context: GetServerSidePropsContext){
     const session = await getSession(context.req);
@@ -103,7 +120,10 @@ export function withAuth<P>(params: AuthRequiredParams<P>){
       const propsResults = {
         props: {
           locales: context.locales,
-          messages: await getTransMessages(context.locale),
+          messages: await getTransMessages({
+            locale: context.locale,
+            folderPath: i18nFolder,
+          }),
           ...props,
           session: session,
         },
@@ -121,15 +141,19 @@ export function withAuth<P>(params: AuthRequiredParams<P>){
 
 type withTranslationsParams<P> = {
   getServerSideProps?: (context: GetServerSidePropsContext) => GetServerSidePropsResult<P> | Promise<GetServerSidePropsResult<P>>
+  folderPath?: string
 }
 
 export function withTranslations<P>(params: withTranslationsParams<P>){
   return async function decoratedFn(context: GetServerSidePropsContext) {
 
-    const {getServerSideProps} = params;
+    const {getServerSideProps, folderPath} = params;
 
     const defaultPageProps = {
-      messages: await getTransMessages(context.locale),
+      messages: await getTransMessages({
+        locale: context.locale,
+        folderPath: folderPath
+      }),
     }
 
     if (!getServerSideProps){
