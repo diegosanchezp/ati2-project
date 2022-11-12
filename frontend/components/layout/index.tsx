@@ -1,6 +1,7 @@
 import React from "react";
 import {useRouter} from "next/router";
-import {djRequest} from "utils/apirest";
+import {djRequest, getCSRF} from "utils/apirest";
+import {ChangeLanguageBody} from "djtypes/auth";
 import { Container, Header, Content, Navbar, Nav, Button } from 'rsuite';
 import {routes} from "utils/routes";
 import {useSession} from "auth";
@@ -20,8 +21,30 @@ export function Layout(props: LayoutProps){
 
   const t = useTranslations('NavHeader');
 
-  function switchLocale(eventKey: string){
+  async function switchLocale(eventKey: string){
     router.push(router.route, router.route, {locale: eventKey})
+    if(!session.user){return}
+    const {csrfRes, csrfToken} = await getCSRF();
+    if(!csrfRes.ok){
+      console.error("Can't get csrf token");
+      return
+    }
+
+    const res = await djRequest(
+      'change_session_lang',
+      {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken as string,
+        },
+        body: JSON.stringify(
+          {
+            language: eventKey,
+          } as ChangeLanguageBody
+        )
+      }
+    )
+    console.log(res.ok)
   }
 
   return (
