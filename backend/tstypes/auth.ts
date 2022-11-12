@@ -21,3 +21,7 @@ export interface LoginRequestBody {
     password: string;
 }
 
+export interface ChangeLanguageBody {
+    language: "es" | "en";
+}
+

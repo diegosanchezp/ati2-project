@@ -17,12 +17,13 @@
     "less-loader": "^11.0.0",
     "mini-css-extract-plugin": "^2.6.1",
     "next": "latest",
+    "next-intl": "^2.9.1",
     "react": "latest",
     "react-dom": "latest",
     "rsuite": "^5.18.1"
   },
   "devDependencies": {
-    "@types/node": "latest",
+    "@types/node": "^18.11.9",
     "@types/react": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",

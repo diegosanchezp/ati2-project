@@ -25,7 +25,7 @@ export const createRequester = (baseUrl?: string, baseInit: RequestInit = {}) =>
 // TODO: env variable
 export const djRequest = createRequester("http://localhost:8000/api");
 // Pre configured function for making http request to next api routes, api base url is relative
-export const nextRequest = createRequester("api");
+export const nextRequest = createRequester("http://localhost:3000/api");
 
 
 export const getCSRF = async () => {

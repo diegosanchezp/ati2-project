@@ -71,4 +71,6 @@ API REST documentation is located at
 - [Nextjs](https://nextjs.org/docs) as the JS framework
 - [rsuiter](https://rsuitejs.com/) as the UI component library
 
+## Developer Documentation
 
+- [Frontend i18n](dev-docs/i18n.md)

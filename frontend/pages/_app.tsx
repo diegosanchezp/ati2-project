@@ -5,6 +5,8 @@ import {Session, SessionProvider} from "auth";
 import '../styles/global.less';
 import {Layout} from "components/layout";
 import { CustomProvider } from 'rsuite';
+import {NextIntlProvider} from 'next-intl';
+
 interface MyAppProps extends AppProps {
   pageProps: AppProps["pageProps"] & {
     session?: Session,
@@ -13,6 +15,7 @@ interface MyAppProps extends AppProps {
 
 export default function MyApp(props: MyAppProps) {
   const { Component, pageProps } = props;
+
   return (
      <>
       <Head>
@@ -20,9 +23,11 @@ export default function MyApp(props: MyAppProps) {
       </Head>
       <SessionProvider session={pageProps?.session}>
         <CustomProvider theme="dark" >
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+            <NextIntlProvider messages={pageProps.messages}>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </NextIntlProvider>
         </CustomProvider>
       </SessionProvider>
     </>

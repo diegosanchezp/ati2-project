@@ -3,7 +3,10 @@ import type { NextPage } from 'next';
 import {useRouter} from "next/router";
 import {nextRequest} from "utils/apirest";
 import {useSession} from "auth";
+import {withTranslations} from "utils/i18n";
+
 import {routes} from "utils/routes";
+import {useTranslations} from 'next-intl';
 import type {UserSerializer as User} from "djtypes/auth";
 import type {errorMsg, formError} from "types"
 import {
@@ -17,6 +20,8 @@ import Link from "next/link";
 const LoginPage: NextPage = () => {
   const {dispatch, session} = useSession();
   const router = useRouter();
+
+  const t = useTranslations('LoginPage');
 
   console.log(session);
   const toaster = useToaster();
@@ -50,7 +55,7 @@ const LoginPage: NextPage = () => {
 
     toaster.push(
       <Message duration={6000} closable type="success">
-        Welcome back {user?.last_name || user?.username}
+        {t('welcomeBack')} {user?.last_name || user?.username}
       </Message>,
       toasterPlacement,
     )
@@ -65,19 +70,19 @@ const LoginPage: NextPage = () => {
         <Panel header={<h3>Login</h3>} bordered>
           <Form fluid onSubmit={login}>
             <Form.Group>
-              <Form.ControlLabel>Email address</Form.ControlLabel>
+              <Form.ControlLabel>{t('emailField')}</Form.ControlLabel>
               <Form.Control name="email" placeholder="example@mail.com" required/>
             </Form.Group>
             <Form.Group>
-              <Form.ControlLabel>Password</Form.ControlLabel>
+              <Form.ControlLabel>{t('passWordField')}</Form.ControlLabel>
               <Form.Control name="password" type="password" placeholder="password" required />
             </Form.Group>
             <Form.Group>
               <ButtonToolbar>
-                <Button appearance="primary" type="submit">Sign in</Button>
+                <Button appearance="primary" type="submit">{t('logIn')}</Button>
                 <Link href={routes.recoverPassword}>
                   <a>
-                    <Button appearance="link">Forgot password?</Button>
+                    <Button appearance="link">{t('forgotPass')}</Button>
                   </a>
                 </Link>
               </ButtonToolbar>
@@ -90,3 +95,8 @@ const LoginPage: NextPage = () => {
 };
 
 export default LoginPage;
+
+
+export const getServerSideProps = withTranslations({
+  folderPath: "auth"
+});

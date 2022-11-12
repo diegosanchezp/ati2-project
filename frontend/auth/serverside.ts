@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext, GetServerSidePropsResult, NextApiRequest } from 'next'
 
 import {UserSerializer as User} from "djtypes/auth";
-
+import {getTransMessages} from "utils/i18n";
 import {createRequester, djRequest} from "utils/apirest";
 import {splitCookiesString} from "./cookies";
 
@@ -66,10 +66,12 @@ type SSPandSession = GetServerSidePropsContext & {
 export type AuthRequiredParams<P> = {
   redirect?: string,
   getServerSideProps?: (context: SSPandSession) => GetServerSidePropsResult<P> | Promise<GetServerSidePropsResult<P>>
+  i18nFolder?: string,
 }
 
+
 export function withAuth<P>(params: AuthRequiredParams<P>){
-  const {redirect, getServerSideProps} = params;
+  const {redirect, getServerSideProps, i18nFolder} = params;
 
   return async function decoratedFn(context: GetServerSidePropsContext){
     const session = await getSession(context.req);
@@ -94,10 +96,15 @@ export function withAuth<P>(params: AuthRequiredParams<P>){
           djRequest: await client(context), // this probably has to change
         }
       );
-      console.log(pageProps);
+
       const {props, ...restPageProps} = pageProps;
       const propsResults = {
         props: {
+          locales: context.locales,
+          messages: await getTransMessages({
+            locale: context.locale,
+            folderPath: i18nFolder,
+          }),
           ...props,
           session: session,
         },

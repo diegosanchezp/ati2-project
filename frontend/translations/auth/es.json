@@ -1,0 +1,14 @@
+{
+  "LoginPage": {
+    "welcomeBack": "Bienvenido de vuelta",
+    "emailField": "Dirección de Email",
+    "passWordField": "Contraseña",
+    "forgotPass": "¿ Olvidaste tu contraseña ?",
+    "logIn": "Iniciar sesión"
+  },
+  "RecoverPasswordPage": {
+    "recoverPassword":"Recuperar contraseña",
+    "emailField": "Dirección de Email",
+    "recoverBtn":"Recuperar"
+  }
+}

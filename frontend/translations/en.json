@@ -1,0 +1,20 @@
+{
+  "Index": {
+    "test": "test"
+  },
+  "NavHeader": {
+    "inicio": "Home",
+    "vehiculos": "Vehicles",
+    "servicios": "Services",
+    "empleo": "Employment",
+    "ayuda": "Help",
+    "contactenos": "Contact us",
+    "conocenosMas": "About us",
+    "idioma": "Language",
+    "cerrarSession": "Close session",
+    "iniciarSession": "Log in",
+    "register":"Sign in",
+    "usuarioNavTitle": "User",
+    "datosUsuario": "Your data"
+  }
+}

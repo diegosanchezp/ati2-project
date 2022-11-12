@@ -1,0 +1,20 @@
+{
+  "Index": {
+    "test": "prueba"
+  },
+  "NavHeader": {
+    "inicio": "Inicio",
+    "vehiculos": "Vehículos",
+    "servicios": "Servicios",
+    "empleo": "Empleo",
+    "ayuda": "Ayuda",
+    "contactenos": "Contáctenos",
+    "conocenosMas": "Conócenos más",
+    "idioma": "Idioma",
+    "cerrarSession": "Cerrar sesión",
+    "iniciarSession": "Iniciar sessión",
+    "register":"Registrarse",
+    "usuarioNavTitle": "Usuario",
+    "datosUsuario": "Datos de usuario"
+  }
+}
