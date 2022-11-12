@@ -2,7 +2,9 @@ import React from "react";
 import type { NextPage } from 'next';
 import {useRouter} from "next/router";
 import {nextRequest} from "utils/apirest";
-import {useSession, withTranslations} from "auth";
+import {useSession} from "auth";
+import {withTranslations} from "utils/i18n";
+
 import {routes} from "utils/routes";
 import {useTranslations} from 'next-intl';
 import type {UserSerializer as User} from "djtypes/auth";

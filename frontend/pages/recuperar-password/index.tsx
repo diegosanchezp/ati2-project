@@ -1,7 +1,7 @@
 import React from "react";
 import type { NextPage } from 'next';
 
-import {withTranslations} from "auth";
+import {withTranslations} from "utils/i18n";
 
 import {djRequest, getCSRF} from "utils/apirest";
 import {useTranslations} from 'next-intl';
