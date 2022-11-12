@@ -5,6 +5,8 @@ import { Container, Header, Content, Navbar, Nav, Button } from 'rsuite';
 import {routes} from "utils/routes";
 import {useSession} from "auth";
 
+import {useTranslations} from 'next-intl';
+
 import {NavLink} from "components/NavLink";
 import { Dropdown } from 'rsuite';
 export type LayoutProps = {
@@ -16,6 +18,7 @@ export function Layout(props: LayoutProps){
   const {session, dispatch} = useSession();
   const router = useRouter();
 
+  const t = useTranslations('NavHeader');
 
   function switchLocale(eventKey: string){
     router.push(router.route, router.route, {locale: eventKey})
@@ -26,27 +29,27 @@ export function Layout(props: LayoutProps){
       <Header>
         <Navbar appearance="inverse">
           <Nav>
-            <Nav.Item as={NavLink} href={routes.home}>Inicio</Nav.Item>
-            <Nav.Item as={NavLink} href="">Vehículos</Nav.Item>
-            <Nav.Item as={NavLink} href="">Servicios</Nav.Item>
-            <Nav.Item as={NavLink} href="">Empleo</Nav.Item>
-            <Nav.Item as={NavLink} href="">Ayuda</Nav.Item>
-            <Nav.Item as={NavLink} href="">Contáctenos</Nav.Item>
-            <Nav.Item as={NavLink} href="">Conócenos más</Nav.Item>
-            <Dropdown title="Idioma" placement="bottomEnd" trigger={['click', 'hover']} >
+            <Nav.Item as={NavLink} href={routes.home}>{t('inicio')}</Nav.Item>
+            <Nav.Item as={NavLink} href="">{t('vehiculos')}</Nav.Item>
+            <Nav.Item as={NavLink} href="">{t('servicios')}</Nav.Item>
+            <Nav.Item as={NavLink} href="">{t('empleo')}</Nav.Item>
+            <Nav.Item as={NavLink} href="">{t('ayuda')}</Nav.Item>
+            <Nav.Item as={NavLink} href="">{t('contactenos')}</Nav.Item>
+            <Nav.Item as={NavLink} href="">{t('conocenosMas')}</Nav.Item>
+            <Dropdown title={t('idioma')} placement="bottomEnd" trigger={['click', 'hover']} >
               <Dropdown.Item eventKey="es" onSelect={switchLocale}>
                 Español
               </Dropdown.Item>
               <Dropdown.Item eventKey="en" onSelect={switchLocale}>
-                Ingles
+                English
               </Dropdown.Item>
             </Dropdown>
           </Nav>
 
           <Nav pullRight>
             {session.user ?
-            <Nav.Menu title="Usuario" placement="bottomEnd" trigger="hover">
-              <Nav.Item>Datos de usuario</Nav.Item>
+            <Nav.Menu title={t('usuarioNavTitle')} placement="bottomEnd" trigger="hover">
+              <Nav.Item>{t('datosUsuario')}</Nav.Item>
               <Nav.Item
                 onClick={async ()=>{
                   await djRequest("logout");
@@ -54,16 +57,16 @@ export function Layout(props: LayoutProps){
                   router.push(routes.login);
                 }}
               >
-                Cerrar sesión
+                {t('cerrarSession')}
               </Nav.Item>
             </Nav.Menu>
             :
             <>
               <Nav.Item as={NavLink} href={routes.login}>
-                <Button color="orange" appearance="primary">Iniciar sessión</Button>
+                <Button color="orange" appearance="primary">{t('iniciarSession')}</Button>
               </Nav.Item>
               <Nav.Item>
-                <Button color="orange" appearance="primary">Registrarse</Button>
+                <Button color="orange" appearance="primary">{t('register')}</Button>
               </Nav.Item>
             </>
           }

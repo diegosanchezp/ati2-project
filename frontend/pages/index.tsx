@@ -18,12 +18,11 @@ export default Home;
 
 export const getServerSideProps = withAuth<HomePageProps>({
 
-	async getServerSideProps({user, locale, locales}){
+	async getServerSideProps({user}){
 
     return {
       props: {
         a: "a",
-        messages: (await import(`../translations/${locale}.json`)).default,
       },
     }
   }

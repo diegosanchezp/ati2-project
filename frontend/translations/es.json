@@ -1,5 +1,27 @@
 {
   "Index": {
     "test": "prueba"
+  },
+  "NavHeader": {
+    "inicio": "Inicio",
+    "vehiculos": "Vehículos",
+    "servicios": "Servicios",
+    "empleo": "Empleo",
+    "ayuda": "Ayuda",
+    "contactenos": "Contáctenos",
+    "conocenosMas": "Conócenos más",
+    "idioma": "Idioma",
+    "cerrarSession": "Cerrar sesión",
+    "iniciarSession": "Iniciar sessión",
+    "register":"Registrarse",
+    "usuarioNavTitle": "Usuario",
+    "datosUsuario": "Datos de usuario"
+  },
+  "LoginPage": {
+    "welcomeBack": "Bienvenido de vuelta",
+    "emailField": "Dirección de Email",
+    "passWordField": "Contraseña",
+    "forgotPass": "¿ Olvidaste tu contraseña ?",
+    "logIn": "Iniciar sesión"
   }
 }

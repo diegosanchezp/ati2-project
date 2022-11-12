@@ -15,6 +15,7 @@ interface MyAppProps extends AppProps {
 
 export default function MyApp(props: MyAppProps) {
   const { Component, pageProps } = props;
+
   return (
      <>
       <Head>
@@ -22,11 +23,11 @@ export default function MyApp(props: MyAppProps) {
       </Head>
       <SessionProvider session={pageProps?.session}>
         <CustomProvider theme="dark" >
-          <Layout>
             <NextIntlProvider messages={pageProps.messages}>
-              <Component {...pageProps} />
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
             </NextIntlProvider>
-          </Layout>
         </CustomProvider>
       </SessionProvider>
     </>

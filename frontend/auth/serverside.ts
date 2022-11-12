@@ -68,6 +68,10 @@ export type AuthRequiredParams<P> = {
   getServerSideProps?: (context: SSPandSession) => GetServerSidePropsResult<P> | Promise<GetServerSidePropsResult<P>>
 }
 
+async function getTransMessages(locale?: string){
+  return (await import(`../translations/${locale}.json`)).default;
+}
+
 export function withAuth<P>(params: AuthRequiredParams<P>){
   const {redirect, getServerSideProps} = params;
 
@@ -99,6 +103,7 @@ export function withAuth<P>(params: AuthRequiredParams<P>){
       const propsResults = {
         props: {
           locales: context.locales,
+          messages: await getTransMessages(context.locale),
           ...props,
           session: session,
         },
@@ -109,6 +114,38 @@ export function withAuth<P>(params: AuthRequiredParams<P>){
       return {
         props: {}
       } as GetServerSidePropsResult<P>
+    }
+  }
+}
+
+
+type withTranslationsParams<P> = {
+  getServerSideProps?: (context: GetServerSidePropsContext) => GetServerSidePropsResult<P> | Promise<GetServerSidePropsResult<P>>
+}
+
+export function withTranslations<P>(params: withTranslationsParams<P>){
+  return async function decoratedFn(context: GetServerSidePropsContext) {
+
+    const {getServerSideProps} = params;
+
+    const defaultPageProps = {
+      messages: await getTransMessages(context.locale),
+    }
+
+    if (!getServerSideProps){
+      return {
+        props: defaultPageProps,
+      } as GetServerSidePropsResult<P>
+    }
+
+    const {props, ...restProps} = await getServerSideProps(context);
+
+    return {
+      ...restProps,
+      props: {
+        ...defaultPageProps,
+        ...props,
+      }
     }
   }
 }
