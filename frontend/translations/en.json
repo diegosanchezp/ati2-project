@@ -16,5 +16,30 @@
     "register":"Sign in",
     "usuarioNavTitle": "User",
     "datosUsuario": "Your data"
+  },
+  "ContactUsPage":{
+    "telephone": "Telephone",
+    "publicAttention":"Public attention",
+    "mondayFriday": {
+      "days": "Monday to Friday",
+      "hours": "From 8 am to 12 m. And from 1pm to 5pm"
+    },
+    "satSunday": {
+      "days":"Saturdays and Sundays",
+      "hours":"From 8 am a 12 m. Y from 1pm to 5pm"
+    },
+    "eMail":"Electronic email",
+    "eMailQuestion":"Send your questions or observations to nirvana01@gmail.com",
+    "linksOfInterest":"Links of interest",
+    "faq":"Frequently asked questions",
+    "terms":"Terms of service",
+    "followUs":"Follow us on",
+    "contactForm": {
+      "header": "Contact form",
+      "for":"For",
+      "nameLastname":"Name and last name",
+      "subject":"Subject",
+      "send":"Send"
+    }
   }
 }
