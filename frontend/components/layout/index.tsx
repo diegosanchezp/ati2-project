@@ -57,7 +57,7 @@ export function Layout(props: LayoutProps){
             <Nav.Item as={NavLink} href="">{t('servicios')}</Nav.Item>
             <Nav.Item as={NavLink} href="">{t('empleo')}</Nav.Item>
             <Nav.Item as={NavLink} href="">{t('ayuda')}</Nav.Item>
-            <Nav.Item as={NavLink} href="">{t('contactenos')}</Nav.Item>
+            <Nav.Item as={NavLink} href={routes.contactUs}>{t('contactenos')}</Nav.Item>
             <Nav.Item as={NavLink} href="">{t('conocenosMas')}</Nav.Item>
             <Dropdown title={t('idioma')} placement="bottomEnd" trigger={['click', 'hover']} >
               <Dropdown.Item eventKey="es" onSelect={switchLocale}>
