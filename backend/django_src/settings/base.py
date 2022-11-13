@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "django_src.apps.finance.apps.FinanceConfig",
     "django_src.apps.vehicle.apps.VehicleConfig",
     "django_src.apps.country.apps.CountryConfig",
+    "django_src.apps.e_mail.apps.EMailConfig",
 
     # ---- Third party ----
     # API REST
