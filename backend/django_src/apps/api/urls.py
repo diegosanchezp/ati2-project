@@ -6,7 +6,7 @@ from drf_spectacular.views import (
 from rest_framework import routers
 
 from django.urls import path, include
-from . import views
+from .views import VehiclesView
 from rest_framework.routers import DefaultRouter, SimpleRouter
 from django.conf import settings
 from django_src.apps.auth.urls import urlpatterns as authurls
@@ -17,6 +17,7 @@ else:
     router = SimpleRouter()
 
 urlpatterns = [
+    path("vehicles/", VehiclesView.as_view(), name="vehicles_list"),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "docs/",
