@@ -29,6 +29,7 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
+    path("email/", include('django_src.apps.e_mail.urls'))
 ]
 
 urlpatterns += authurls

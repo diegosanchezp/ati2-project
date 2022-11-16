@@ -10,6 +10,8 @@
     "post-update": "echo \"codesandbox preview only, need an update\" && yarn upgrade --latest"
   },
   "dependencies": {
+    "@fortawesome/free-brands-svg-icons": "^6.2.0",
+    "@rsuite/icons": "^1.0.2",
     "backend": "*",
     "css-loader": "^6.7.1",
     "immutability-helper": "^3.1.1",

@@ -20,5 +20,30 @@
   "CommonButtons":{
     "continue":"Continuar",
     "previous":"Volver"
+  },
+  "ContactUsPage":{
+    "telephone": "Teléfonos",
+    "publicAttention":"Atención al público",
+    "mondayFriday": {
+      "days": "Lunes a Viernes",
+      "hours": "De 8 am a 12 m. Y de 1pm a 5pm"
+    },
+    "satSunday": {
+      "days":"Sábados y Domingo",
+      "hours":"De 8 am a 12 m. Y de 1pm a 5pm"
+    },
+    "eMail":"Correo electrónico",
+    "eMailQuestion":"Envíanos tus preguntas o comentarios a nirvana01@gmail.com",
+    "linksOfInterest":"Enlaces de interés",
+    "faq":"Preguntas Frecuentes",
+    "terms":"Términos de servicio",
+    "followUs":"Siguenos en",
+    "contactForm": {
+      "header": "Formulario de contacto",
+      "for":"Para",
+      "nameLastname":"Nombre y apellido",
+      "subject":"Asunto",
+      "send":"Enviar"
+    }
   }
 }
