@@ -88,7 +88,7 @@ export function Layout(props: LayoutProps){
               <Nav.Item as={NavLink} href={routes.login}>
                 <Button color="orange" appearance="primary">{t('iniciarSession')}</Button>
               </Nav.Item>
-              <Nav.Item>
+              <Nav.Item as={NavLink} href={routes.register}>
                 <Button color="orange" appearance="primary">{t('register')}</Button>
               </Nav.Item>
             </>

@@ -10,5 +10,16 @@
     "recoverPassword":"Recover password",
     "emailField": "Email address",
     "recoverBtn":"Recover"
+  },
+  "RegisterPage":{
+    "registerTitle": "Register panel",
+    "helpMessages1": "*Estos son los pasos a seguir para completar su registro.",
+    "helpMessages2": "*Si en algún momento necesita acceder a una sección del registro, haga clic en el panel de color verde, que sea de su preferencia",
+    "step1": "¿Cómo supo de nosotros?",
+    "step2": "Registrar usuario",
+    "step3": "Idioma del adiestramiento",
+    "step4": "Datos de inicio de sesión",
+    "step5": "Frecuencia e información a recibir",
+    "step6": "Datos de facturación"
   }
 }

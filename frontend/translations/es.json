@@ -16,5 +16,9 @@
     "register":"Registrarse",
     "usuarioNavTitle": "Usuario",
     "datosUsuario": "Datos de usuario"
+  },
+  "CommonButtons":{
+    "continue":"Continuar",
+    "previous":"Volver"
   }
 }

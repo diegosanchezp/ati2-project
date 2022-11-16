@@ -16,5 +16,9 @@
     "register":"Sign in",
     "usuarioNavTitle": "User",
     "datosUsuario": "Your data"
+  },
+  "CommonButtons":{
+    "continue":"Continue",
+    "previous":"Volver"
   }
 }
