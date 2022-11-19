@@ -161,12 +161,6 @@ class Vehicle(models.Model):
         null=True, 
     )
 
-    user_contact = models.ForeignKey(
-        to=settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="+",
-    )
-
     owner = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
         verbose_name=_("Vehicle owner"),
@@ -217,7 +211,7 @@ class Vehicle(models.Model):
         to="misc.Telephone",
         blank=True,
         null=True,
-        related_query_name="social_media"
+        related_query_name="pub_phone_numbers"
     )
 
     def __str__(self) -> str:
