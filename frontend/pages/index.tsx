@@ -23,6 +23,7 @@ export const getServerSideProps = withAuth<HomePageProps>({
     return {
       props: {
         a: "a",
+        user: user
       },
     }
   }

@@ -1,8 +1,8 @@
 import "@/styles/custom/index.less";
 import React from "react";
-import type { PageWithSession } from "types";
-//import PhoneInput from 'react-phone-input-2'
-//import 'react-phone-input-2/lib/style.css';
+import {withAuth, useSession} from "auth";
+import type {PageWithSession} from "types"
+
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
@@ -22,11 +22,10 @@ import {
   Uploader,
   useToaster,
 } from "rsuite";
-import { readFile } from "fs";
 
-type HomePageProps = {};
+type EditVehiclePageProps = {};
 
-const VehicleEditPage: PageWithSession<HomePageProps> = (props) => {
+const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   const toaster = useToaster();
 
   const [mobileNumberState, setMobileNumberState] = React.useState(false);
@@ -137,7 +136,6 @@ const VehicleEditPage: PageWithSession<HomePageProps> = (props) => {
       <FlexboxGrid.Item colspan={12} style={{ width: "100%" }}>
         <Panel header={<h3>Modificar publicación</h3>} bordered>
           <Form onSubmit={onSubmitEditVehicle}>
-            <input name="test" type={'file'}></input>
             <Grid>
               <Row gutter={16} style={{ marginBottom: 32 }}>
                 <FlexboxGrid justify="center">
@@ -650,3 +648,14 @@ const VehicleEditPage: PageWithSession<HomePageProps> = (props) => {
 };
 
 export default VehicleEditPage;
+
+export const getServerSideProps = withAuth<VehiclesPageProps>({
+
+	async getServerSideProps({user}){
+    return {
+      props: {
+        a: "a",
+      },
+    }
+  }
+})

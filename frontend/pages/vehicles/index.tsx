@@ -8,7 +8,12 @@ import {
   Button, Message, useToaster,
 } from "rsuite";
 
-const VehicleListPage: NextPage = (props) => {
+import {withAuth, useSession} from "auth";
+import type {PageWithSession} from "types"
+
+type VehiclesPageProps = {};
+
+const VehicleListPage: PageWithSession<VehiclesPageProps> = (props) => {
   const toaster = useToaster();
 
   const toastOptions = {
@@ -26,3 +31,14 @@ const VehicleListPage: NextPage = (props) => {
 };
 
 export default VehicleListPage
+
+export const getServerSideProps = withAuth<VehiclesPageProps>({
+
+	async getServerSideProps({user}){
+    return {
+      props: {
+        a: "a",
+      },
+    }
+  }
+})

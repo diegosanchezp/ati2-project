@@ -92,7 +92,7 @@ class Vehicle(models.Model):
 
     contact_days = models.JSONField(
         verbose_name="Contact days",
-        help_text=_("JSON Array of contact days, ex: [\"monday\", \"tuesday\"]")
+        help_text=_("JSON Array of contact days, ex: [\"monday\", \"tuesday\"]"),
     )
 
     contact_hour_from = models.TimeField(
@@ -113,21 +113,21 @@ class Vehicle(models.Model):
     )
     status = models.CharField(
         choices=Status.choices,
-        max_length=4
+        max_length=4,
     )
 
     details = models.TextField(
-        blank=True,
+        blank=True, 
         verbose_name=_("Details"),
     )
 
     accessories = models.TextField(
         verbose_name=_("Accessories "),
-        blank=True
+        blank=True, 
     )
     services = models.TextField(
         verbose_name=_("Services to date"),
-        blank=True
+        blank=True, 
     )
 
     location_city = models.ForeignKey(
@@ -135,11 +135,18 @@ class Vehicle(models.Model):
         on_delete=models.CASCADE,
         verbose_name=_("Location City"),
         related_name="vehicles",
+        blank=True,
+        null=True
+    )
+
+    location_zone = models.TextField(
+        verbose_name=_("Location Zone"),
+        blank=True,
     )
 
     exact_location = models.TextField(
         verbose_name=_("Exact location"),
-        blank=True
+        blank=True,
     )
 
     rental_price = models.FloatField(
@@ -150,8 +157,8 @@ class Vehicle(models.Model):
 
     sale_price = models.FloatField(
         verbose_name=_("Sale price of the vehicle"),
-        blank=True,
-        null=True,
+        blank=True, 
+        null=True, 
     )
 
     user_contact = models.ForeignKey(
@@ -174,6 +181,13 @@ class Vehicle(models.Model):
         related_name="vehicles",
     )
 
+    brand = models.ForeignKey(
+        verbose_name=_("Vehicle Brand"),
+        to="VehicleBrand",
+        on_delete=models.CASCADE,
+        related_name="vehicles",
+    )
+
     currency = models.ForeignKey(
         verbose_name=_("Currency for prices"),
         to="finance.Currency",
@@ -181,6 +195,36 @@ class Vehicle(models.Model):
         null=True,
         on_delete=models.SET_NULL
     )
+
+    """contact_first_name = models.TextField(
+        verbose_name=_("Contact First Name"),
+        blank=True, 
+        null=True
+    )
+
+    contact_last_name = models.TextField(
+        verbose_name=_("Contact Last Name"),
+        blank=True, 
+        null=True
+    )
+
+    contact_email = models.TextField(
+        verbose_name=_("Contact Email"),
+        blank=True, 
+        null=True
+    )
+
+    contact_phone = models.TextField(
+        verbose_name=_("Contact Phone"),
+        blank=True, 
+        null=True
+    )
+
+    contact_mobile = models.TextField(
+        verbose_name=_("Contact Mobile"),
+        blank=True, 
+        null=True
+    )"""
 
     def __str__(self) -> str:
         return f"{self.model.brand.name} {self.model.name} {self.year}"
