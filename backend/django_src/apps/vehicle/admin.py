@@ -1,5 +1,7 @@
 from django.contrib import admin
 from . import models
+from django.contrib.contenttypes.admin import GenericStackedInline
+from django_src.apps.misc.models import Telephone
 # Register your models here.
 
 admin.site.register(models.VehicleVideos)
@@ -16,6 +18,10 @@ class VehicleVideoInline(admin.StackedInline):
 
 class VehicleModelInline(admin.StackedInline):
     model = models.VehicleModel
+    extra = 1
+
+class VehicleTelephonesInline(GenericStackedInline):
+    model = Telephone
     extra = 1
 
 @admin.register(models.VehicleBrand)
@@ -40,4 +46,5 @@ class VehicleAdmin(admin.ModelAdmin):
     inlines = [
         VehicleImageInline,
         VehicleVideoInline,
+        VehicleTelephonesInline,
     ]

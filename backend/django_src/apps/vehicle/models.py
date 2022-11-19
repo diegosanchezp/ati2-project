@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-
+from django.contrib.contenttypes.fields import GenericRelation
 # Doesnt werks
 # def user_directory_path(dir_name: str):
 #     def fn(instance, filename):
@@ -196,35 +196,29 @@ class Vehicle(models.Model):
         on_delete=models.SET_NULL
     )
 
-    """contact_first_name = models.TextField(
+    contact_first_name = models.CharField(
         verbose_name=_("Contact First Name"),
-        blank=True, 
-        null=True
+        max_length=255,
+        blank=True,
     )
 
-    contact_last_name = models.TextField(
+    contact_last_name = models.CharField(
         verbose_name=_("Contact Last Name"),
-        blank=True, 
-        null=True
+        max_length=255,
+        blank=True,
     )
 
-    contact_email = models.TextField(
+    contact_email = models.EmailField(
         verbose_name=_("Contact Email"),
-        blank=True, 
-        null=True
+        blank=True,
     )
 
-    contact_phone = models.TextField(
-        verbose_name=_("Contact Phone"),
-        blank=True, 
-        null=True
+    contact_phone_numbers  = GenericRelation(
+        to="misc.Telephone",
+        blank=True,
+        null=True,
+        related_query_name="social_media"
     )
-
-    contact_mobile = models.TextField(
-        verbose_name=_("Contact Mobile"),
-        blank=True, 
-        null=True
-    )"""
 
     def __str__(self) -> str:
         return f"{self.model.brand.name} {self.model.name} {self.year}"
