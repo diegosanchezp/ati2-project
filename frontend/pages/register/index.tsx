@@ -58,7 +58,8 @@ const RegisterPage: NextPage = () => {
   return (
     <FlexboxGrid justify="center">
       <FlexboxGrid.Item colspan={18}>
-        <Panel header={<h3>{t('registerTitle')}</h3>} bordered>
+        <Panel 
+        header={<h4>{t('registerTitle')}</h4>} bordered>
           <div>
             <p>{t('helpMessages1')}</p>
             <p>{t('helpMessages2')}</p>

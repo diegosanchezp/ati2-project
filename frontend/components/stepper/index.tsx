@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { Panel, Row, Col, Button, Grid } from 'rsuite';
+import { Panel, Row, Col, Grid,  Notification, useToaster } from 'rsuite';
+import Step1 from './steps/step1';
+import Step2 from './steps/step2';
+import Step3 from './steps/step3';
+import Step4 from './steps/step4';
+import Step5 from './steps/step5';
+import Step6 from './steps/step6';
 import {useTranslations} from 'next-intl';
 
 const StepperStyles = {
@@ -17,27 +23,63 @@ const StepperStyles = {
 
 export default function Stepper({ steps }){
   const [actualStep, setActualStep] = useState(0);
-  const translationButtons = useTranslations('CommonButtons');
-
-  const handleNextStep = () => {
+  const [informed, setInformed] = useState(false);
+  const toaster = useToaster();
+  const translationButtons = useTranslations('RegisterPage');
+  const handleNextStep = (values:any) => {
+    if(values.hasOwnProperty('informedCheck') && !values.informedCheck){
+        setActualStep(actualStep => actualStep + 2);
+        setInformed(false);
+        return
+    }
     if(actualStep + 1 < steps.length){
         setActualStep(actualStep => actualStep + 1);
     }
   }
 
   const backToStep = (index: number) => {
+    if(index === 4 && !informed){
+        toaster.push(message, { placement:'topEnd' })
+        return
+    }
     if(index <= actualStep){
         setActualStep(index);
     }
   }
 
+  const handleBackStep = () => {
+    if(actualStep - 1 >= 0){
+        setActualStep(actualStep => actualStep - 1);
+    }
+  }
+
+  const componentsSteps = {
+    step1: <Step1 stepTitle={steps[0].name} handleNext={handleNextStep} handleBack={handleBackStep} />,
+    step2: <Step2 stepTitle={steps[1].name} handleNext={handleNextStep} handleBack={handleBackStep} />,
+    step3: <Step3 stepTitle={steps[2].name} handleNext={handleNextStep} handleBack={handleBackStep}/>,
+    step4: <Step4 stepTitle={steps[3].name} handleNext={handleNextStep} handleBack={handleBackStep} />,
+    step5: <Step5 stepTitle={steps[4].name} handleNext={handleNextStep} handleBack={handleBackStep}/>,
+    step6: <Step6 stepTitle={steps[5].name} handleNext={handleNextStep} handleBack={handleBackStep}/>
+  }
+
+  const message = (
+    <Notification 
+        type={'info'} 
+        header={translationButtons('infoFrecuency')} 
+        closable>
+
+    </Notification>
+  );
+
   return (
-    <Grid fluid>
+    <Grid fluid className="stepper">
         <Row gutter={24}>
             {
-                steps.map((step,index) => (
-                    <Col md={8} sm={12} style={{padding:4}}>
+                steps.map((step:any,index:number) => (
+                    <Col key={index} md={8} sm={12} style={{padding:4}}>
                         <Panel 
+                            key={index}
+                            className='stepper-panel'
                             onClick={()=>{backToStep(index)}}
                             style={actualStep >= index ? StepperStyles.selectedPanel: {}}
                             bordered>
@@ -50,22 +92,8 @@ export default function Stepper({ steps }){
             }
         </Row>
         <Row>
-            <Col md={2}>
-                <Button style={{marginTop:'15px'}} color="red" appearance="primary" onClick={handleNextStep}>
-                    {translationButtons('previous')}
-                </Button>
-            </Col>
-            <Col md={20}>
-                <Panel style={{backgroundColor:'rgb(0,176,240)'}} bordered>
-                    <h6 style={{textAlign:'center'}}>
-                        {steps[actualStep].name}
-                    </h6>
-                </Panel>
-            </Col>
-            <Col md={2}>
-                <Button style={{marginTop:'15px'}} color="red" appearance="primary" onClick={handleNextStep}>
-                    {translationButtons('continue')}
-                </Button>
+            <Col md={24}>
+                {componentsSteps[steps[actualStep].component]}
             </Col>
         </Row>  
     </Grid>        
