@@ -17,6 +17,10 @@
     "usuarioNavTitle": "Usuario",
     "datosUsuario": "Datos de usuario"
   },
+  "CommonButtons":{
+    "continue":"Continuar",
+    "previous":"Volver"
+  },
   "ContactUsPage":{
     "telephone": "Teléfonos",
     "publicAttention":"Atención al público",
