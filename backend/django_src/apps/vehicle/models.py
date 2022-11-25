@@ -69,6 +69,11 @@ class VehicleModel(models.Model):
         return f"{self.brand.name} {self.name}"
 
 class Vehicle(models.Model):
+    class TypeVehicle(models.TextChoices):
+        TRUCK = "TRUCK", _("Truck")
+        CAR = "CAR", _("Car")
+        VAN = "VAN", _("Van")
+
     class Status(models.TextChoices):
         NEW = "NEW", _("New")
         USED = "USED", _("Used")
@@ -89,6 +94,12 @@ class Vehicle(models.Model):
         SUNDAY = "SUNDAY", _("Sunday")
         WEEKENDS = "WEEKENDS", _("Weekends")
         MONDAY_TO_FRIDAY = "MONDAY_TO_FRIDAY", _("Monday to friday")
+
+    type_vehicle = models.CharField(
+        max_length=5,
+        choices=TypeVehicle.choices,
+        default='CAR'
+    )
 
     contact_days = models.JSONField(
         verbose_name="Contact days",
