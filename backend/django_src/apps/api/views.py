@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 
 from ..vehicle.models import Vehicle
+from .serializers import VehicleListSerializer
 
 class VehiclesView(APIView):
     def get(self, request, format = None):
@@ -61,14 +62,16 @@ class VehiclesView(APIView):
         page_number = request.GET.get("page", 1)
         page_quantity = request.GET.get("page_quantity", 10)
 
-        vehicles = Vehicle.objects.filter(filters).values()
+        vehicles = Vehicle.objects.select_related("currency")\
+            .filter(filters)
+
         paginator = Paginator(vehicles, page_quantity)
         page_obj = paginator.get_page(page_number)
 
-        response = {
+        serializer = VehicleListSerializer({
             "data": list(page_obj),
             "total_pages": paginator.num_pages,
             "total_elements": len(vehicles)
-        }
+        })
 
-        return Response(response)
+        return Response(serializer.data)
