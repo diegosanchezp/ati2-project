@@ -8,6 +8,7 @@ import "react-phone-number-input/style.css";
 
 import CameraRetroIcon from "@rsuite/icons/legacy/CameraRetro";
 import {
+  CheckboxGroup,
   Checkbox,
   Col,
   FlexboxGrid,
@@ -28,18 +29,21 @@ import {
   getVehiclesBrands,
   getVehiclesModels,
   createVehicle,
+  getVehicle,
 } from "pages/api/vehicle";
 import { getCurrencies } from "pages/api/finance";
 import dayjs from "dayjs";
+import { useRouter } from "next/router";
 
-type CreateVehiclePageProps = {};
+type EditVehiclePageProps = {};
 
-const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
+const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   const toaster = useToaster();
+  const router = useRouter();
 
   const continents = [
     {
-      label: "America",
+      label: "Americas",
       value: "Americas",
     },
     {
@@ -48,7 +52,7 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
     },
     {
       label: "Oceania",
-      value: "oOeania",
+      value: "Oceania",
     },
     {
       label: "Europe",
@@ -156,12 +160,12 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
     setShowVideosState(_value);
   }
 
-  function onChangeMobile(_: any, checked: Boolean) {
-    setMobileNumberState(checked);
+  function onChangeMobile(_: any, checked: boolean) {
+    setMobileNumberState(() => checked);
   }
 
-  function onChangePhone(_: any, checked: Boolean) {
-    setPhoneNumberState(checked);
+  function onChangePhone(_: any, checked: boolean) {
+    setPhoneNumberState(() => checked);
   }
 
   function onUploadVehicleImages(_list: any) {
@@ -189,7 +193,6 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
             vehicleImagesReaders.push(_reader.result);
           };
         });
-        console.log(vehicleImagesReaders);
         _createVehicleRequest = {
           ..._createVehicleRequest,
           vehicle_images: vehicleImagesReaders,
@@ -238,7 +241,7 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
         ..._createVehicleRequest,
         contact_hour_from: dayjs(
           `01-01-01 ${_createVehicleRequest.contact_hour_from}:00 ${_createVehicleRequest.contact_hour_from_system}`
-        ).format("HH:mm"),
+        ).format("HH"),
       };
     }
 
@@ -250,7 +253,7 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
         ..._createVehicleRequest,
         contact_hour_to: dayjs(
           `01-01-01 ${_createVehicleRequest.contact_hour_to}:00 ${_createVehicleRequest.contact_hour_to_system}`
-        ).format("HH:mm"),
+        ).format("HH"),
       };
     }
 
@@ -275,21 +278,18 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
       _createVehicleRequest = {
         ..._createVehicleRequest,
         year: dayjs()
-          .set("month", _createVehicleRequest.year)
-          .format("YYYY-MM-DD"),
+          .set("year", _createVehicleRequest.year)
+          .format("YYYY"),
       };
     }
 
     _createVehicleRequest = {
       ..._createVehicleRequest,
       owner: props.session.user.id,
-      user_contact: props.session.user.id,
       status: "NEW",
       accessories: "something",
       services: "something",
     };
-
-    console.log(_createVehicleRequest);
 
     await createVehicle(_createVehicleRequest);
   }
@@ -365,7 +365,7 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
 
   async function getInitialData() {
     const countries = await getCountries();
-    if (countries) setCountriesState(
+    setCountriesState(
       countries.map((country: any) => ({
         label: country.name,
         value: country.id,
@@ -373,7 +373,7 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
     );
 
     const vehicleBrands = await getVehiclesBrands();
-    if (vehicleBrands) setVehicleBrandsState(
+    setVehicleBrandsState(
       vehicleBrands.map((brand: any) => ({
         label: brand.name,
         value: brand.id,
@@ -381,7 +381,7 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
     );
 
     const vehicleModels = await getVehiclesModels();
-    if (vehicleModels) setVehicleModelsState(
+    setVehicleModelsState(
       vehicleModels.map((model: any) => ({
         label: model.name,
         value: model.id,
@@ -389,7 +389,7 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
     );
 
     const currencies = await getCurrencies();
-    if(currencies) setCurrenciesState(
+    setCurrenciesState(
       currencies.map((currency: any) => ({
         label: `${currency.name} - ${currency.code}`,
         value: currency.id,
@@ -397,53 +397,108 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
     );
 
     getYearsList(1970, parseInt(dayjs().format("YYYY")));
+
+    const vehicleData = await getVehicle(`${router.query.vehicleId}`);
+    console.log(vehicleData);
+    if (vehicleData) {
+      setCreateVehicleRequestState(() => ({
+        ...vehicleData.vehicle,
+        year: vehicleData.vehicle
+          ? parseInt(dayjs(vehicleData.vehicle.year).format("YYYY"))
+          : null,
+        contact_hour_from: vehicleData.vehicle
+          ? dayjs(`2022-01-01 ${vehicleData.vehicle.contact_hour_from}`).format(
+              "HH"
+            )
+          : null,
+        contact_hour_from_system: vehicleData.vehicle
+          ? dayjs(`2022-01-01 ${vehicleData.vehicle.contact_hour_from}`).format(
+              "a"
+            )
+          : null,
+        contact_hour_to: vehicleData.vehicle
+          ? dayjs(`2022-01-01 ${vehicleData.vehicle.contact_hour_to}`).format(
+              "HH"
+            )
+          : null,
+        contact_hour_to_system: vehicleData.vehicle
+          ? dayjs(`2022-01-01 ${vehicleData.vehicle.contact_hour_to}`).format(
+              "a"
+            )
+          : null,
+      }));
+      setCountriesState(() =>
+        vehicleData.countries
+          ? vehicleData.countries.map((country: any) => ({
+              label: country.name,
+              value: country.id,
+            }))
+          : []
+      );
+      setStatesState(() =>
+        vehicleData.states
+          ? vehicleData.states.map((state: any) => ({
+              label: state.name,
+              value: state.id,
+            }))
+          : []
+      );
+      setCitiesState(() =>
+        vehicleData.cities
+          ? vehicleData.cities.map((city: any) => ({
+              label: city.name,
+              value: city.id,
+            }))
+          : []
+      );
+    }
   }
 
   async function onChangeCountry(_countryId: number) {
-    const states = await getStates(_countryId);
-    setStatesState(
-      states.map((state: any) => ({
-        label: state.name,
-        value: state.id,
-      }))
-    );
+    onChangeCreateVehicleRequest(_countryId, "location_country");
+    if (_countryId) {
+      const states = await getStates(_countryId);
+      setStatesState(
+        states.map((state: any) => ({
+          label: state.name,
+          value: state.id,
+        }))
+      );
+    }
   }
 
   async function onChangeState(_stateId: number) {
-    const cities = await getCities(_stateId);
-    setCitiesState(
-      cities.map((city: any) => ({
-        label: city.name,
-        value: city.id,
-      }))
-    );
+    onChangeCreateVehicleRequest(_stateId, "location_state");
+    if (_stateId) {
+      const cities = await getCities(_stateId);
+      setCitiesState(
+        cities.map((city: any) => ({
+          label: city.name,
+          value: city.id,
+        }))
+      );
+    }
   }
 
   async function onChangeCity(_cityId: number) {
-    setCreateVehicleRequestState((prevState: any) => ({
-      ...prevState,
-      location_city: _cityId,
-    }));
+    onChangeCreateVehicleRequest(_cityId, "location_city");
+    if (_cityId)
+      setCreateVehicleRequestState((prevState: any) => ({
+        ...prevState,
+        location_city: _cityId,
+      }));
   }
 
   function onChangeCreateVehicleRequest(_value: any, _field: string) {
     let _createVehicleRequest = createVehicleRequestState;
     _createVehicleRequest[_field] = _value;
-    setCreateVehicleRequestState(() => _createVehicleRequest);
+    setCreateVehicleRequestState((...prevState) => ({..._createVehicleRequest, ...prevState}));
   }
 
-  function onChangeContactDays(_value: any, _day: string) {
-    let _contactDays = createVehicleRequestState.contact_days;
-    const _dayIndex = _contactDays ? _contactDays.indexOf(_day) : -1;
-
-    if (!_contactDays || _dayIndex == -1) {
-      _contactDays = _contactDays ?? [];
-      _contactDays.push(_day);
-    } else _contactDays.splice(_dayIndex, 1);
-
+  function onChangeContactDays(_value: any) {
     setCreateVehicleRequestState((prevState: any) => ({
       ...prevState,
-      contact_days: _contactDays,
+      contact_days: _value,
     }));
   }
 
@@ -468,7 +523,7 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
       style={{ marginTop: 40, paddingRight: 20, paddingLeft: 20 }}
     >
       <FlexboxGrid.Item colspan={12} style={{ width: "100%" }}>
-        <Panel header={<h3>Crear publicación</h3>} bordered>
+        <Panel header={<h3>Editar publicación</h3>} bordered>
           <Form onSubmit={onSubmitCreateVehicle}>
             <Grid>
               <Row gutter={16} style={{ marginBottom: 32 }}>
@@ -494,8 +549,16 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                           name="continent"
                           placeholder="Selecciona un continente"
                           data={continentsState}
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.location_continent
+                              : null
+                          }
                           onChange={(_value: any) =>
-                            onChangeCreateVehicleRequest(_value, "continent")
+                            onChangeCreateVehicleRequest(
+                              _value,
+                              "location_continent"
+                            )
                           }
                         />
                       </Form.Group>
@@ -513,6 +576,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                           name="country"
                           placeholder="Selecciona un país"
                           data={countriesState}
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.location_country
+                              : null
+                          }
                           onChange={onChangeCountry}
                         />
                       </Form.Group>
@@ -530,6 +598,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                           name="state"
                           placeholder="Selecciona un estado"
                           data={statesState}
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.location_state
+                              : null
+                          }
                           onChange={onChangeState}
                         />
                       </Form.Group>
@@ -547,6 +620,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                           name="city"
                           placeholder="Selecciona una ciudad"
                           data={citiesState}
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.location_city
+                              : null
+                          }
                           onChange={onChangeCity}
                         />
                       </Form.Group>
@@ -563,6 +641,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                         <Form.Control
                           name="zone"
                           style={{ maxWidth: "100%" }}
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.location_zone
+                              : ""
+                          }
                           onChange={(_value: any) =>
                             onChangeCreateVehicleRequest(
                               _value,
@@ -583,6 +666,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                         </Form.ControlLabel>
                         <RadioGroup
                           name="contract"
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.contract_type
+                              : null
+                          }
                           onChange={(_value: any) =>
                             onChangeCreateVehicleRequest(
                               _value,
@@ -622,6 +710,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                           name="brand"
                           placeholder="Selecciona una marca"
                           data={vehicleBrandsState}
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.brand
+                              : null
+                          }
                           onChange={(_value: any) =>
                             onChangeCreateVehicleRequest(_value, "brand")
                           }
@@ -641,6 +734,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                           name="model"
                           placeholder="Selecciona un modelo"
                           data={vehicleModelsState}
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.model
+                              : null
+                          }
                           onChange={(_value: any) =>
                             onChangeCreateVehicleRequest(_value, "model")
                           }
@@ -660,6 +758,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                           name="year"
                           placeholder="Selecciona un año"
                           data={yearsState}
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.year
+                              : null
+                          }
                           onChange={(_value: any) =>
                             onChangeCreateVehicleRequest(_value, "year")
                           }
@@ -818,6 +921,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                   <Input
                     name="moreDetails"
                     as="textarea"
+                    value={
+                      createVehicleRequestState
+                        ? createVehicleRequestState.details
+                        : null
+                    }
                     onChange={(_value: any) =>
                       onChangeCreateVehicleRequest(_value, "details")
                     }
@@ -837,6 +945,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                   <Input
                     name="location"
                     as="textarea"
+                    value={
+                      createVehicleRequestState
+                        ? createVehicleRequestState.exact_location
+                        : null
+                    }
                     onChange={(_value: any) =>
                       onChangeCreateVehicleRequest(_value, "exact_location")
                     }
@@ -853,6 +966,12 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                     <Form.Control
                       name="price"
                       type="number"
+                      value={
+                        createVehicleRequestState
+                          ? createVehicleRequestState.sale_price ||
+                            createVehicleRequestState.rental_price
+                          : null
+                      }
                       onChange={(_value: any) =>
                         onChangeCreateVehicleRequest(_value, "price")
                       }
@@ -865,6 +984,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                     <SelectPicker
                       name="currency"
                       placeholder="Selecciona una moneda"
+                      value={
+                        createVehicleRequestState
+                          ? createVehicleRequestState.currency
+                          : null
+                      }
                       onChange={(_value: any) =>
                         onChangeCreateVehicleRequest(_value, "currency")
                       }
@@ -896,6 +1020,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                     <Form.Control
                       name="contactName"
                       placeholder="Jesús Antonio"
+                      value={
+                        createVehicleRequestState
+                          ? createVehicleRequestState.contact_first_name
+                          : null
+                      }
                       onChange={(_value: any) =>
                         onChangeCreateVehicleRequest(
                           _value,
@@ -909,6 +1038,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                     <Form.Control
                       name="contactLastName"
                       placeholder="Perez Castillo"
+                      value={
+                        createVehicleRequestState
+                          ? createVehicleRequestState.contact_last_name
+                          : null
+                      }
                       onChange={(_value: any) =>
                         onChangeCreateVehicleRequest(
                           _value,
@@ -922,6 +1056,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                     <Form.Control
                       name="contactEmail"
                       placeholder="jesusp@test.com"
+                      value={
+                        createVehicleRequestState
+                          ? createVehicleRequestState.contact_email
+                          : null
+                      }
                       onChange={(_value: any) =>
                         onChangeCreateVehicleRequest(_value, "contact_email")
                       }
@@ -962,65 +1101,31 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                   </FlexboxGrid>
 
                   <FlexboxGrid justify="center">
-                    <Grid style={{ width: "auto" }}>
-                      <Col xs={6}>
-                        <Checkbox
-                          onChange={(_value: any) =>
-                            onChangeContactDays(_value, "MONDAY")
-                          }
-                        >
-                          Lunes
-                        </Checkbox>
-                        <Checkbox
-                          onChange={(_value: any) =>
-                            onChangeContactDays(_value, "FRIDAY")
-                          }
-                        >
-                          Viernes
-                        </Checkbox>
-                      </Col>
-                      <Col xs={6}>
-                        <Checkbox
-                          onChange={(_value: any) =>
-                            onChangeContactDays(_value, "TUESDAY")
-                          }
-                        >
-                          Martes
-                        </Checkbox>
-                        <Checkbox
-                          onChange={(_value: any) =>
-                            onChangeContactDays(_value, "SATURDAY")
-                          }
-                        >
-                          Sábado
-                        </Checkbox>
-                      </Col>
-                      <Col xs={6}>
-                        <Checkbox
-                          onChange={(_value: any) =>
-                            onChangeContactDays(_value, "WEDNESDAY")
-                          }
-                        >
-                          Miércoles
-                        </Checkbox>
-                        <Checkbox
-                          onChange={(_value: any) =>
-                            onChangeContactDays(_value, "SUNDAY")
-                          }
-                        >
-                          Domingo
-                        </Checkbox>
-                      </Col>
-                      <Col xs={6}>
-                        <Checkbox
-                          onChange={(_value: any) =>
-                            onChangeContactDays(_value, "THURSDAY")
-                          }
-                        >
-                          Jueves
-                        </Checkbox>
-                      </Col>
-                    </Grid>
+                    <CheckboxGroup
+                      value={createVehicleRequestState 
+                        ? createVehicleRequestState.contact_days
+                        : [] 
+                      }
+                      onChange={(_value: any) => onChangeContactDays(_value)}
+                    >
+                      <Grid style={{ width: "auto" }}>
+                        <Col xs={6}>
+                          <Checkbox value="monday">Lunes</Checkbox>
+                          <Checkbox value="friday">Viernes</Checkbox>
+                        </Col>
+                        <Col xs={6}>
+                          <Checkbox value="tuesday">Martes</Checkbox>
+                          <Checkbox value="saturday">Sábado</Checkbox>
+                        </Col>
+                        <Col xs={6}>
+                          <Checkbox value="wednesday">Miércoles</Checkbox>
+                          <Checkbox value="sunday">Domingo</Checkbox>
+                        </Col>
+                        <Col xs={6}>
+                          <Checkbox value="thursday">Jueves</Checkbox>
+                        </Col>
+                      </Grid>
+                    </CheckboxGroup>
                   </FlexboxGrid>
                   <FlexboxGrid justify="center">
                     <p
@@ -1041,6 +1146,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                         <SelectPicker
                           name="startContactTime"
                           placeholder="Selecciona una hora"
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.contact_hour_from
+                              : null
+                          }
                           onChange={(_value: any) =>
                             onChangeCreateVehicleRequest(
                               _value,
@@ -1053,6 +1163,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                       <SelectPicker
                         name="startTimeSystem"
                         placeholder="am"
+                        value={
+                          createVehicleRequestState
+                            ? createVehicleRequestState.contact_hour_from_system
+                            : null
+                        }
                         onChange={(_value: any) =>
                           onChangeCreateVehicleRequest(
                             _value,
@@ -1073,6 +1188,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                         <SelectPicker
                           name="endContactTime"
                           placeholder="Selecciona una hora"
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.contact_hour_to
+                              : null
+                          }
                           onChange={(_value: any) =>
                             onChangeCreateVehicleRequest(
                               _value,
@@ -1085,6 +1205,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                       <SelectPicker
                         name="endTimeSystem"
                         placeholder="am"
+                        value={
+                          createVehicleRequestState
+                            ? createVehicleRequestState.contact_hour_to_system
+                            : null
+                        }
                         onChange={(_value: any) =>
                           onChangeCreateVehicleRequest(
                             _value,
@@ -1119,7 +1244,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
   );
 };
 
-export default VehicleCreatePage;
+export default VehicleEditPage;
+
+interface VehiclesPageProps {
+  countries: [];
+}
 
 export const getServerSideProps = withAuth<VehiclesPageProps>({
   async getServerSideProps({ user }) {

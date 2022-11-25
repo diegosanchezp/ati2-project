@@ -26,7 +26,7 @@ export const getVehiclesModels = async () => {
 export const createVehicle = async (_vehicleData: any) => {
   const { csrfToken, csrfRes } = await getCSRF();
 
-  const response = await djRequest("vehicle/create", {
+  const response = await djRequest("vehicle", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -39,5 +39,16 @@ export const createVehicle = async (_vehicleData: any) => {
     const { success } = await response.json();
     console.log(success)
     return success;
+  }
+}
+
+export const getVehicle = async (_id: string) => {
+  const response = await djRequest(`vehicle/${_id}`, {
+    method: "GET",    
+  });
+
+  if (response.ok) {
+    const vehicleData = await response.json();
+    return vehicleData;
   }
 }
