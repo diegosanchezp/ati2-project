@@ -1,11 +1,19 @@
 from rest_framework import serializers
-from ..vehicle.models import Vehicle
+from ..vehicle.models import Vehicle, VehicleImages
 from ..finance.serializers import CurrencySerializer
 from ..country.serializers import CitySerializer
+
+class VehicleImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VehicleImages
+        exclude = [
+            "vehicle"
+        ]
 
 class VehicleSerializer(serializers.ModelSerializer):
     currency = CurrencySerializer(read_only = True)
     location_city = CitySerializer(read_only = True)
+    images = VehicleImageSerializer(many = True, read_only = True)
     class Meta: 
         model = Vehicle
         exclude = [
@@ -13,6 +21,8 @@ class VehicleSerializer(serializers.ModelSerializer):
             "owner",
             "model"
         ]
+
+
 
 class VehicleListSerializer(serializers.Serializer):
     data = VehicleSerializer(many = True, read_only = True)

@@ -2,9 +2,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 
-from ..vehicle.models import Vehicle
+
+from ..vehicle.models import Vehicle, VehicleImages
 from .serializers import VehicleListSerializer
 
 class VehiclesView(APIView):
@@ -63,8 +64,8 @@ class VehiclesView(APIView):
         page_quantity = request.GET.get("page_quantity", 10)
 
         vehicles = Vehicle.objects.select_related("currency", "location_city__state__country")\
+            .prefetch_related("images")\
             .filter(filters)
-
         paginator = Paginator(vehicles, page_quantity)
         page_obj = paginator.get_page(page_number)
 
