@@ -62,7 +62,7 @@ class VehiclesView(APIView):
         page_number = request.GET.get("page", 1)
         page_quantity = request.GET.get("page_quantity", 10)
 
-        vehicles = Vehicle.objects.select_related("currency")\
+        vehicles = Vehicle.objects.select_related("currency", "location_city__state__country")\
             .filter(filters)
 
         paginator = Paginator(vehicles, page_quantity)
