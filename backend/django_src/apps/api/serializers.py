@@ -40,7 +40,6 @@ class VehicleSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Vehicle
         exclude = [
-            "user_contact",
             "owner",
         ]
 

@@ -59,13 +59,20 @@ class VehiclesView(APIView):
         currency_code = request.GET.get("currency_code", "any")
         if(currency_code != "any"):
             filters &= Q(currency__code__iexact = currency_code)
+
+        type_vehicle = request.GET.get("type_vehicle", "any")
+        if(type_vehicle != "any"):
+            filters &= Q(type_vehicle__iexact = type_vehicle)
+
+        order_by = request.GET.get("order_by", "-id")
         
         page_number = request.GET.get("page", 1)
         page_quantity = request.GET.get("page_quantity", 10)
 
         vehicles = Vehicle.objects.select_related("currency", "location_city__state__country", "model__brand")\
             .prefetch_related("images", "videos")\
-            .filter(filters)
+            .filter(filters)\
+            .order_by(order_by)
 
         paginator = Paginator(vehicles, page_quantity)
         page_obj = paginator.get_page(page_number)
