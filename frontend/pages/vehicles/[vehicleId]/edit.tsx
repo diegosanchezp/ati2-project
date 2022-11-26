@@ -126,6 +126,32 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     },
   ];
 
+  const vehicleStatus = [
+    {
+      label: 'New',
+      value: 'NEW',
+    },
+    {
+      label: 'Used',
+      value: 'USED',
+    }
+  ]
+
+  const vehicleTypes = [
+    {
+      label: "truck",
+      value: "TRUCK"
+    },
+    {
+      label: "Van",
+      value: "VAN"
+    },
+    {
+      label: "Car",
+      value: "CAR"
+    },
+  ];
+
   const [mobileNumberState, setMobileNumberState] = React.useState(false);
   const [phoneNumberState, setPhoneNumberState] = React.useState(false);
   const [vehicleImagesState, setVehicleImagesState] = React.useState({});
@@ -136,6 +162,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   const [citiesState, setCitiesState] = React.useState([]);
   const [vehicleBrandsState, setVehicleBrandsState] = React.useState([]);
   const [vehicleModelsState, setVehicleModelsState] = React.useState([]);
+  const [vehicleTypesState, setVehicleTypesState] = React.useState(vehicleTypes);
+  const [vehicleStatusState, setVehicleStatusState] = React.useState(vehicleStatus);
   const [currenciesState, setCurrenciesState] = React.useState([]);
   const [createVehicleRequestState, setCreateVehicleRequestState] =
     React.useState({});
@@ -204,13 +232,13 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       _createVehicleRequest = {
         ..._createVehicleRequest,
         rental_price: _createVehicleRequest.price,
-        sale_price: undefined,
+        sale_price: null,
       };
     } else if (_createVehicleRequest.contract_type == "SALE") {
       _createVehicleRequest = {
         ..._createVehicleRequest,
         sale_price: _createVehicleRequest.price,
-        rental_price: undefined,
+        rental_price: null,
       };
     } else if (_createVehicleRequest.contract_type == "RENTAL_SALE") {
       _createVehicleRequest = {
@@ -221,8 +249,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     } else {
       _createVehicleRequest = {
         ..._createVehicleRequest,
-        sale_price: undefined,
-        rental_price: undefined,
+        sale_price: null,
+        rental_price: null,
       };
     }
 
@@ -765,6 +793,54 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           }
                           onChange={(_value: any) =>
                             onChangeCreateVehicleRequest(_value, "year")
+                          }
+                        />
+                      </Form.Group>
+                    </Col>
+
+                    <Col xs={4}>
+                      <Form.Group>
+                        <Form.ControlLabel
+                          className="button button--blue"
+                          style={{ marginBottom: 16, textAlign: "start" }}
+                        >
+                          Status de vehículo
+                        </Form.ControlLabel>
+                        <SelectPicker
+                          name="status"
+                          placeholder="Selecciona un status"
+                          data={vehicleStatusState}
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.status
+                              : null
+                          }
+                          onChange={(_value: any) =>
+                            onChangeCreateVehicleRequest(_value, "status")
+                          }
+                        />
+                      </Form.Group>
+                    </Col>
+
+                    <Col xs={4}>
+                      <Form.Group>
+                        <Form.ControlLabel
+                          className="button button--blue"
+                          style={{ marginBottom: 16, textAlign: "start" }}
+                        >
+                          Tipo de vehículo
+                        </Form.ControlLabel>
+                        <SelectPicker
+                          name="type"
+                          placeholder="Selecciona un tipo"
+                          data={vehicleTypesState}
+                          value={
+                            createVehicleRequestState
+                              ? createVehicleRequestState.type_vehicle
+                              : null
+                          }
+                          onChange={(_value: any) =>
+                            onChangeCreateVehicleRequest(_value, "type_vehicle")
                           }
                         />
                       </Form.Group>
