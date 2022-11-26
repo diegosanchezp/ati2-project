@@ -28,14 +28,36 @@ import PublicationsType from "components/publications-bars/publications-type-ren
 import PublicationsTypeVehicle from "components/publications-bars/publications-type-vehicle";
 import PublicationsOrder from "components/publications-bars/publications-order";
 import PublicationsStatusVehicle from "components/publications-bars/publications-status-behicle";
+import FilterVehicles from "components/filter-vehicle/filter-vehicle";
+import { url } from "inspector";
+import { getURL } from "next/dist/shared/lib/utils";
+import next from "next";
 
 function PublicationsPage() {
+  //states for query, tal vez agunos deben iniciar de otra forma
+  const [continent, setContinent] = useState("");
+  const [country, setCountry] = useState("");
+  const [state, setStates] = useState([]);
+  const [city, setCity] = useState("");
+  const [typeStatus, setTypeStatus] = useState(TypeStatusVehicleEnum.ALL);
+  const [brand, setBrand] = useState("");
+  const [model, setModel] = useState("");
+  const [typePrice, setTypePrice] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [seeAlso, setSeeAlso] = useState("");
+  const [currency, setCurrency] = useState("");
+  const [typeOrder, setTypeOrder] = useState(TypeOrderPubliationsEnum.PRECIO);
+  //other filters
+  const [typeVehicle, setTypeVehicle] = useState(TypeVehicleEnum.ALL);
+
+  const [submit, setSubmit] = useState(true);
+  const [cleanStatesQuery, setCleanStatesQuery] = useState(true);
+
   const [typeVisualizer, setTypeVisualizer] = useState(
     TypeVisualizerEnum.PHOTO
   );
-  const [typeVehicle, setTypeVehicle] = useState(TypeVehicleEnum.ALL);
-  const [typeOrder, setTypeOrder] = useState(TypeOrderPubliationsEnum.PRECIO);
-  const [typeStatus, setTypeStatus] = useState(TypeStatusVehicleEnum.ALL);
+
   const [activePage, setActivePage] = useState(1);
   const [cardsSelected, setCardsSelected] = useState([]);
   const [lastCard, setLastCard] = useState(0);
@@ -48,14 +70,63 @@ function PublicationsPage() {
     true,
     true,
   ]);
-  /*useEffect(() => {
-    const isPhoto = typeVisualizer === TypeVisualizerEnum.PHOTO;
-    if (isPhoto) {
-      setTypeVisualizer(TypeVisualizerEnum.LIST);
-    } else {
-      setTypeVisualizer(TypeVisualizerEnum.PHOTO);
+  //states a enviar a FilterVehicles
+  const queryFilter = {
+    state,
+    setStates,
+    continent,
+    setContinent,
+    typePrice,
+    cleanStatesQuery,
+    setCleanStatesQuery,
+  };
+  //states para generar url, NOTA los nombres deben ser iguales a el key del query a recibir en el back
+  const queryStates = { state, continent };
+
+  //effect para construir el url, se llama al presionar buscar, cambiando el valor del state se puede llamar en cualquier punto
+  useEffect(() => {
+    if (submit) {
+      const url = getURLQuery();
+      console.log("ejecutar busqueda a ", url);
+      setSubmit(false);
     }
-  }, [typeVisualizer]);*/
+  }, [submit]);
+
+  //state para limpiar el panel de busqueda y reiniciar los estados, creo que se puede mover al componente
+
+  //funcion genera el url en base a los valores de los states
+  function getURLQuery() {
+    // console.log("state", state);
+    //generamos lista de todos los states existentes
+    const queryList = Object.keys(queryStates);
+    // console.log("querylist", queryList);
+    let url = "";
+    for (const queryItem of queryList) {
+      //console.log("url lengggg ", url.length, "and query item ", queryItem);
+      const value = queryStates[queryItem];
+      let validValue = false;
+      const typeValue = typeof value;
+
+      //TODO quizas hacen falta mas validaciones segun el tipo y el filtro, esto deberia cubrir obj (arraya de check picket) y sleect picket simple
+      if (typeValue === "string") {
+        if (value !== "") validValue = true;
+      }
+      if (typeValue === "object") {
+        console.log(Object.keys(value));
+        if (value && Object.keys(value).length > 0) validValue = true;
+      }
+
+      if (validValue) {
+        if (url.length > 0) {
+          url = `${url}&${queryItem}=${value}`;
+        } else {
+          url = `?${queryItem}=${value}`;
+        }
+      }
+    }
+    return url;
+  }
+
   useEffect(() => {
     //3 casos
     const isClient = false;
@@ -84,207 +155,10 @@ function PublicationsPage() {
     }
     console.log("----------------------------------");
   }, [lastCard]);
-  const data = [
-    "Eugenia",
-    "Bryan",
-    "Linda",
-    "Nancy",
-    "Lloyd",
-    "Alice",
-    "Julia",
-    "Albert",
-    "Louisa",
-    "Lester",
-    "Lola",
-    "Lydia",
-    "Hal",
-    "Hannah",
-    "Harriet",
-    "Hattie",
-    "Hazel",
-    "Hilda",
-  ].map((item) => ({ label: item, value: item }));
 
   return (
     <Container id="publications-panel">
-      <Container id="publications-search">
-        <PanelGroup accordion defaultActiveKey={1} bordered>
-          <Panel
-            header="Busqueda rápida"
-            eventKey={1}
-            id="panel-busqueda-rapida"
-          >
-            <SelectPicker
-              label="Continente"
-              data={data}
-              style={{ width: 224 }}
-              searchable={false}
-              virtualized
-            />
-            <CheckPicker
-              label="Pais"
-              data={data}
-              style={{ width: 224 }}
-              virtualized
-              searchable={false}
-            />
-            <CheckPicker
-              label="Estado"
-              data={data}
-              style={{ width: 224 }}
-              virtualized
-              searchable={false}
-            />
-            <SelectPicker
-              label="Vehículo en"
-              data={data}
-              style={{ width: 224 }}
-              searchable={false}
-              virtualized
-            />
-            <SelectPicker
-              label="Marca"
-              data={data}
-              style={{ width: 224 }}
-              searchable={false}
-              virtualized
-            />
-            <SelectPicker
-              disabled
-              label="Modelo"
-              data={data}
-              style={{ width: 224 }}
-              searchable={false}
-              virtualized
-            />
-            <Container>
-              <Button size="sm" color="blue" appearance="primary">
-                Buscar
-              </Button>
-              <Button size="sm" color="orange" appearance="primary">
-                Cancelar
-              </Button>
-            </Container>
-          </Panel>
-          <Panel header="Busqueda detallada" eventKey={2} id="panel2">
-            <Form>
-              <SelectPicker
-                label="Continente"
-                data={data}
-                style={{ width: 224 }}
-                searchable={false}
-                virtualized
-              />
-              <CheckPicker
-                label="Pais"
-                data={data}
-                style={{ width: 224 }}
-                virtualized
-                searchable={false}
-              />
-              <CheckPicker
-                label="Estado"
-                data={data}
-                style={{ width: 224 }}
-                virtualized
-                searchable={false}
-              />
-              <CheckPicker
-                label="Ciudad"
-                data={data}
-                style={{ width: 224 }}
-                virtualized
-                searchable={false}
-              />
-              <CheckPicker
-                label="Zona"
-                data={data}
-                style={{ width: 224 }}
-                virtualized
-                searchable={false}
-              />
-              <SelectPicker
-                label="Vehículo en"
-                data={data}
-                style={{ width: 224 }}
-                searchable={false}
-                virtualized
-              />
-              <SelectPicker
-                label="Marca"
-                data={data}
-                style={{ width: 224 }}
-                searchable={false}
-                virtualized
-              />
-              <SelectPicker
-                disabled
-                label="Modelo"
-                data={data}
-                style={{ width: 224 }}
-                searchable={false}
-                virtualized
-              />
-              <p>quiero ver????????</p>
-              <Container>
-                <p>Moneda</p>
-              </Container>
-              <Container>
-                <p>Precio</p>
-                <RadioGroup name="radioList">
-                  <Radio value="A" checked={true}>
-                    Por rango
-                  </Radio>
-                  <Form.Group controlId="min-price">
-                    <Form.ControlLabel>Min</Form.ControlLabel>
-                    <Form.Control
-                      size="sm"
-                      name="min-price"
-                      type="number"
-                      style={{ width: 224 }}
-                    />
-                  </Form.Group>
-                  <Form.Group controlId="max-price">
-                    <Form.ControlLabel>Max</Form.ControlLabel>
-                    <Form.Control
-                      size="sm"
-                      name="max-price"
-                      type="number"
-                      style={{ width: 224 }}
-                    />
-                  </Form.Group>
-                  <Radio value="B" checked={false}>
-                    Cualquier precio
-                  </Radio>
-                </RadioGroup>
-              </Container>
-              <Container>
-                <p>Listar resultados de forma</p>
-                <RadioGroup name="radioList">
-                  <Radio value="A" checked={true}>
-                    Mayor a menor
-                  </Radio>
-                  <Radio value="B" checked={false}>
-                    Menor a mayor
-                  </Radio>
-                  <Radio value="C" checked={false}>
-                    Más recomendados
-                  </Radio>
-                </RadioGroup>
-              </Container>
-              <Container>
-                <Button size="sm" color="blue" appearance="primary">
-                  Buscar
-                </Button>
-                <Button size="sm" color="orange" appearance="primary">
-                  Cancelar
-                </Button>
-              </Container>
-            </Form>
-          </Panel>
-        </PanelGroup>
-      </Container>
-
+      <FilterVehicles setSubmit={setSubmit} queryFilter={queryFilter} />
       <Container id="publications">
         <Container className="options-buttons">
           <Button
