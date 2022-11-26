@@ -14,4 +14,9 @@ urlpatterns = [
         views.SetNewPasswordView.as_view(),
         name="set_new_password",
     ),
+    path(
+        "change_session_lang",
+        views.ChangeSessionLanguageView.as_view(),
+        name="change_session_lang"
+    ),
 ]

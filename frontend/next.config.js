@@ -2,6 +2,10 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 /** @type {import('next').NextConfig} */
 module.exports = {
+  i18n: {
+    locales: ['en', 'es'],
+    defaultLocale: 'es'
+  },
   reactStrictMode: true,
   webpack(config) {
     config.module.rules.push({

@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-
+from django.contrib.contenttypes.fields import GenericRelation
 # Doesnt werks
 # def user_directory_path(dir_name: str):
 #     def fn(instance, filename):
@@ -69,6 +69,11 @@ class VehicleModel(models.Model):
         return f"{self.brand.name} {self.name}"
 
 class Vehicle(models.Model):
+    class TypeVehicle(models.TextChoices):
+        TRUCK = "TRUCK", _("Truck")
+        CAR = "CAR", _("Car")
+        VAN = "VAN", _("Van")
+
     class Status(models.TextChoices):
         NEW = "NEW", _("New")
         USED = "USED", _("Used")
@@ -90,9 +95,15 @@ class Vehicle(models.Model):
         WEEKENDS = "WEEKENDS", _("Weekends")
         MONDAY_TO_FRIDAY = "MONDAY_TO_FRIDAY", _("Monday to friday")
 
+    type_vehicle = models.CharField(
+        max_length=5,
+        choices=TypeVehicle.choices,
+        default='CAR'
+    )
+
     contact_days = models.JSONField(
         verbose_name="Contact days",
-        help_text=_("JSON Array of contact days, ex: [\"monday\", \"tuesday\"]")
+        help_text=_("JSON Array of contact days, ex: [\"monday\", \"tuesday\"]"),
     )
 
     contact_hour_from = models.TimeField(
@@ -113,21 +124,21 @@ class Vehicle(models.Model):
     )
     status = models.CharField(
         choices=Status.choices,
-        max_length=4
+        max_length=4,
     )
 
     details = models.TextField(
-        blank=True,
+        blank=True, 
         verbose_name=_("Details"),
     )
 
     accessories = models.TextField(
         verbose_name=_("Accessories "),
-        blank=True
+        blank=True, 
     )
     services = models.TextField(
         verbose_name=_("Services to date"),
-        blank=True
+        blank=True, 
     )
 
     location_city = models.ForeignKey(
@@ -135,11 +146,18 @@ class Vehicle(models.Model):
         on_delete=models.CASCADE,
         verbose_name=_("Location City"),
         related_name="vehicles",
+        blank=True,
+        null=True
+    )
+
+    location_zone = models.TextField(
+        verbose_name=_("Location Zone"),
+        blank=True,
     )
 
     exact_location = models.TextField(
         verbose_name=_("Exact location"),
-        blank=True
+        blank=True,
     )
 
     rental_price = models.FloatField(
@@ -150,14 +168,8 @@ class Vehicle(models.Model):
 
     sale_price = models.FloatField(
         verbose_name=_("Sale price of the vehicle"),
-        blank=True,
-        null=True,
-    )
-
-    user_contact = models.ForeignKey(
-        to=settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="+",
+        blank=True, 
+        null=True, 
     )
 
     owner = models.ForeignKey(
@@ -174,12 +186,43 @@ class Vehicle(models.Model):
         related_name="vehicles",
     )
 
+    brand = models.ForeignKey(
+        verbose_name=_("Vehicle Brand"),
+        to="VehicleBrand",
+        on_delete=models.CASCADE,
+        related_name="vehicles",
+    )
+
     currency = models.ForeignKey(
         verbose_name=_("Currency for prices"),
         to="finance.Currency",
         related_name="+",
         null=True,
         on_delete=models.SET_NULL
+    )
+
+    contact_first_name = models.CharField(
+        verbose_name=_("Contact First Name"),
+        max_length=255,
+        blank=True,
+    )
+
+    contact_last_name = models.CharField(
+        verbose_name=_("Contact Last Name"),
+        max_length=255,
+        blank=True,
+    )
+
+    contact_email = models.EmailField(
+        verbose_name=_("Contact Email"),
+        blank=True,
+    )
+
+    contact_phone_numbers  = GenericRelation(
+        to="misc.Telephone",
+        blank=True,
+        null=True,
+        related_query_name="pub_phone_numbers"
     )
 
     def __str__(self) -> str:

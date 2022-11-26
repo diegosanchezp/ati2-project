@@ -1,0 +1,123 @@
+{
+  "LoginPage": {
+    "welcomeBack": "Welcome back",
+    "emailField": "Email address",
+    "passWordField": "Password",
+    "forgotPass": "Forgot password ?",
+    "logIn": "Log in"
+  },
+  "RecoverPasswordPage": {
+    "recoverPassword":"Recover password",
+    "emailField": "Email address",
+    "recoverBtn":"Recover"
+  },
+  "RegisterPage":{
+    "registerTitle": "Register panel",
+    "helpMessages1": "*Estos son los pasos a seguir para completar su registro.",
+    "helpMessages2": "*Si en algún momento necesita acceder a una sección del registro, haga clic en el panel de color verde, que sea de su preferencia",
+    "step1": "¿Cómo supo de nosotros?",
+    "step2": "Registrar usuario",
+    "step3": "Idioma del adiestramiento",
+    "step4": "Datos de inicio de sesión",
+    "step5": "Frecuencia e información a recibir",
+    "step6": "Datos de facturación",
+    "infoFrecuency": "No seleccionaste mantener informado",
+    "firstStep":{
+      "header": "Por favor, coméntenos, como se entero de los servicios de la empresa. Es importante para nosotros, porque nos ayuda a mejorar el servicio que le ofrecemos",
+      "webPortal": "Portal web de la empresa",
+      "socialMedias": "Redes sociales",
+      "friends": "Amigos",
+      "others": "Otros",
+      "tagOthers": "Especifique, cual fue el medio por que el que supo de nosotros",
+      "selectOptions":"Seleccione una o varias redes sociales"
+    },
+    "secondStep":{
+      "header": "Selecciona un tipo de usuario",
+      "natural": "Persona natural",
+      "business": "Business",
+      "name": "Nombre",
+      "lastname": "Apellido",
+      "ID": "Cédula/pasaporte/DNI",
+      "email": "Correo electrónico",
+      "country": "País de procedencia",
+      "phone": "Teléfono",
+      "mobile": "Móvil",
+      "landline": "Fijo",
+      "businessName" : "Nombre de la empresa",
+      "businessId":"Razón social/RIF",
+      "city": "Ciudad",
+      "address": "Dirección",
+      "fullname": "Nombre y Apellido",
+      "subheaderBusiness": "Datos de la empresa",
+      "subheaderBusiness2": "Datos del representante de la empresa",
+      "warning": "Por favor verifique que sus datos sean los correctos, ya que serán utilizados para generar su publicación, enviarle sus datos de acceso, o notificar sus pagos"
+    },
+    "thirdStep":{
+      "header": "Selecciona un idioma",
+      "spanish": "Español",
+      "english": "Inglés"
+    },
+    "fourthStep":{
+      "email": "Correo para acceder al portal",
+      "password": "Contraseña",
+      "informedCheck": "Quiero mantenerme informado acerca de los servicios que ofrece la empresa, y otros aspectos de interés"
+    },
+    "fifthStep":{
+      "header": "¿Con que frecuencia le gustaría mantenerse informado acerca de los servicios que ofrece la empresa?",
+      "weekly": "1 vez a la semana",
+      "twoWeekly": "Cada 2 semanas",
+      "monthly": "1 vez al mes",
+      "other": "Otra",
+      "interestServices": "Servicios de interés",
+      "selectCategory": "Puede seleccionar más de 1 categoría, si lo desea",
+      "informedWays": "Medio(s) por los que le gustaría mantenerse informado",
+      "email": "Correo electrónico según sus preferencias",
+      "bussinesSocialMedia": "Redes sociales de la empresa",
+      "mySocialMedia": "Mis redes sociales",
+      "sms": "Mensaje de texto",
+      "otherWay": "Otro(s)",
+      "facebook": "Mensaje privado en mi cuenta de Facebook",
+      "phoneNumber": "Verifique, o inserte el número por el que desea mantenerse informado",
+      "otherWayTag": "Especifique los medios por los que desea mantenerse informado",
+      "facebookTag": "Introduzca dirección de correo de Facebook para contactarlo",
+      "customFrecuencyTag": "Personalice su frecuencia"
+    },
+    "sixthStep":{
+      "clientCodeTag": "Su código de cliente es",
+      "warningMessage": "Es importante que usted FORMALICE su pago para poder publicar su vehículo, mediante su PAGO.",
+      "header": "Datos a utilizar, para facilitar las notificaciones de pago",
+      "subHeader": "Queremos ayudarte, facilitando el pago de la publicación de tu apartamento o casa , y para lo cual, te pedimos que proporciones los datos que consideras utilizar, para realizar tus transferencias o depósitos, especificados a continuación",
+      "originBank": "Banco origen",
+      "destinyBank": "Banco destino",
+      "originCountry": "País donde reside la cuenta del banco origen",
+      "firstSection": {
+        "title": "Sugerencia para realizar sus pagos",
+        "paragraph1": "Se recomienda que inicie sesión en el portal Web de la empresa, para que los datos que ha proporcionado, puedan ser utilizados, para facilitarle, el proceso de notificación de pago de su publicación.",
+        "paragraph2": "De lo contrario, deberá llenar la información solicitada, en el portal Web de la empresa, y en el portal de notificación de pagos."
+      },
+      "secondSection": {
+        "title": "Pasos para notificar su pago",
+        "paragraph1": "1- Cuando usted se registra, el portal le genera el código de cliente, que ve en pantalla, y que le será enviado a su correo, junto con sus datos de acceso",
+        "paragraph2": "2- Luego utilice el código proporcionado, y acceda al sistema de notificación de pagos de la empresa, haciendo clic aquí: ",
+        "linkParagraph2": "notificarPagos",
+        "paragraph3": "3- Introduzca el código del cliente, en el sistema de notificación de pago",
+        "paragraph4": "4- Presione el botón Notificar pago, en el sistema de notificación de pagos"
+      },
+      "thirdSection": {
+        "title": "Para transferencias bancarias o depósito",
+        "paymentData": "Datos de pago",
+        "bank": "Banco",
+        "accountNumber": "Nro de cuenta",
+        "SWIFTCode": "Código SWIFT",
+        "accountName": "A nombre de:"
+      },
+      "fourthSection": {
+        "title": "Horario de atención al público",
+        "attentionDays": "Lunes a Viernes",
+        "attentionHours": "De 8.00am a 12.00m y de 1:00pm a 5:00pm",
+        "phoneNumbers": "Teléfonos",
+        "email": "Email"
+      }
+    }
+  }
+}

@@ -24,6 +24,7 @@ from django.contrib.auth.views import (
     PasswordResetConfirmView
 )
 from django.conf import settings
+from django.utils import translation
 
 from django_typomatic import ts_interface, generate_ts
 from rest_framework import serializers
@@ -77,7 +78,11 @@ def logout_view(request):
         return JsonResponse({'detail': 'You\'re not logged in.'}, status=400)
 
     logout(request)
-    return JsonResponse({'detail': 'Successfully logged out.'})
+    response = JsonResponse({'detail': 'Successfully logged out.'})
+    # Remove language cookie
+    translation.deactivate()
+    response.delete_cookie(settings.LANGUAGE_COOKIE_NAME)
+    return response
 
 
 class SessionView(APIView):
@@ -155,6 +160,33 @@ class SetNewPasswordView(APIView):
                 return Response(data=form.errors.get_json_data(), status=400)
 
         return Response(data={"message": "success"})
+
+@ts_interface(context="auth")
+class ChangeLanguageBody(serializers.Serializer):
+    language = serializers.ChoiceField(
+        choices=settings.LANGUAGES
+    )
+
+class ChangeSessionLanguageView(APIView):
+
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        request=ChangeLanguageBody,
+    )
+    def post(self, request, format=None, **kwargs):
+        lang_body = ChangeLanguageBody(data=request.data)
+        if not lang_body.is_valid():
+            return Response(
+                data={"message": "Invalid language"},
+                status=400
+            )
+        user_language = lang_body.data
+        translation.activate(user_language["language"])
+        res = Response(data={"message": "success"})
+        res.set_cookie(settings.LANGUAGE_COOKIE_NAME, user_language["language"])
+        return res
 
 
 if settings.DEBUG:

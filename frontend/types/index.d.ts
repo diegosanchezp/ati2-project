@@ -1,7 +1,12 @@
-import type { NextPage } from 'next';
+import type { NextPage, GetServerSidePropsContext } from 'next';
 import type {Session} from "auth";
 
-export type PageWithSession<T={}> = NextPage<T & {session: Session}>
+export type PageWithSession<T={}> = NextPage<T &
+  {
+    session: Session,
+    locales: GetServerSidePropsContext["locales"]
+  }
+>
 
 type errorMsg = {
     message: string,

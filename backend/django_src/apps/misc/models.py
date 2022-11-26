@@ -86,24 +86,58 @@ class Telephone(models.Model):
     Phone Numbers
     """
 
+    # class ScopeChoice(models.TextChoices):
+    #     NATURAL_PERSON = "NATURAL_PERSON", _("Natural person")
+    #     VEHICLE_PUBLICATION = "VEHICLE_PUBLICATION", _("Vehiclepublication")
+
     class PType(models.TextChoices):
         FIXED = "FIXED", _("Fixed phone number")
         MOBILE = "MOBILE", _("Mobile phone number")
 
     number = models.CharField(max_length=255)
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         on_delete=models.CASCADE,
         to=settings.AUTH_USER_MODEL,
         related_name="phone_numbers",
     )
+
+    # belongs_to = models.CharField(
+    #     max_length=255,
+    #     blank=True,
+    #     choices=ScopeChoice.choices,
+    #     default=ScopeChoice.NATURAL_PERSON,
+    # )
+
+
     country_number = models.IntegerField()
     ext = models.CharField(max_length=255, blank=True)
     ptype = models.CharField(
         max_length=255,
         choices=PType.choices,
     )
+
+    object_id = models.CharField(max_length=255)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    content_object = GenericForeignKey(
+        'content_type',
+        'object_id'
+    )
+
+    # @property
+    # def natural_person_phones(self):
+    #     return self.objects.filter(scope=self.ScopeChoice.NATURAL_PERSON)
+    #
+    # @property
+    # def vehicle_publication_phones(self):
+    #     return self.objects.filter(scope=self.ScopeChoice.VEHICLE_PUBLICATION)
+
+
     def __str__(self) -> str:
         return f"{self.ptype} {self.country_number} - {self.number}"
+    class Meta:
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
 
 class Empresa(models.Model):
     """

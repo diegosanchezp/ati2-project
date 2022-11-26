@@ -1,4 +1,5 @@
 from pathlib import Path
+from django.utils.translation import gettext_lazy as _
 
 import environ
 
@@ -33,6 +34,7 @@ INSTALLED_APPS = [
     "django_src.apps.finance.apps.FinanceConfig",
     "django_src.apps.vehicle.apps.VehicleConfig",
     "django_src.apps.country.apps.CountryConfig",
+    "django_src.apps.e_mail.apps.EMailConfig",
 
     # ---- Third party ----
     # API REST
@@ -105,6 +107,11 @@ AUTHENTICATION_BACKENDS=["django_src.apps.auth.backends.EmailBackend"]
 
 LANGUAGE_CODE = "en-us"
 
+LANGUAGES = [
+    ('es', _('Spanish')),
+    ('en', _('English')),
+]
+
 TIME_ZONE = "UTC"
 
 USE_I18N = True
@@ -138,6 +145,8 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_HTTPONLY = True
+
+LANGUAGE_COOKIE_SAMESITE = 'Lax'
 
 CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 CORS_ALLOW_CREDENTIALS = True

@@ -1,7 +1,10 @@
 import React from "react";
 import type { NextPage } from 'next';
 
+import {withTranslations} from "utils/i18n";
+
 import {djRequest, getCSRF} from "utils/apirest";
+import {useTranslations} from 'next-intl';
 
 import {
   Form, FlexboxGrid, ButtonToolbar, Panel,
@@ -10,12 +13,13 @@ import {
 
 const RecoverPasswordPage: NextPage = (props) => {
   const [pageState, setPageState] = React.useState("");
-
+  const t = useTranslations('RecoverPasswordPage');
   const toaster = useToaster();
 
   const toastOptions = {
     placement: "bottomCenter"
   }
+
   const handleSubmit = async (checkStatus: boolean, e: React.FormEvent<HTMLFormElement>) => {
 
     const formData = new FormData(e.target as HTMLFormElement);
@@ -57,15 +61,15 @@ const RecoverPasswordPage: NextPage = (props) => {
   return (
     <FlexboxGrid justify="center">
       <FlexboxGrid.Item colspan={12}>
-        <Panel header={<h3>Recover password</h3>} bordered>
+        <Panel header={<h3>{t('recoverPassword')}</h3>} bordered>
           <Form fluid onSubmit={handleSubmit}>
             <Form.Group>
-              <Form.ControlLabel>Email address</Form.ControlLabel>
+              <Form.ControlLabel>{t('emailField')}</Form.ControlLabel>
               <Form.Control name="email" type="email" placeholder="example@mail.com" required disabled={pageState === "emailSent"}/>
             </Form.Group>
             <Form.Group>
               <ButtonToolbar>
-                <Button appearance="primary" type="submit" disabled={pageState === "emailSent"}>Recover</Button>
+                <Button appearance="primary" type="submit" disabled={pageState === "emailSent"}>{t('recoverBtn')}</Button>
               </ButtonToolbar>
             </Form.Group>
           </Form>
@@ -76,3 +80,7 @@ const RecoverPasswordPage: NextPage = (props) => {
 };
 
 export default RecoverPasswordPage
+
+export const getServerSideProps = withTranslations({
+  folderPath: "auth"
+});
