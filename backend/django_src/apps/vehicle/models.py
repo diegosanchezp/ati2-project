@@ -234,7 +234,8 @@ class Vehicle(models.Model):
         verbose_name=_("Contact Email"),
         blank=True,
     )
-
+    # t = Telephone(...)
+    # vehicle.contact_phone_numbers.add(t)
     contact_phone_numbers  = GenericRelation(
         to="misc.Telephone",
         blank=True,

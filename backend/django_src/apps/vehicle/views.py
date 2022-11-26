@@ -1,12 +1,14 @@
+from .utils import base64ToImageField
+from django.http import JsonResponse
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework import serializers
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from django_src.apps.country.models import City, Country, State
 from django_src.apps.country.views import CitiesSerializer, CountriesSerializer, StatesSerializer
 from django_src.apps.vehicle.models import Vehicle, VehicleBrand, VehicleImages, VehicleModel, VehicleVideos
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework import serializers
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from django.http import JsonResponse
-from .utils import base64ToImageField
+from django_src.apps.finance.models import Currency
+
 # Create your views here.
 
 
@@ -74,6 +76,7 @@ class VehicleView(APIView):
     def post(request):
         vehicle = request.data.get('vehicle')
         createVehicleSerializer = VehicleSerializer(data=vehicle)
+        # Currency(name=)
         if createVehicleSerializer.is_valid(raise_exception=True):
             createVehicleSerializer.save()
 
@@ -94,6 +97,7 @@ class VehicleView(APIView):
         if id:
             vehicle = Vehicle.objects.filter(id=id).first()
             vehicleSerializer = VehicleSerializer(vehicle)
+            
 
             vehicleImages = VehicleImages.objects.filter(vehicle=id)
             vehicleImagesSerializer = VehicleImageSerializer(
@@ -119,22 +123,30 @@ class VehicleView(APIView):
             citiesSerializer = CitiesSerializer(cities, many=True)
 
             return JsonResponse({
-                    'vehicle': _vehicleData, 
-                    'images': vehicleImagesSerializer.data, 
-                    'videos': vehicleVideosSerializer.data, 
-                    'countries': countriesSerializer.data,
-                    'states': statesSerializer.data,
-                    'cities': citiesSerializer.data
-                })
+                'vehicle': _vehicleData,
+                'images': vehicleImagesSerializer.data,
+                'videos': vehicleVideosSerializer.data,
+                'countries': countriesSerializer.data,
+                'states': statesSerializer.data,
+                'cities': citiesSerializer.data
+            })
 
+        @staticmethod
+        def put(request):
+            vehicle = request.data.get('vehicle')
+            vehicleId = request.data.get('vehicle_id')
+            editVehicleSerializer = VehicleSerializer(id=vehicleId, data=vehicle)
+            if editVehicleSerializer.is_valid(raise_exception=True):
+                editVehicleSerializer.save()
 
-class VehicleDeleteView(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
+            vehicleImages = vehicle['vehicle_images']
+            for image in vehicleImages:
+                imageData = {
+                    'vehicle': editVehicleSerializer.data['id'],
+                    'image': base64ToImageField(image)
+                }
+                vehicleImageSerializer = VehicleImageSerializer(data=imageData)
+                if vehicleImageSerializer.is_valid():
+                    vehicleImageSerializer.save()
 
-    @staticmethod
-    def post(request):
-        ids = request.data.get('ids')
-        vehicles_to_delete = Vehicle.objects.filter(pk__in=ids)
-        vehicles_to_delete.delete()
-        return JsonResponse({'success': True})
+            return JsonResponse({'success': True})

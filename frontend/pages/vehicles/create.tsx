@@ -365,38 +365,42 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
 
   async function getInitialData() {
     const countries = await getCountries();
-    if (countries) setCountriesState(
-      countries.map((country: any) => ({
-        label: country.name,
-        value: country.id,
-      }))
-    );
+    if (countries)
+      setCountriesState(
+        countries.map((country: any) => ({
+          label: country.name,
+          value: country.id,
+        }))
+      );
 
     const vehicleBrands = await getVehiclesBrands();
-    if (vehicleBrands) setVehicleBrandsState(
-      vehicleBrands.map((brand: any) => ({
-        label: brand.name,
-        value: brand.id,
-      }))
-    );
+    if (vehicleBrands)
+      setVehicleBrandsState(
+        vehicleBrands.map((brand: any) => ({
+          label: brand.name,
+          value: brand.id,
+        }))
+      );
 
     const vehicleModels = await getVehiclesModels();
-    if (vehicleModels) setVehicleModelsState(
-      vehicleModels.map((model: any) => ({
-        label: model.name,
-        value: model.id,
-      }))
-    );
+    if (vehicleModels)
+      setVehicleModelsState((prevState: any) =>
+        vehicleModels.map((model: any) => ({
+          label: model.name,
+          value: model.id,
+        }))
+      );
 
     const currencies = await getCurrencies();
-    if(currencies) setCurrenciesState(
-      currencies.map((currency: any) => ({
-        label: `${currency.name} - ${currency.code}`,
-        value: currency.id,
-      }))
-    );
+    if (currencies)
+      setCurrenciesState(
+        currencies.map((currency: any) => ({
+          label: `${currency.name} - ${currency.code}`,
+          value: currency.id,
+        }))
+      );
 
-    getYearsList(1970, parseInt(dayjs().format("YYYY")));
+    getYearsList(1960, parseInt(dayjs().format("YYYY")));
   }
 
   async function onChangeCountry(_countryId: number) {
