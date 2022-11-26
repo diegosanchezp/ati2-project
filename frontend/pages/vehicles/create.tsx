@@ -22,7 +22,7 @@ import {
   Uploader,
   useToaster,
 } from "rsuite";
-
+import {FileType} from "rsuite/Uploader";
 import { getCountries, getStates, getCities } from "pages/api/location";
 import {
   getVehiclesBrands,
@@ -124,7 +124,7 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
 
   const [mobileNumberState, setMobileNumberState] = React.useState(false);
   const [phoneNumberState, setPhoneNumberState] = React.useState(false);
-  const [vehicleImagesState, setVehicleImagesState] = React.useState({});
+  const [vehicleImagesState, setVehicleImagesState] = React.useState<FileType[]>([]);
   const [vehicleVideosState, setVehicleVideosState] = React.useState({});
   const [showVideosState, setShowVideosState] = React.useState(false);
   const [countriesState, setCountriesState] = React.useState([]);
@@ -138,11 +138,24 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
   const [continentsState, setContinentsState] = React.useState(continents);
   const [yearsState, setYearsState] = React.useState([]);
 
-  function onInputVehicleImages(_fileList: Array<any>, _index: number) {
-    const _file = _fileList.length > 0 ? _fileList[0] : null;
-    let newFile = {};
-    newFile[_index] = _file;
-    setVehicleImagesState({ ...vehicleImagesState, ...newFile });
+  console.log(vehicleImagesState)
+  function removeVehicleImage(file: FileType){
+    setVehicleImagesState((prevImgs)=>{
+      const filtered = prevImgs.filter(
+        imgFile => imgFile !== undefined
+      ).filter(
+          imgFile => Object.keys(imgFile).length !== 0
+      ).filter(
+        (imgFile)=> imgFile.fileKey !== file.fileKey
+      );
+      return filtered;
+    });
+  }
+
+  function onInputVehicleImages(_fileList: FileType[], _index: number) {
+    setVehicleImagesState((prevImg)=>{
+      return [...prevImg, _fileList[0]]
+    });
   }
 
   function onInputVehicleVideos(_fileList: Array<any>, _index: number) {
@@ -685,28 +698,16 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
                     </p>
                   </FlexboxGrid>
                   <Grid style={{ width: "100%" }}>
-                    {vehicleImagesList.map((number, index) => (
+                    {Array.from(Array(20).keys()).map((index) => (
                       <Col key={index} xs={3}>
                         <Uploader
-                          name="vehicleImages[]"
-                          multiple
+                          name="vehicleImages"
                           action=""
+                          multiple={false}
                           listType="picture"
                           accept=".jpg, .png, .svg"
-                          className={
-                            vehicleImagesState[index] != undefined &&
-                            vehicleImagesState[index] != {} &&
-                            vehicleImagesState[index] != null
-                              ? "remove-file-input-uploader"
-                              : ""
-                          }
+                          onRemove={removeVehicleImage}
                           maxPreviewFileSize={6242880}
-                          autoUpload={false}
-                          disabled={
-                            vehicleImagesState[index] != undefined &&
-                            vehicleImagesState[index] != {} &&
-                            vehicleImagesState[index] != null
-                          }
                           onChange={(_fileList: Array<any>) =>
                             onInputVehicleImages(_fileList, index)
                           }
