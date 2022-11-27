@@ -2,6 +2,7 @@ import "@/styles/custom/index.less";
 import React, { useEffect, useState } from "react";
 import { withAuth, useSession } from "auth";
 import type { PageWithSession } from "types";
+import type {VehicleGetSerializer,  } from "djtypes/vehicle";
 
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
@@ -37,7 +38,7 @@ import { useRouter } from "next/router";
 import { readFileAsync } from "utils/file";
 
 type EditVehiclePageProps = {
-  vehicleData: any
+  vehicleData: VehicleGetSerializer,
 };
 
 const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
@@ -387,12 +388,12 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     return null;
   }
 
+
   const toastOptions = {
     placement: "bottomCenter",
   };
 
-  const [effectState, setEffectState] = useState("");
-
+  const initialImages = [];
   async function getInitialData() {
     const countries = await getCountries();
     setCountriesState(
@@ -481,6 +482,27 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
             }))
           : []
       );
+
+      if (vehicleData.images) {
+        let _vehicleImages = {}
+        vehicleData.images.forEach(async (image: any, index: number) => {
+          const _imageName = image.image.split('/')[image.image.split('/').length - 1]
+          _vehicleImages[index] = []
+          initialImages.push({
+            url: `http://localhost:8000${image.image}`,
+            name: _imageName,
+            fileKey: image.id
+          })
+          _vehicleImages[index].push({
+            url: `http://localhost:8000${image.image}`,
+            name: _imageName,
+            fileKey: image.id
+          })
+          console.log(_vehicleImages[index])
+        })
+        
+        setVehicleImagesState((prevState) => ({ ...prevState, ..._vehicleImages }))
+      }
     }
   }
 
@@ -545,7 +567,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
 
   useEffect(() => {
     getInitialData();
-  }, [effectState]);
+  }, []);
 
   return (
     <FlexboxGrid
@@ -867,6 +889,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                         <Uploader
                           name="vehicleImages[]"
                           multiple
+                          fileList={vehicleImagesState[index]}
                           action=""
                           listType="picture"
                           accept=".jpg, .png, .svg"
@@ -1336,6 +1359,7 @@ export const getServerSideProps = withAuth<EditVehiclePageProps>({
     });
 
     const data = await response.json();
+    console.log(data);
 
     return {
       props: {
