@@ -10,6 +10,7 @@ from django_src.apps.country.models import City, Country, State
 from django_src.apps.country.views import CitiesSerializer, CountriesSerializer, StatesSerializer
 from django_src.apps.vehicle.models import Vehicle, VehicleBrand, VehicleImages, VehicleModel, VehicleVideos
 from django_src.apps.finance.models import Currency
+from rest_framework.response import Response
 
 from .serializers import *
 # Create your views here.
@@ -44,6 +45,26 @@ class VehicleGetView(generics.RetrieveAPIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = Vehicle.objects.all()
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        initial_data = serializer.data
+        countries = Country.objects.all()
+        countriesSerializer = CountriesSerializer(countries, many=True)
+
+        states = State.objects.filter(
+            country=instance.location_city.state.country.id)
+        statesSerializer = StatesSerializer(states, many=True)
+
+        cities = City.objects.filter(state=instance.location_city.state.id)
+        citiesSerializer = CitiesSerializer(cities, many=True)
+        new_data = {
+            'countries': countriesSerializer.data,
+            'states': statesSerializer.data,
+            'cities': citiesSerializer.data
+        }
+        return Response({**initial_data, **new_data})
 
 class VehicleView(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]

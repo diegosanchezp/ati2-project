@@ -2,8 +2,16 @@ import "@/styles/custom/index.less";
 import React, { useEffect, useState } from "react";
 import { withAuth, useSession } from "auth";
 import type { PageWithSession } from "types";
-import type {VehicleGetSerializer,  } from "djtypes/vehicle";
+import type {VehicleGetSerializer, VehicleSerializer as OriginalVehicleSerializer } from "djtypes/vehicle";
+import type {CitiesSerializer,StatesSerializer, CountriesSerializer} from "djtypes/country";
 
+type VehicleSerializer = OriginalVehicleSerializer & {
+  countries: CountriesSerializer[];
+  states: StatesSerializer[];
+  cities: CitiesSerializer[];
+  contact_hour_to_system?: string;
+  contact_hour_from_system?: string;
+};
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
@@ -38,8 +46,13 @@ import { useRouter } from "next/router";
 import { readFileAsync } from "utils/file";
 
 type EditVehiclePageProps = {
-  vehicleData: VehicleGetSerializer,
+  vehicleData: VehicleSerializer,
 };
+
+type GeneralStateList = {
+  label: string
+  value: string
+}
 
 const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   const toaster = useToaster();
@@ -157,14 +170,16 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     },
   ];
 
+  const [vehicleState, setVehicleState] = React.useState<VehicleSerializer>(vehicleData);
+
   const [mobileNumberState, setMobileNumberState] = React.useState(false);
   const [phoneNumberState, setPhoneNumberState] = React.useState(false);
   const [vehicleImagesState, setVehicleImagesState] = React.useState({});
   const [vehicleVideosState, setVehicleVideosState] = React.useState({});
   const [showVideosState, setShowVideosState] = React.useState(false);
-  const [countriesState, setCountriesState] = React.useState([]);
-  const [statesState, setStatesState] = React.useState([]);
-  const [citiesState, setCitiesState] = React.useState([]);
+  const [countriesState, setCountriesState] = React.useState<GeneralStateList[]>([]);
+  const [statesState, setStatesState] = React.useState<GeneralStateList[]>([]);
+  const [citiesState, setCitiesState] = React.useState<GeneralStateList[]>([]);
   const [vehicleBrandsState, setVehicleBrandsState] = React.useState([]);
   const [vehicleModelsState, setVehicleModelsState] = React.useState([]);
   const [vehicleTypesState, setVehicleTypesState] = React.useState(vehicleTypes);
@@ -421,7 +436,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
 
     const currencies = await getCurrencies();
     setCurrenciesState(
-      currencies.map((currency: any) => ({
+      currencies.map((currency) => ({
         label: `${currency.name} - ${currency.code}`,
         value: currency.id,
       }))
@@ -432,28 +447,28 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     // const vehicleData = await getVehicle(`${router.query.vehicleId}`);
     console.log(vehicleData);
     if (vehicleData) {
-      setCreateVehicleRequestState(() => ({
-        ...vehicleData.vehicle,
-        year: vehicleData.vehicle
-          ? parseInt(dayjs(vehicleData.vehicle.year).format("YYYY"))
+      setVehicleState((prevState) => ({
+        ...prevState,
+        year: vehicleData
+          ? parseInt(dayjs(vehicleData.year).format("YYYY"))
           : null,
-        contact_hour_from: vehicleData.vehicle
-          ? dayjs(`2022-01-01 ${vehicleData.vehicle.contact_hour_from}`).format(
+        contact_hour_from: vehicleData
+          ? dayjs(`2022-01-01 ${vehicleData.contact_hour_from}`).format(
               "HH"
             )
           : null,
-        contact_hour_from_system: vehicleData.vehicle
-          ? dayjs(`2022-01-01 ${vehicleData.vehicle.contact_hour_from}`).format(
+        contact_hour_from_system: vehicleData
+          ? dayjs(`2022-01-01 ${vehicleData.contact_hour_from}`).format(
               "a"
             )
           : null,
-        contact_hour_to: vehicleData.vehicle
-          ? dayjs(`2022-01-01 ${vehicleData.vehicle.contact_hour_to}`).format(
+        contact_hour_to: vehicleData
+          ? dayjs(`2022-01-01 ${vehicleData.contact_hour_to}`).format(
               "HH"
             )
           : null,
-        contact_hour_to_system: vehicleData.vehicle
-          ? dayjs(`2022-01-01 ${vehicleData.vehicle.contact_hour_to}`).format(
+        contact_hour_to_system: vehicleData
+          ? dayjs(`2022-01-01 ${vehicleData.contact_hour_to}`).format(
               "a"
             )
           : null,
@@ -542,7 +557,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   }
 
   function onChangeCreateVehicleRequest(_value: any, _field: string) {
-    let _createVehicleRequest = createVehicleRequestState;
+    let _createVehicleRequest = vehicleState;
     _createVehicleRequest[_field] = _value;
     setCreateVehicleRequestState((...prevState) => ({..._createVehicleRequest, ...prevState}));
   }
@@ -602,8 +617,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           placeholder="Selecciona un continente"
                           data={continentsState}
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.location_continent
+                            vehicleState
+                              ? vehicleState.location_city.state.country.continent
                               : null
                           }
                           onChange={(_value: any) =>
@@ -629,8 +644,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           placeholder="Selecciona un país"
                           data={countriesState}
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.location_country
+                            vehicleState
+                              ? vehicleState.location_city.state.country.id
                               : null
                           }
                           onChange={onChangeCountry}
@@ -651,8 +666,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           placeholder="Selecciona un estado"
                           data={statesState}
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.location_state
+                            vehicleState
+                              ? vehicleState.location_city.state.id
                               : null
                           }
                           onChange={onChangeState}
@@ -673,8 +688,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           placeholder="Selecciona una ciudad"
                           data={citiesState}
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.location_city
+                            vehicleState
+                              ? vehicleState.location_city.id
                               : null
                           }
                           onChange={onChangeCity}
@@ -694,8 +709,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           name="zone"
                           style={{ maxWidth: "100%" }}
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.location_zone
+                            vehicleState
+                              ? vehicleState.location_zone
                               : ""
                           }
                           onChange={(_value: any) =>
@@ -719,8 +734,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                         <RadioGroup
                           name="contract"
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.contract_type
+                            vehicleState
+                              ? vehicleState.contract_type
                               : null
                           }
                           onChange={(_value: any) =>
@@ -763,8 +778,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           placeholder="Selecciona una marca"
                           data={vehicleBrandsState}
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.brand
+                            vehicleState
+                              ? vehicleState.model.brand.id
                               : null
                           }
                           onChange={(_value: any) =>
@@ -787,8 +802,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           placeholder="Selecciona un modelo"
                           data={vehicleModelsState}
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.model
+                            vehicleState
+                              ? vehicleState.model.id
                               : null
                           }
                           onChange={(_value: any) =>
@@ -811,8 +826,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           placeholder="Selecciona un año"
                           data={yearsState}
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.year
+                            vehicleState
+                              ? vehicleState.year
                               : null
                           }
                           onChange={(_value: any) =>
@@ -835,8 +850,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           placeholder="Selecciona un status"
                           data={vehicleStatusState}
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.status
+                            vehicleState
+                              ? vehicleState.status
                               : null
                           }
                           onChange={(_value: any) =>
@@ -859,8 +874,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           placeholder="Selecciona un tipo"
                           data={vehicleTypesState}
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.type_vehicle
+                            vehicleState
+                              ? vehicleState.type_vehicle
                               : null
                           }
                           onChange={(_value: any) =>
@@ -1023,8 +1038,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                     name="moreDetails"
                     as="textarea"
                     value={
-                      createVehicleRequestState
-                        ? createVehicleRequestState.details
+                      vehicleState
+                        ? vehicleState.details
                         : null
                     }
                     onChange={(_value: any) =>
@@ -1047,8 +1062,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                     name="location"
                     as="textarea"
                     value={
-                      createVehicleRequestState
-                        ? createVehicleRequestState.exact_location
+                      vehicleState
+                        ? vehicleState.exact_location
                         : null
                     }
                     onChange={(_value: any) =>
@@ -1068,9 +1083,9 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                       name="price"
                       type="number"
                       value={
-                        createVehicleRequestState
-                          ? createVehicleRequestState.sale_price ||
-                            createVehicleRequestState.rental_price
+                        vehicleState
+                          ? vehicleState.sale_price ||
+                            vehicleState.rental_price
                           : null
                       }
                       onChange={(_value: any) =>
@@ -1086,8 +1101,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                       name="currency"
                       placeholder="Selecciona una moneda"
                       value={
-                        createVehicleRequestState
-                          ? createVehicleRequestState.currency
+                        vehicleState
+                          ? vehicleState.currency.id
                           : null
                       }
                       onChange={(_value: any) =>
@@ -1122,8 +1137,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                       name="contactName"
                       placeholder="Jesús Antonio"
                       value={
-                        createVehicleRequestState
-                          ? createVehicleRequestState.contact_first_name
+                        vehicleState
+                          ? vehicleState.contact_first_name
                           : null
                       }
                       onChange={(_value: any) =>
@@ -1140,8 +1155,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                       name="contactLastName"
                       placeholder="Perez Castillo"
                       value={
-                        createVehicleRequestState
-                          ? createVehicleRequestState.contact_last_name
+                        vehicleState
+                          ? vehicleState.contact_last_name
                           : null
                       }
                       onChange={(_value: any) =>
@@ -1158,8 +1173,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                       name="contactEmail"
                       placeholder="jesusp@test.com"
                       value={
-                        createVehicleRequestState
-                          ? createVehicleRequestState.contact_email
+                        vehicleState
+                          ? vehicleState.contact_email
                           : null
                       }
                       onChange={(_value: any) =>
@@ -1203,8 +1218,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
 
                   <FlexboxGrid justify="center">
                     <CheckboxGroup
-                      value={createVehicleRequestState 
-                        ? createVehicleRequestState.contact_days
+                      value={vehicleState 
+                        ? vehicleState.contact_days
                         : [] 
                       }
                       onChange={(_value: any) => onChangeContactDays(_value)}
@@ -1248,8 +1263,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           name="startContactTime"
                           placeholder="Selecciona una hora"
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.contact_hour_from
+                            vehicleState
+                              ? vehicleState.contact_hour_from
                               : null
                           }
                           onChange={(_value: any) =>
@@ -1265,8 +1280,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                         name="startTimeSystem"
                         placeholder="am"
                         value={
-                          createVehicleRequestState
-                            ? createVehicleRequestState.contact_hour_from_system
+                          vehicleState
+                            ? vehicleState.contact_hour_from_system
                             : null
                         }
                         onChange={(_value: any) =>
@@ -1290,8 +1305,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           name="endContactTime"
                           placeholder="Selecciona una hora"
                           value={
-                            createVehicleRequestState
-                              ? createVehicleRequestState.contact_hour_to
+                            vehicleState
+                              ? vehicleState.contact_hour_to
                               : null
                           }
                           onChange={(_value: any) =>
@@ -1307,8 +1322,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                         name="endTimeSystem"
                         placeholder="am"
                         value={
-                          createVehicleRequestState
-                            ? createVehicleRequestState.contact_hour_to_system
+                          vehicleState
+                            ? vehicleState.contact_hour_to_system
                             : null
                         }
                         onChange={(_value: any) =>
