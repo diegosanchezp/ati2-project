@@ -16,6 +16,7 @@ django-widget-tweaks = "*"
 argon2-cffi = "*"
 django-typomatic = "*"
 pillow = "*"
+ipython = "*"
 
 [dev-packages]
 django-stubs = "*"
