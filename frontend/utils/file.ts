@@ -8,6 +8,6 @@ export function readFileAsync(file) {
 
     reader.onerror = reject;
 
-    reader.readAsArrayBuffer(file);
+    reader.readAsDataURL(file);
   })
 }

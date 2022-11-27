@@ -34,6 +34,7 @@ import {
 import { getCurrencies } from "pages/api/finance";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
+import { readFileAsync } from "utils/file";
 
 type EditVehiclePageProps = {};
 
@@ -212,15 +213,13 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
 
     if (vehicleImagesState) {
       const vehicleImages = Object.values(vehicleImagesState);
-      let vehicleImagesReaders = [];
+      let vehicleImagesReaders: Array<any> = [];
       if (vehicleImages.length > 0) {
-        vehicleImages.forEach((image) => {
-          let _reader = new FileReader();
-          _reader.readAsDataURL(image.blobFile);
-          _reader.onloadend = async () => {
-            vehicleImagesReaders.push(_reader.result);
-          };
+        vehicleImages.forEach(async (image: any) => {
+          const fileBase64 = await readFileAsync(image.blobFile)
+          vehicleImagesReaders.push(fileBase64)
         });
+        console.log(vehicleImagesReaders);
         _createVehicleRequest = {
           ..._createVehicleRequest,
           vehicle_images: vehicleImagesReaders,
@@ -1327,7 +1326,7 @@ interface VehiclesPageProps {
 }
 
 export const getServerSideProps = withAuth<VehiclesPageProps>({
-  async getServerSideProps({ user }) {
+  async getServerSideProps({ user,  }) {
     return {
       props: {
         a: "a",

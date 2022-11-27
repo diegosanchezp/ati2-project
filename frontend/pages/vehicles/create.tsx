@@ -2,10 +2,10 @@ import "@/styles/custom/index.less";
 import React, { useEffect, useState } from "react";
 import { withAuth, useSession } from "auth";
 import type { PageWithSession } from "types";
-
+import {readFileAsync} from "utils/file";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-
+import { FileType } from "rsuite/Uploader";
 import CameraRetroIcon from "@rsuite/icons/legacy/CameraRetro";
 import {
   Checkbox,
@@ -180,14 +180,11 @@ const VehicleCreatePage: PageWithSession<CreateVehiclePageProps> = (props) => {
 
     if (vehicleImagesState) {
       const vehicleImages = Object.values(vehicleImagesState);
-      let vehicleImagesReaders = [];
+      let vehicleImagesReaders: Array<any> = [];
       if (vehicleImages.length > 0) {
-        vehicleImages.forEach((image) => {
-          let _reader = new FileReader();
-          _reader.readAsDataURL(image.blobFile);
-          _reader.onloadend = async () => {
-            vehicleImagesReaders.push(_reader.result);
-          };
+        vehicleImages.forEach(async (image: any) => {
+          const fileBase64 = await readFileAsync(image.blobFile)
+          vehicleImagesReaders.push(fileBase64)
         });
         console.log(vehicleImagesReaders);
         _createVehicleRequest = {
