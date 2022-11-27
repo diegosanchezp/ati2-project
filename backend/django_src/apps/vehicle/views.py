@@ -9,21 +9,28 @@ from django_src.apps.country.views import CitiesSerializer, CountriesSerializer,
 from django_src.apps.vehicle.models import Vehicle, VehicleBrand, VehicleImages, VehicleModel, VehicleVideos
 from django_src.apps.finance.models import Currency
 
+# Typescript types
+from django.conf import settings
+from django_typomatic import ts_interface, generate_ts
+
 # Create your views here.
 
 
+@ts_interface(context="vehicle")
 class VehicleBrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = VehicleBrand
         fields = ['id', 'name']
 
 
+@ts_interface(context="vehicle")
 class VehicleModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = VehicleModel
         fields = ['id', 'name']
 
 
+@ts_interface(context="vehicle")
 class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehicle
@@ -33,6 +40,7 @@ class VehicleSerializer(serializers.ModelSerializer):
         return Vehicle.objects.create(**validate_data)
 
 
+@ts_interface(context="vehicle")
 class VehicleImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = VehicleImages
@@ -67,6 +75,15 @@ class VehicleModelView(APIView):
 
         return JsonResponse({'models': vehicleModelsSerializer.data})
 
+
+@ts_interface(context="vehicle")
+class VehicleGetSerializer(serializers.Serializer):
+    vehicle = VehicleSerializer()
+    images = VehicleImageSerializer(many=True)
+    videos = VehicleImageSerializer(many=True)
+    countries = CountriesSerializer()
+    states = StatesSerializer()
+    cities = CitiesSerializer()
 
 class VehicleView(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
@@ -122,6 +139,7 @@ class VehicleView(APIView):
             cities = City.objects.filter(state=vehicle.location_city.state.id)
             citiesSerializer = CitiesSerializer(cities, many=True)
 
+
             return JsonResponse({
                 'vehicle': _vehicleData,
                 'images': vehicleImagesSerializer.data,
@@ -150,3 +168,6 @@ class VehicleView(APIView):
                     vehicleImageSerializer.save()
 
             return JsonResponse({'success': True})
+
+if settings.DEBUG:
+    generate_ts(settings.TS_TYPES_DIR / "vehicle.ts", context='vehicle')

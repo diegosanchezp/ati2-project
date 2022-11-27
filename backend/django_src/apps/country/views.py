@@ -7,16 +7,22 @@ from django.http import JsonResponse
 
 # Create your views here.
 
+from django.conf import settings
+from django_typomatic import ts_interface, generate_ts
+
+@ts_interface(context="country")
 class CountriesSerializer(serializers.ModelSerializer):
     class Meta:
         model= Country
         fields= ['id', 'name', 'iso3']
 
+@ts_interface(context="country")
 class StatesSerializer(serializers.ModelSerializer):
     class Meta:
         model= State
         fields= ['id', 'name']
 
+@ts_interface(context="country")
 class CitiesSerializer(serializers.ModelSerializer):
     class Meta:
         model= City
@@ -54,3 +60,6 @@ class CitiesByStateView(APIView):
         citiesSerializer = CitiesSerializer(cities, many=True)
 
         return JsonResponse({'cities': citiesSerializer.data})
+
+if settings.DEBUG:
+    generate_ts(settings.TS_TYPES_DIR / "country.ts", context='country')
