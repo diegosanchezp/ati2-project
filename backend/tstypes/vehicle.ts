@@ -1,3 +1,10 @@
+export interface TelephoneSerializer {
+    number: string;
+    country_number: number;
+    ext?: string;
+    ptype: "FIXED" | "MOBILE";
+}
+
 export interface VehicleBrandSerializer {
     id?: number;
     name: string;
@@ -8,8 +15,35 @@ export interface VehicleModelSerializer {
     name: string;
 }
 
+export interface CityNestedSerializer {
+    id?: number;
+    name: string;
+    state?: any;
+}
+
+export interface VechicleModelNested {
+    id?: number;
+    name: string;
+    brand?: any;
+}
+
+export interface VehicleVideosSerializer {
+
+}
+
+export interface VehicleImageSerializer {
+    id?: number;
+    image: any;
+    vehicle: number | string;
+}
+
 export interface VehicleSerializer {
     id?: number;
+    location_city: CityNestedSerializer;
+    model: VechicleModelNested;
+    images: VehicleImageSerializer[];
+    videos: VehicleVideosSerializer[];
+    contact_phone_numbers: TelephoneSerializer[];
     type_vehicle?: "TRUCK" | "CAR" | "VAN";
     contact_days: any;
     contact_hour_from: string;
@@ -27,17 +61,7 @@ export interface VehicleSerializer {
     contact_first_name?: string;
     contact_last_name?: string;
     contact_email?: string;
-    location_city?: number | string | null;
-    owner: number | string;
-    model: number | string;
-    brand: number | string;
-    currency?: number | string | null;
-}
-
-export interface VehicleImageSerializer {
-    id?: number;
-    image: any;
-    vehicle: number | string;
+    currency?: any;
 }
 
 export interface VehicleGetSerializer {
