@@ -33,6 +33,7 @@ import { url } from "inspector";
 import { getURL } from "next/dist/shared/lib/utils";
 import next from "next";
 import { djRequest, getCSRF } from "utils/apirest";
+import { useSession } from "auth";
 
 function PublicationsPage() {
   //states for query, tal vez agunos deben iniciar de otra forma
@@ -151,6 +152,8 @@ function PublicationsPage() {
     return url;
   }
 
+  const { dispatch, session } = useSession();
+  console.log("session ", session);
   useEffect(() => {
     //3 casos
     const isClient = false;
@@ -297,6 +300,7 @@ function PublicationsPage() {
               setCardSelected={setCardsSelected}
               setLastCard={setLastCard}
               lastCard={lastCard}
+              data={vehicles}
             />
           )}
         </Container>

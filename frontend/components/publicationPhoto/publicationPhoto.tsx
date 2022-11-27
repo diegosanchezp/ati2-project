@@ -22,6 +22,7 @@ import {
 } from "rsuite";
 import { list } from "../../pages/publications/list-DELETE/data";
 import ContactarAnunciante from "components/contactar-anunciante/contactarAnunciante";
+import { ifError } from "assert";
 const CustomPopover = React.forwardRef(({ content, title, ...props }, ref) => {
   return (
     <Popover ref={ref} title={title} {...props}>
@@ -111,10 +112,23 @@ function PublicationPhoto(props) {
               <Container className="publications-more-data">
                 <CustomPanel
                   placement="auto"
-                  title="Accesorios"
+                  title="Detalles del vehículo"
+                  url="details"
+                  nameLink="Ver detalles"
+                  id={item.id}
+                  accessories={item.accessories}
+                  details={item.details}
+                  address={item.exact_location}
+                />
+                <CustomPanel
+                  placement="auto"
+                  title="Accesorios del vehículo"
                   url="details"
                   nameLink="Ver accesorios"
                   id={item.id}
+                  accessories={item.accessories}
+                  details={item.details}
+                  address={item.exact_location}
                 />
                 <CustomPanel
                   placement="auto"
@@ -122,6 +136,9 @@ function PublicationPhoto(props) {
                   url="fotos"
                   nameLink="Ver fotos"
                   id={item.id}
+                  accessories={item.accessories}
+                  details={item.details}
+                  address={item.exact_location}
                 />
                 <CustomPanel
                   placement="auto"
@@ -129,6 +146,9 @@ function PublicationPhoto(props) {
                   url="videos"
                   nameLink="Ver videos"
                   id={item.id}
+                  accessories={item.accessories}
+                  details={item.details}
+                  address={item.exact_location}
                 />
                 <CustomPanel
                   placement="auto"
@@ -136,6 +156,9 @@ function PublicationPhoto(props) {
                   url="details"
                   nameLink="Ver servicios al día"
                   id={item.id}
+                  accessories={item.accessories}
+                  details={item.details}
+                  address={item.exact_location}
                 />
                 <CustomPanel
                   placement="auto"
@@ -143,6 +166,9 @@ function PublicationPhoto(props) {
                   url="details"
                   nameLink="Ver ubicación exacta"
                   id={item.id}
+                  accessories={item.accessories}
+                  details={item.details}
+                  address={item.exact_location}
                 />
               </Container>
             </Content>

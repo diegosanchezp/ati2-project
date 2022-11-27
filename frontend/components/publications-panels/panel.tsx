@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React from "react";
-import { Popover, Whisper } from "rsuite";
-import PanelPublicationMore from "./panel-more";
+import { Container, Popover, Whisper } from "rsuite";
+import PanelPublicationSeeMore from "./panel-more";
 
 const openInNewTab = (url: string) => {
   window.open(
@@ -11,20 +11,43 @@ const openInNewTab = (url: string) => {
   );
 };
 
-const CustomPopover = React.forwardRef(({ content, title, ...props }, ref) => {
-  return (
-    <Popover ref={ref} title={title} {...props}>
-      <p>This is a Popover </p>
-      <p>
-        Especificaciones:a Confederación de Norteamérica, Centroamérica y el
-        Caribe de Fútbol a Confederación de Norteamérica, Centroamérica y el
-        Caribe de Fútbol{" "}
-      </p>
-      <PanelPublicationMore />
-      <p>{content}</p>
-    </Popover>
-  );
-});
+const CustomPopover = React.forwardRef(
+  ({ content, title, accessories, address, id, details, ...props }, ref) => {
+    const noAccessoriBox =
+      title === "Ubicacion" || title === "Detalles del vehículo";
+    console.log("noAccessoriBox ", noAccessoriBox, "detalles ", details);
+    const listAccesories = accessories ? accessories?.split(",") : [];
+    const listDetails = details ? details?.split(",") : [];
+    return (
+      <Popover ref={ref} title={title} {...props}>
+        {noAccessoriBox ? (
+          <Container>
+            <ul>
+              {listDetails.map((accesorie) => (
+                <li>
+                  <p>{accesorie}</p>
+                </li>
+              ))}
+            </ul>
+          </Container>
+        ) : (
+          <Container>
+            <p>Accesorios del vehiculo </p>
+            <ul>
+              {listAccesories.map((accesorie) => (
+                <li>
+                  <p>{accesorie}</p>
+                </li>
+              ))}
+            </ul>
+          </Container>
+        )}
+
+        <PanelPublicationSeeMore address={address} id={id} />
+      </Popover>
+    );
+  }
+);
 
 const CustomPanel = ({
   placement,
@@ -32,13 +55,24 @@ const CustomPanel = ({
   nameLink,
   url,
   id,
-  //children: any,
-}) => (
+  accessories,
+  address,
+  details,
+}: any) => (
   <Whisper
     trigger="hover"
     placement={placement}
     controlId={`control-id-${placement}-${title}`}
-    speaker={<CustomPopover content={"test content"} title={title} />}
+    speaker={
+      <CustomPopover
+        content={"test content"}
+        title={title}
+        accessories={accessories}
+        address={address}
+        id={id}
+        details={details}
+      />
+    }
     enterable
   >
     <a
@@ -51,12 +85,5 @@ const CustomPanel = ({
     </a>
   </Whisper>
 );
-/*<a
-      //href="https://google.com"
-      href="test"
-      target="popup"
-      onClick={() => openInNewTab("test")}
-    >
-      {nameLink}
-    </a>*/
+
 export default CustomPanel;

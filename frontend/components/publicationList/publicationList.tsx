@@ -16,6 +16,9 @@ import CustomPanel from "components/publications-panels/panel";
 import ContactarAnunciante from "components/contactar-anunciante/contactarAnunciante";
 
 function PublicationList(props: any) {
+  const baseURL = "http://localhost:8000";
+  const { data } = props;
+
   const selectCard = (e) => {
     const vehicleID = e;
 
@@ -39,7 +42,7 @@ function PublicationList(props: any) {
   };
   return (
     <Container className="publication-list">
-      {list.map((item) => (
+      {data.map((item) => (
         <Container className="publication-card-list">
           <Content className="button-select">
             <Checkbox value={item.id} onChange={selectCard}></Checkbox>
@@ -47,29 +50,38 @@ function PublicationList(props: any) {
 
           <Content>
             <Carousel className="custom-slider publication-card-list-img">
-              {item.images.map((image) => (
-                <img src={image} height="15" />
-              ))}
+              {item.images.length > 0 ? (
+                item.images.map((image) => (
+                  <img src={`${baseURL}${image.image}`} height="15" />
+                ))
+              ) : (
+                <img
+                  src={
+                    "https://st4.depositphotos.com/14953852/22772/v/600/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg"
+                  }
+                  height="15"
+                />
+              )}
             </Carousel>
           </Content>
 
           <Content className="vehicle-data">
-            <p>{item.salePrice}</p>
+            <p>{item.sale_price}</p>
             <p>{item.status}</p>
-            <p>Marca {item.brand}</p>
-            <p>Modelo {item.model}</p>
+            <p>Marca {item.model.brand.name}</p>
+            <p>Modelo {item.model.name}</p>
             <ContactarAnunciante className="contactar-anunciante-button" />
           </Content>
 
           <Content>
             <p>
-              <b>Pais</b> {item.address.country}
+              <b>Pais</b> {item.location_city.location.split(">")[0]}
             </p>
             <p>
-              <b>Ciudad</b> {item.address.city}
+              <b>Ciudad</b> {item.location_city.name}
             </p>
             <p>
-              <b>Direccion</b> {item.address.address}
+              <b>Direccion</b> {item.location_zone}
             </p>
           </Content>
 
@@ -77,16 +89,22 @@ function PublicationList(props: any) {
             <CustomPanel
               placement="auto"
               title="Fotos"
-              nameLink="Ver fotos"
               url="fotos"
+              nameLink="Ver fotos"
               id={item.id}
+              accessories={item.accessories}
+              details={item.details}
+              address={item.exact_location}
             />
             <CustomPanel
               placement="auto"
               title="Videos"
-              nameLink="Ver videos"
               url="videos"
+              nameLink="Ver videos"
               id={item.id}
+              accessories={item.accessories}
+              details={item.details}
+              address={item.exact_location}
             />
             <Container className="publication-list-photo-see-all">
               <a href="">Ver información completa</a>

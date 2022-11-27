@@ -3,24 +3,52 @@ import { Container } from "rsuite";
 
 import { TypeOrderPubliationsEnum } from "../../pages/publications/enums/publications.enum";
 
-function PanelPublicationMore() {
+function PanelPublicationSeeMore({ address, id }) {
+  const openInNewTab = (url: string) => {
+    window.open(
+      url,
+      "name",
+      "width=600,height=800,toolbar=no, location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,left=100, top=20"
+    );
+  };
   return (
     <Container>
       <p>Haga click oara ver mas informacion</p>
       <ul>
         <li>
-          <a>Ver fotos of </a>
+          <a
+            //href="https://google.com"
+            href="test"
+            target="popup"
+            onClick={() => openInNewTab(`publications/fotos?id=${id}`)}
+          >
+            Ver fotos
+          </a>
         </li>
         <li>
-          <a>Ver videos of </a>
+          <a
+            //href="https://google.com"
+            href="test"
+            target="popup"
+            onClick={() => openInNewTab(`publications/videos?id=${id}`)}
+          >
+            Ver videos
+          </a>
         </li>
         <li>
-          <a>Ver ubicacion exacta of </a>
+          <a
+            //href="https://google.com"
+            href="test"
+            target="popup"
+            onClick={() => openInNewTab(`publications/details?id=${id}`)}
+          >
+            Ver ubicación exacta
+          </a>
         </li>
       </ul>
-      <p>Ublicacion exacta: </p>
+      <p>Ublicacion exacta: {address} </p>
     </Container>
   );
 }
 
-export default PanelPublicationMore;
+export default PanelPublicationSeeMore;
