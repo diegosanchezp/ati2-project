@@ -62,6 +62,8 @@ const openInNewTab = (url: string) => {
   );
 };
 function PublicationPhoto(props) {
+  const baseURL = "http://localhost:8000";
+  const { data } = props;
   const selectCard = (e) => {
     const vehicleID = e;
 
@@ -86,7 +88,7 @@ function PublicationPhoto(props) {
 
   return (
     <Container className="publication-photo">
-      {list.map((item) => (
+      {data.map((item) => (
         <Container className="publication-card-photo">
           <Container className="publication-card-photo-columns">
             <Content className="button-select">
@@ -95,10 +97,16 @@ function PublicationPhoto(props) {
             <Content className="photo-data">
               <img
                 className="publication-card-photo-img"
-                src={item.images[0]}
+                src={
+                  item.images[0]?.image
+                    ? `${baseURL}${item.images[0].image}`
+                    : "https://st4.depositphotos.com/14953852/22772/v/600/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg"
+                }
               ></img>
               <p className="price-photo">
-                <b>{item.salePrice} USD</b>
+                <b>
+                  {item.sale_price} {item.currency.code}
+                </b>
               </p>
               <Container className="publications-more-data">
                 <CustomPanel
@@ -141,23 +149,23 @@ function PublicationPhoto(props) {
             <Content className="photo-data-addres">
               <Container className="photo-vehicle-status-data">
                 <p style={{ color: "#2589f5" }}>
-                  {item.brand}-{item.model}
+                  {item.model.brand.name}-{item.model.name}
                 </p>
-                <p style={{ color: "#eb3626" }}>{item.contrattype}</p>
+                <p style={{ color: "#eb3626" }}>{item.contract_type}</p>
                 <p style={{ color: "#5ea83e" }}>{item.status}</p>
               </Container>
               <Container className="photo-vehicle-addres-data">
                 <p>
                   <b>Pais: </b>
-                  {item.address.country}
+                  {item.location_city.location.split(">")[0]}
                 </p>
                 <p>
                   <b>Ciudad: </b>
-                  {item.address.city}
+                  {item.location_city.name}
                 </p>
                 <p>
                   <b>Zona: </b>
-                  {item.address.address}
+                  {item.location_zone}
                 </p>
               </Container>
               <ContactarAnunciante className="contactar-anunciante-button" />

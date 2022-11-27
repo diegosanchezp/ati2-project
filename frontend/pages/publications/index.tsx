@@ -32,6 +32,7 @@ import FilterVehicles from "components/filter-vehicle/filter-vehicle";
 import { url } from "inspector";
 import { getURL } from "next/dist/shared/lib/utils";
 import next from "next";
+import { djRequest, getCSRF } from "utils/apirest";
 
 function PublicationsPage() {
   //states for query, tal vez agunos deben iniciar de otra forma
@@ -62,6 +63,8 @@ function PublicationsPage() {
   const [cardsSelected, setCardsSelected] = useState([]);
   const [lastCard, setLastCard] = useState(0);
 
+  const [vehicles, setVehicles] = useState([]);
+
   //estados 5 botones
   const [optionsButtons, setOptionsButtons] = useState([
     true,
@@ -89,6 +92,27 @@ function PublicationsPage() {
       const url = getURLQuery();
       console.log("ejecutar busqueda a ", url);
       setSubmit(false);
+
+      const fetchData = async () => {
+        const { csrfToken, csrfRes } = await getCSRF();
+
+        const response = await djRequest("vehicles", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken as string,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("data ", data.data);
+          setVehicles(data.data);
+          return data;
+        }
+      };
+
+      fetchData();
     }
   }, [submit]);
 
@@ -251,7 +275,7 @@ function PublicationsPage() {
             next
             first
             size="md"
-            total={100}
+            total={vehicles.total_pages}
             limit={90}
             activePage={activePage}
             onChangePage={setActivePage}
@@ -265,6 +289,7 @@ function PublicationsPage() {
               setCardSelected={setCardsSelected}
               setLastCard={setLastCard}
               lastCard={lastCard}
+              data={vehicles}
             />
           ) : (
             <PublicationList

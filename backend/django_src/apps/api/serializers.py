@@ -2,6 +2,7 @@ from rest_framework import serializers
 from ..vehicle.models import Vehicle, VehicleImages, VehicleVideos, VehicleModel, VehicleBrand
 from ..finance.serializers import CurrencySerializer
 from ..country.serializers import CitySerializer
+from django_typomatic import ts_interface, generate_ts
 
 
 class VehicleBrandSerializer(serializers.ModelSerializer):
@@ -44,8 +45,7 @@ class VehicleSerializer(serializers.ModelSerializer):
         ]
 
 
-
-class VehicleListSerializer(serializers.Serializer):
+class VehicleListSerializer(serializers.Serializer): 
     data = VehicleSerializer(many = True, read_only = True)
     total_elements = serializers.IntegerField()
     total_pages = serializers.IntegerField()
