@@ -41,6 +41,8 @@ class VehicleModelView(APIView):
 
 class VehicleGetView(generics.RetrieveAPIView):
     serializer_class = VehicleSerializer
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Vehicle.objects.all()
 
 class VehicleView(APIView):
