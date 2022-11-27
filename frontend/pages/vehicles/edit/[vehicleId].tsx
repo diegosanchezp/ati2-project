@@ -36,11 +36,14 @@ import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import { readFileAsync } from "utils/file";
 
-type EditVehiclePageProps = {};
+type EditVehiclePageProps = {
+  vehicleData: any
+};
 
 const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   const toaster = useToaster();
   const router = useRouter();
+  const {vehicleData} = props;
 
   const continents = [
     {
@@ -425,7 +428,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
 
     getYearsList(1970, parseInt(dayjs().format("YYYY")));
 
-    const vehicleData = await getVehicle(`${router.query.vehicleId}`);
+    // const vehicleData = await getVehicle(`${router.query.vehicleId}`);
     console.log(vehicleData);
     if (vehicleData) {
       setCreateVehicleRequestState(() => ({
@@ -1322,14 +1325,21 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
 export default VehicleEditPage;
 
 interface VehiclesPageProps {
-  countries: [];
+  // countries: [];
 }
 
-export const getServerSideProps = withAuth<VehiclesPageProps>({
-  async getServerSideProps({ user,  }) {
+export const getServerSideProps = withAuth<EditVehiclePageProps>({
+  async getServerSideProps({params, djRequest}) {
+
+    const response = await djRequest(`api/vehicle/${params.vehicleId}`, {
+      method: "GET",    
+    });
+
+    const data = await response.json();
+
     return {
       props: {
-        a: "a",
+        vehicleData: data,
       },
     };
   },
