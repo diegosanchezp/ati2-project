@@ -2,7 +2,7 @@ import React from "react";
 import EditIcon from "@rsuite/icons/Edit";
 import WarningRoundIcon from "@rsuite/icons/WarningRound";
 import VisibleIcon from "@rsuite/icons/Visible";
-//import UnvisibleIcon from "@rsuite/icons/Unvisible";
+import UnvisibleIcon from "@rsuite/icons/Unvisible";
 import {
   Container,
   Content,
@@ -18,6 +18,7 @@ import ContactarAnunciante from "components/contactar-anunciante/contactarAnunci
 function PublicationList(props: any) {
   const baseURL = "http://localhost:8000";
   const { data } = props;
+  const { isLogin, isAdmin, isClient, sessionUserId } = props.session;
 
   const selectCard = (e) => {
     const vehicleID = e;
@@ -110,12 +111,40 @@ function PublicationList(props: any) {
               <a href="">Ver información completa</a>
             </Container>
           </Content>
+          {isLogin ? (
+            <Container className="publications-authenticated-buttons">
+              <IconButton
+                icon={<EditIcon />}
+                disabled={sessionUserId !== item.owner.id} ////solo  el dueño
+                circle
+                size="sm"
+              />
+              {item.publication_enabled ? (
+                <IconButton
+                  icon={<UnvisibleIcon />}
+                  disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño | deshabilitar
+                  circle
+                  size="sm"
+                />
+              ) : (
+                <IconButton
+                  icon={<VisibleIcon />}
+                  disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño | habilitar
+                  circle
+                  size="sm"
+                />
+              )}
 
-          <Container className="publications-authenticated-buttons">
-            <IconButton icon={<EditIcon />} circle size="sm" />
-            <IconButton icon={<VisibleIcon />} circle size="sm" />
-            <IconButton icon={<WarningRoundIcon />} circle size="sm" />
-          </Container>
+              <IconButton
+                icon={<WarningRoundIcon />}
+                disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño
+                circle
+                size="sm"
+              />
+            </Container>
+          ) : (
+            <Container></Container>
+          )}
         </Container>
       ))}
     </Container>

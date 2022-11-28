@@ -1,17 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Container,
-  Button,
-  Divider,
-  Radio,
-  RadioGroup,
-  Pagination,
-  PanelGroup,
-  Panel,
-  CheckPicker,
-  SelectPicker,
-  Form,
-} from "rsuite";
+import { Container, Button, Divider, Pagination } from "rsuite";
 
 //COMPONENTS
 import PublicationList from "components/publicationList/publicationList";
@@ -29,9 +17,6 @@ import PublicationsTypeVehicle from "components/publications-bars/publications-t
 import PublicationsOrder from "components/publications-bars/publications-order";
 import PublicationsStatusVehicle from "components/publications-bars/publications-status-behicle";
 import FilterVehicles from "components/filter-vehicle/filter-vehicle";
-import { url } from "inspector";
-import { getURL } from "next/dist/shared/lib/utils";
-import next from "next";
 import { djRequest, getCSRF } from "utils/apirest";
 import { useSession } from "auth";
 
@@ -219,15 +204,22 @@ function PublicationsPage() {
   //efect para seleccion de vehiculo
   useEffect(() => {
     //console.log("en effect ", cardsSelected);
-    //TODO verificar si el cliente es el dueño del auto, revisar toda esta logica
+    let isOwner = false;
     const len = cardsSelected.length;
+    // console.log("leeen ", len);
+    if (len === 1) {
+      const vehicleSelect = vehicles.filter(
+        (vehicle) => vehicle?.id === lastCard
+      )[0];
+      isOwner = vehicleSelect.owner.id === sessionUserId;
+    }
 
     //Relacion botones-session
     const seeButton = true;
-    const editButton = isLogin && isClient;
-    const deshabilitarButton = isLogin && (isAdmin || isClient);
-    const habilitarButton = isLogin && (isAdmin || isClient);
-    const deleteButton = isLogin && (isAdmin || isClient);
+    const editButton = isLogin && isOwner;
+    const deshabilitarButton = isLogin && (isAdmin || isOwner);
+    const habilitarButton = isLogin && (isAdmin || isOwner);
+    const deleteButton = isLogin && (isAdmin || isOwner);
 
     const activeButtons = len === 1;
     const moreCards = len >= 2;
@@ -241,12 +233,18 @@ function PublicationsPage() {
         !deleteButton,
       ]);
     } else {
-      setOptionsButtons([true, true, true, true, true]);
+      //setOptionsButtons([true, true, true, true, true]);
     }
     if (moreCards) {
-      console.log("more os 1 card ", len);
+      // console.log("more os 1 card ", len);
       //habilitar -> habilitar, deshabilitar,eliminar
-      //setOptionsButtons([true, true, !deshabilitarButton, !habilitarButton, !deleteButton]);
+      setOptionsButtons([
+        true,
+        true,
+        !deshabilitarButton,
+        !habilitarButton,
+        !deleteButton,
+      ]);
     }
     //console.log("----------------------------------");
   }, [lastCard]);
@@ -378,6 +376,7 @@ function PublicationsPage() {
               setLastCard={setLastCard}
               lastCard={lastCard}
               data={vehicles}
+              session={sessionObj}
             />
           )}
         </Container>

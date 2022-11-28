@@ -77,7 +77,7 @@ class VehiclesView(APIView):
         if(type_vehicle != "any"):
             filters &= Q(type_vehicle__iexact = type_vehicle)
 
-        order_by = request.GET.get("order_by", "-id")
+        order_by = request.GET.get("order_by", "-id") #-1 DESC | 1 ASC
         
         page_number = request.GET.get("page", 1)
         page_quantity = request.GET.get("page_quantity", 10)

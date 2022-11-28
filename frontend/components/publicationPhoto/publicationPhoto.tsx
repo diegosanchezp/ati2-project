@@ -35,6 +35,7 @@ function PublicationPhoto(props) {
   const baseURL = "http://localhost:8000";
   const { data } = props;
   const { isLogin, isAdmin, isClient, sessionUserId } = props.session;
+
   const selectCard = (e) => {
     const vehicleID = e;
 
@@ -173,12 +174,22 @@ function PublicationPhoto(props) {
                     circle
                     size="sm"
                   />
-                  <IconButton
-                    icon={<VisibleIcon />}
-                    disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño
-                    circle
-                    size="sm"
-                  />
+                  {item.publication_enabled ? (
+                    <IconButton
+                      icon={<UnvisibleIcon />}
+                      disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño | deshabilitar
+                      circle
+                      size="sm"
+                    />
+                  ) : (
+                    <IconButton
+                      icon={<VisibleIcon />}
+                      disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño | habilitar
+                      circle
+                      size="sm"
+                    />
+                  )}
+
                   <IconButton
                     icon={<WarningRoundIcon />}
                     disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño
