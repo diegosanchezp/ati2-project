@@ -2,6 +2,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
+import datetime
+
 # Doesnt werks
 # def user_directory_path(dir_name: str):
 #     def fn(instance, filename):
@@ -139,6 +141,21 @@ class Vehicle(models.Model):
     services = models.TextField(
         verbose_name=_("Services to date"),
         blank=True, 
+    )
+
+    publication_enabled = models.BooleanField(
+        verbose_name=_("Publication enabled"),
+        default=True
+    )
+
+    init_publication_date = models.DateField(
+        verbose_name=_("Init publication date"),
+        default=datetime.date.today
+    )
+
+    finish_publication_date = models.DateField(
+        verbose_name=_("Finish publication date"),
+        default=datetime.date.today
     )
 
     location_city = models.ForeignKey(
