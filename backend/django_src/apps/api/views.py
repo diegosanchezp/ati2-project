@@ -67,7 +67,7 @@ class VehiclesView(APIView):
         order_by = request.GET.get("order_by", "-id")
         
         page_number = request.GET.get("page", 1)
-        page_quantity = request.GET.get("page_quantity", 1)
+        page_quantity = request.GET.get("page_quantity", 10)
 
         vehicles = Vehicle.objects.select_related("currency", "location_city__state__country", "model__brand", "owner")\
             .prefetch_related("images", "videos")\

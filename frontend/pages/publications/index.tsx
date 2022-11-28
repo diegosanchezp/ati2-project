@@ -72,6 +72,7 @@ function PublicationsPage() {
   let isClient = false;
   let isAdmin = false;
   let isLogin = false;
+  let sessionUserId = -1;
   setSessionData();
   function setSessionData() {
     const { dispatch, session } = useSession();
@@ -81,7 +82,8 @@ function PublicationsPage() {
       isLogin = true;
       console.log("Publications user ", session.user);
       isAdmin = session.user?.is_superuser || false;
-      isClient = false; //en cada carta si el ownerId es igual al session cliente
+      sessionUserId = session.user.id || -1;
+      isClient = !isAdmin; //en cada carta si el ownerId es igual al session cliente
     }
   }
 
@@ -217,6 +219,7 @@ function PublicationsPage() {
   //efect para seleccion de vehiculo
   useEffect(() => {
     //console.log("en effect ", cardsSelected);
+    //TODO verificar si el cliente es el dueño del auto, revisar toda esta logica
     const len = cardsSelected.length;
 
     //Relacion botones-session
@@ -247,7 +250,7 @@ function PublicationsPage() {
     }
     //console.log("----------------------------------");
   }, [lastCard]);
-  const sessionObj = { isLogin, isAdmin, isClient };
+  const sessionObj = { isLogin, isAdmin, isClient, sessionUserId };
 
   return (
     <Container id="publications-panel">

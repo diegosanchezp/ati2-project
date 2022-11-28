@@ -23,37 +23,6 @@ import {
 import { list } from "../../pages/publications/list-DELETE/data";
 import ContactarAnunciante from "components/contactar-anunciante/contactarAnunciante";
 import { ifError } from "assert";
-const CustomPopover = React.forwardRef(({ content, title, ...props }, ref) => {
-  return (
-    <Popover ref={ref} title={title} {...props}>
-      <p>This is a Popover </p>
-      <p>
-        Especificaciones:a Confederación de Norteamérica, Centroamérica y el
-        Caribe de Fútbol a Confederación de Norteamérica, Centroamérica y el
-        Caribe de Fútbol{" "}
-      </p>
-      <PanelPublicationMore />
-      <p>{content}</p>
-    </Popover>
-  );
-});
-const CustomComponent = ({ placement, title, nameLink, children: any }) => (
-  <Whisper
-    trigger="hover"
-    placement={placement}
-    controlId={`control-id-${placement}`}
-    speaker={<CustomPopover content={"test content"} title={title} />}
-    enterable
-  >
-    <a
-      href="https://google.com"
-      target="popup"
-      onClick={() => openInNewTab("https://google.com")}
-    >
-      {nameLink}
-    </a>
-  </Whisper>
-);
 
 const openInNewTab = (url: string) => {
   window.open(
@@ -65,7 +34,7 @@ const openInNewTab = (url: string) => {
 function PublicationPhoto(props) {
   const baseURL = "http://localhost:8000";
   const { data } = props;
-  const { isLogin, isAdmin, isClient } = props.session;
+  const { isLogin, isAdmin, isClient, sessionUserId } = props.session;
   const selectCard = (e) => {
     const vehicleID = e;
 
@@ -200,19 +169,19 @@ function PublicationPhoto(props) {
                 <Container className="publications-authenticated-buttons">
                   <IconButton
                     icon={<EditIcon />}
-                    disabled={!isClient}
+                    disabled={sessionUserId !== item.owner.id} ////solo  el dueño
                     circle
                     size="sm"
                   />
                   <IconButton
                     icon={<VisibleIcon />}
-                    disabled={!isClient && !isAdmin}
+                    disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño
                     circle
                     size="sm"
                   />
                   <IconButton
                     icon={<WarningRoundIcon />}
-                    disabled={!isClient && !isAdmin}
+                    disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño
                     circle
                     size="sm"
                   />
