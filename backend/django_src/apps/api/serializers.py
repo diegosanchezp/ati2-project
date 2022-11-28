@@ -4,6 +4,24 @@ from ..finance.serializers import CurrencySerializer
 from ..country.serializers import CitySerializer
 from django_typomatic import ts_interface, generate_ts
 
+from django.contrib.auth import get_user_model
+
+class OwnerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        exclude = [
+            "password",
+            "last_login",
+            "is_superuser",
+            "is_staff",
+            "is_active",
+            "date_joined",
+            "user_type",
+            "language",
+            "keep_informed",
+            "groups",
+            "user_permissions"
+        ]
 
 class VehicleBrandSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,13 +54,12 @@ class VehicleSerializer(serializers.ModelSerializer):
     currency = CurrencySerializer(read_only = True)
     location_city = CitySerializer(read_only = True)
     model = VehicleModelSerializer(read_only = True)
+    owner = OwnerSerializer(read_only = True)
     images = VehicleImageSerializer(many = True, read_only = True)
     videos = VehicleVideosSerializer(many = True, read_only = True)
     class Meta: 
         model = Vehicle
-        exclude = [
-            "owner",
-        ]
+        exclude = []
 
 
 class VehicleListSerializer(serializers.Serializer): 
