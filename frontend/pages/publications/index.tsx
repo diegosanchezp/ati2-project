@@ -60,7 +60,10 @@ function PublicationsPage() {
     TypeVisualizerEnum.PHOTO
   );
 
+  //pagnation
   const [activePage, setActivePage] = useState(1);
+  const [totalVehicles, setTotalVehicles] = useState(0);
+  const vehiclesPerPage = 10;
   const [cardsSelected, setCardsSelected] = useState([]);
   const [lastCard, setLastCard] = useState(0);
 
@@ -90,7 +93,14 @@ function PublicationsPage() {
   //effect para construir el url, se llama al presionar buscar, cambiando el valor del state se puede llamar en cualquier punto
   useEffect(() => {
     if (submit) {
-      const url = getURLQuery();
+      let url = getURLQuery();
+
+      const paginationString = `page=${activePage}&page_quantity=${vehiclesPerPage}`;
+      if (url.length > 0) {
+        url = `${url}&${paginationString}`;
+      } else {
+        url = `?${paginationString}`;
+      }
       console.log("ejecutar busqueda a ", url);
       setSubmit(false);
 
@@ -109,6 +119,7 @@ function PublicationsPage() {
           const data = await response.json();
           console.log("data ", data.data);
           setVehicles(data.data);
+          setTotalVehicles(data.total_elements);
           return data;
         }
       };
@@ -117,7 +128,42 @@ function PublicationsPage() {
     }
   }, [submit]);
 
-  //state para limpiar el panel de busqueda y reiniciar los estados, creo que se puede mover al componente
+  //effect buscar cuando se cambia de pag
+  //TODO funcion
+  useEffect(() => {
+    let url = getURLQuery();
+
+    const paginationString = `page=${activePage}&page_quantity=${vehiclesPerPage}`;
+    if (url.length > 0) {
+      url = `${url}&${paginationString}`;
+    } else {
+      url = `?${paginationString}`;
+    }
+    console.log("ejecutar busqueda a ", url);
+    setSubmit(false);
+
+    const fetchData = async () => {
+      const { csrfToken, csrfRes } = await getCSRF();
+
+      const response = await djRequest(`vehicles/${url}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken as string,
+        },
+      });
+      console.log("fetch of getVehicles");
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("vehicles of change page data ", data.data);
+        setVehicles(data.data);
+        setTotalVehicles(data.total_elements);
+        return data;
+      }
+    };
+    fetchData();
+  }, [activePage]);
 
   //funcion genera el url en base a los valores de los states
   function getURLQuery() {
@@ -152,19 +198,20 @@ function PublicationsPage() {
     return url;
   }
 
-  const { dispatch, session } = useSession();
-  console.log("session ", session);
+  //const { dispatch, session } = useSession();
+  //console.log("session ", session);
+  //efect para seleccion de vehiculo
   useEffect(() => {
     //3 casos
     const isClient = false;
     const isAdmin = true;
     const isLogin = true;
-    console.log("en effect ", cardsSelected);
+    //console.log("en effect ", cardsSelected);
     const len = cardsSelected.length;
 
     const activeButtons = len === 1;
     if (activeButtons) {
-      console.log("tengo que activar botones");
+      //console.log("tengo que activar botones");
       const seeButton = true;
       const editButton = isLogin && isClient;
       const disableButton = isLogin && (isAdmin || isClient);
@@ -180,7 +227,7 @@ function PublicationsPage() {
     } else {
       setOptionsButtons([true, true, true, true, true]);
     }
-    console.log("----------------------------------");
+    //console.log("----------------------------------");
   }, [lastCard]);
 
   return (
@@ -278,8 +325,8 @@ function PublicationsPage() {
             next
             first
             size="md"
-            total={vehicles.total_pages}
-            limit={90}
+            total={totalVehicles} //cant vehiculos
+            limit={vehiclesPerPage} //cant vehiculos por pag
             activePage={activePage}
             onChangePage={setActivePage}
           />

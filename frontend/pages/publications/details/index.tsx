@@ -1,9 +1,37 @@
 import { Popover, Whisper, Button, Toggle, Container } from "rsuite";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 function PublicationsDetails(props: any) {
   const router = useRouter();
+  console.log("query id ", router.query.id);
+  const [avehicle, setVehicle] = useState();
+  const [vehicleId, setVehicleId] = useState(router.query.id);
+
+  console.log(router);
+
+  useEffect(() => {
+    /*const fetchData = async () => {
+      const { csrfToken, csrfRes } = await getCSRF();
+
+      const response = await djRequest(`vehicle/${vehicleId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken as string,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("data ", data.data);
+        //setVehicles(data.data);
+        return data;
+      }
+    };
+
+    fetchData();*/
+  }, [vehicleId]);
 
   const videos = [
     {
