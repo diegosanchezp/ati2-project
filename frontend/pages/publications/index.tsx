@@ -81,7 +81,7 @@ function PublicationsPage() {
       isLogin = true;
       console.log("Publications user ", session.user);
       isAdmin = session.user?.is_superuser || false;
-      isClient = !isAdmin;
+      isClient = false; //en cada carta si el ownerId es igual al session cliente
     }
   }
 

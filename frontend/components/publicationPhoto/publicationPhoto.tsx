@@ -198,9 +198,24 @@ function PublicationPhoto(props) {
               <ContactarAnunciante className="contactar-anunciante-button" />
               {isLogin ? (
                 <Container className="publications-authenticated-buttons">
-                  <IconButton icon={<EditIcon />} circle size="sm" />
-                  <IconButton icon={<VisibleIcon />} circle size="sm" />
-                  <IconButton icon={<WarningRoundIcon />} circle size="sm" />
+                  <IconButton
+                    icon={<EditIcon />}
+                    disabled={!isClient}
+                    circle
+                    size="sm"
+                  />
+                  <IconButton
+                    icon={<VisibleIcon />}
+                    disabled={!isClient && !isAdmin}
+                    circle
+                    size="sm"
+                  />
+                  <IconButton
+                    icon={<WarningRoundIcon />}
+                    disabled={!isClient && !isAdmin}
+                    circle
+                    size="sm"
+                  />
                 </Container>
               ) : (
                 <Container></Container>
