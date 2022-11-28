@@ -65,6 +65,7 @@ const openInNewTab = (url: string) => {
 function PublicationPhoto(props) {
   const baseURL = "http://localhost:8000";
   const { data } = props;
+  const { isLogin, isAdmin, isClient } = props.session;
   const selectCard = (e) => {
     const vehicleID = e;
 
@@ -195,12 +196,15 @@ function PublicationPhoto(props) {
                 </p>
               </Container>
               <ContactarAnunciante className="contactar-anunciante-button" />
-
-              <Container className="publications-authenticated-buttons">
-                <IconButton icon={<EditIcon />} circle size="sm" />
-                <IconButton icon={<VisibleIcon />} circle size="sm" />
-                <IconButton icon={<WarningRoundIcon />} circle size="sm" />
-              </Container>
+              {isLogin ? (
+                <Container className="publications-authenticated-buttons">
+                  <IconButton icon={<EditIcon />} circle size="sm" />
+                  <IconButton icon={<VisibleIcon />} circle size="sm" />
+                  <IconButton icon={<WarningRoundIcon />} circle size="sm" />
+                </Container>
+              ) : (
+                <Container></Container>
+              )}
             </Content>
           </Container>
           <Container className="publication-card-photo-see-all">

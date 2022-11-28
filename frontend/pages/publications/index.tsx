@@ -66,8 +66,24 @@ function PublicationsPage() {
   const vehiclesPerPage = 10;
   const [cardsSelected, setCardsSelected] = useState([]);
   const [lastCard, setLastCard] = useState(0);
-
   const [vehicles, setVehicles] = useState([]);
+
+  //session data variables
+  let isClient = false;
+  let isAdmin = false;
+  let isLogin = false;
+  setSessionData();
+  function setSessionData() {
+    const { dispatch, session } = useSession();
+    console.log("session user test ", session);
+    console.log("login  ", isLogin);
+    if (session.user) {
+      isLogin = true;
+      console.log("Publications user ", session.user);
+      isAdmin = session.user?.is_superuser || false;
+      isClient = !isAdmin;
+    }
+  }
 
   //estados 5 botones
   const [optionsButtons, setOptionsButtons] = useState([
@@ -198,37 +214,40 @@ function PublicationsPage() {
     return url;
   }
 
-  //const { dispatch, session } = useSession();
-  //console.log("session ", session);
   //efect para seleccion de vehiculo
   useEffect(() => {
-    //3 casos
-    const isClient = false;
-    const isAdmin = true;
-    const isLogin = true;
     //console.log("en effect ", cardsSelected);
     const len = cardsSelected.length;
 
+    //Relacion botones-session
+    const seeButton = true;
+    const editButton = isLogin && isClient;
+    const deshabilitarButton = isLogin && (isAdmin || isClient);
+    const habilitarButton = isLogin && (isAdmin || isClient);
+    const deleteButton = isLogin && (isAdmin || isClient);
+
     const activeButtons = len === 1;
+    const moreCards = len >= 2;
     if (activeButtons) {
       //console.log("tengo que activar botones");
-      const seeButton = true;
-      const editButton = isLogin && isClient;
-      const disableButton = isLogin && (isAdmin || isClient);
-      const ableButton = isLogin && (isAdmin || isClient);
-      const deleteButton = isLogin && (isAdmin || isClient);
       setOptionsButtons([
         !seeButton,
         !editButton,
-        !disableButton,
-        !ableButton,
+        !deshabilitarButton,
+        !habilitarButton,
         !deleteButton,
       ]);
     } else {
       setOptionsButtons([true, true, true, true, true]);
     }
+    if (moreCards) {
+      console.log("more os 1 card ", len);
+      //habilitar -> habilitar, deshabilitar,eliminar
+      //setOptionsButtons([true, true, !deshabilitarButton, !habilitarButton, !deleteButton]);
+    }
     //console.log("----------------------------------");
   }, [lastCard]);
+  const sessionObj = { isLogin, isAdmin, isClient };
 
   return (
     <Container id="publications-panel">
@@ -318,20 +337,27 @@ function PublicationsPage() {
           </Container>
         </Container>
         <Divider />
-        <Container id="publications-pagination">
-          <Pagination
-            prev
-            last
-            next
-            first
-            size="md"
-            total={totalVehicles} //cant vehiculos
-            limit={vehiclesPerPage} //cant vehiculos por pag
-            activePage={activePage}
-            onChangePage={setActivePage}
-          />
-        </Container>
-        <Divider />
+        {totalVehicles > 0 ? (
+          <Container>
+            <Container id="publications-pagination">
+              <Pagination
+                prev
+                last
+                next
+                first
+                size="md"
+                total={totalVehicles} //cant vehiculos
+                limit={vehiclesPerPage} //cant vehiculos por pag
+                activePage={activePage}
+                onChangePage={setActivePage}
+              />
+            </Container>
+            <Divider />
+          </Container>
+        ) : (
+          <Container></Container>
+        )}
+
         <Container>
           {typeVisualizer === TypeVisualizerEnum.PHOTO ? (
             <PublicationPhoto
@@ -340,6 +366,7 @@ function PublicationsPage() {
               setLastCard={setLastCard}
               lastCard={lastCard}
               data={vehicles}
+              session={sessionObj}
             />
           ) : (
             <PublicationList
