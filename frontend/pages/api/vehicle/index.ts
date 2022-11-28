@@ -52,3 +52,22 @@ export const getVehicle = async (_id: string) => {
     return vehicleData;
   }
 }
+
+export const editVehicle = async (_vehicleData: any, _id: string) => {
+  const { csrfToken, csrfRes } = await getCSRF();
+
+  const response = await djRequest(`vehicle/${_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken as string,
+    },
+    body: JSON.stringify({ vehicle: _vehicleData})    
+  });
+
+  if (response.ok) {
+    const { success } = await response.json();
+    console.log(success)
+    return success;
+  }
+}

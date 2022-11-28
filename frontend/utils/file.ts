@@ -1,4 +1,4 @@
-export function readFileAsync(file) {
+export function readFileAsync(file: Blob) {
   return new Promise((resolve, reject) => {
     let reader = new FileReader();
 
