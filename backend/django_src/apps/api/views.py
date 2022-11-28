@@ -2,11 +2,24 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.core.paginator import Paginator
-from django.db.models import Prefetch, Q
+from django.db.models import Q
+from django.http import Http404
+
+from ..vehicle.models import Vehicle
+from .serializers import VehicleListSerializer, VehicleSerializer
+
+class VehicleDetailsView(APIView):
+    def get(self, request, id):
+        try:
+            vehicle = Vehicle.objects.select_related("currency", "location_city__state__country", "model__brand", "owner")\
+                .prefetch_related("images", "videos")\
+                .get(id = id)
+            serializer = VehicleSerializer(vehicle)         
+            return Response(serializer.data)
+        except:
+            raise Http404("Vehicle not found...")
 
 
-from ..vehicle.models import Vehicle, VehicleImages
-from .serializers import VehicleListSerializer
 
 class VehiclesView(APIView):
     def get(self, request, format = None):
