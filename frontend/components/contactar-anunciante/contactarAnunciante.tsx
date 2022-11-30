@@ -6,7 +6,7 @@ function ContactarAnunciante(props: any) {
     window.open(
       url,
       "name",
-      "width=800,height=900,toolbar=no, location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,left=100, top=20"
+      "width=950,height=900,toolbar=no, location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,left=100, top=20"
     );
   };
 

@@ -1,4 +1,5 @@
-import React from "react";
+import { useSession } from "auth";
+import React, { useState } from "react";
 import {
   Container,
   Button,
@@ -13,6 +14,59 @@ const Textarea = React.forwardRef((props, ref) => (
   <Input {...props} as="textarea" ref={ref} />
 ));
 function CallMeForm(props: any) {
+  const { vehicle } = props;
+
+  const { dispatch, session } = useSession();
+
+  let userEmail = "";
+  if (session.user) {
+    userEmail = session.user.email;
+  }
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState(userEmail);
+  const [message, setMessage] = useState("");
+  const [days, setDays] = useState([]);
+  //number phone (fix)
+  const [fixCode, setFixCode] = useState([]);
+  const [fixNumber, setFixNumber] = useState("");
+  const [fixExt, setFixExt] = useState("");
+  //number phone (Mov)
+  const [movCode, setMovCode] = useState([]);
+  const [movNumber, setMovNumber] = useState("");
+  const [movExt, setMovExt] = useState("");
+  //hours
+  const [initHourOne, setInitHourOne] = useState("");
+  const [initHourTwo, setInitHourTwo] = useState("");
+  const [finHourOne, setFinHourOne] = useState("");
+  const [finHourTwo, setFinHourTwo] = useState("");
+
+  function handleSubmit() {
+    const body = {
+      userId: vehicle.owner.id,
+      name: firstName,
+      lastname: lastName,
+      contact_days: days,
+      contact_hour_from: `${initHourOne}:${initHourTwo}`,
+      contact_hour_to: `${finHourOne}:${finHourTwo}`,
+    };
+    if (fixCode.length > 0 && fixNumber.length > 0) {
+      body["fixedPhone"] = {
+        number: fixNumber,
+        country_number: parseInt(fixCode),
+        ext: fixExt,
+        ptype: "FIXED",
+      };
+    }
+    if (fixCode.length > 0 && fixNumber.length > 0) {
+      body["mobilePhone"] = {
+        number: movNumber,
+        country_number: parseInt(movCode),
+        ptype: "MOBILE",
+      };
+    }
+    console.log("body ", body);
+  }
   const openInNewTab = (url: string) => {
     window.open(
       url,
@@ -20,7 +74,7 @@ function CallMeForm(props: any) {
       "width=1200,height=900,toolbar=no, location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,left=100, top=20"
     );
   };
-  const dataCodeNumber = ["+54", "+53"].map((item) => ({
+  const dataCodeNumber = ["54", "53"].map((item) => ({
     label: item,
     value: item,
   }));
@@ -29,7 +83,7 @@ function CallMeForm(props: any) {
     <Container>
       <p id="contact-type-title">Quiero que me llamen</p>
 
-      <Form fluid>
+      <Form fluid onSubmit={handleSubmit}>
         <table id="contact-table">
           <tr>
             <td>
@@ -44,8 +98,15 @@ function CallMeForm(props: any) {
                   searchable={false}
                   virtualized
                   label="Código"
+                  value={movCode}
+                  onChange={setMovCode}
                 />
-                <Form.Control name="movil" />
+                <Form.Control
+                  name="movil"
+                  value={movNumber}
+                  onChange={setMovNumber}
+                  placeholder="numero"
+                />
               </Form.Group>
               <p>Fijo</p>
               <Form.Group controlId="fijo" className="contact-number">
@@ -55,8 +116,22 @@ function CallMeForm(props: any) {
                   searchable={false}
                   virtualized
                   label="Código"
+                  value={fixCode}
+                  onChange={setFixCode}
                 />
-                <Form.Control name="fijo" />
+                <Form.Control
+                  name="fijo"
+                  placeholder="numero"
+                  value={fixNumber}
+                  onChange={setFixNumber}
+                />
+                <Form.Control
+                  name="fijo-ext"
+                  placeholder="extension"
+                  placeholder="extension"
+                  value={fixExt}
+                  onChange={setFixExt}
+                />
               </Form.Group>
             </td>
           </tr>
@@ -66,7 +141,11 @@ function CallMeForm(props: any) {
             </td>
             <td>
               <Form.Group controlId="nombre">
-                <Form.Control name="name" />
+                <Form.Control
+                  name="name"
+                  value={firstName}
+                  onChange={setFirstName}
+                />
               </Form.Group>
             </td>
           </tr>
@@ -76,7 +155,11 @@ function CallMeForm(props: any) {
             </td>
             <td>
               <Form.Group controlId="lastname">
-                <Form.Control name="lastname" />
+                <Form.Control
+                  name="lastname"
+                  value={lastName}
+                  onChange={setLastName}
+                />
               </Form.Group>
             </td>
           </tr>
@@ -86,7 +169,13 @@ function CallMeForm(props: any) {
             </td>
             <td>
               <Form.Group controlId="days">
-                <CheckboxGroup inline name="checkboxList" id="days-contac-grid">
+                <CheckboxGroup
+                  inline
+                  name="checkboxList"
+                  id="days-contac-grid"
+                  value={days}
+                  onChange={setDays}
+                >
                   <Checkbox value="LUNES">Lunes</Checkbox>
                   <Checkbox value="MARTES">Martes</Checkbox>
                   <Checkbox value="MIERCOLES">Miercoles</Checkbox>
@@ -112,6 +201,8 @@ function CallMeForm(props: any) {
                   searchable={false}
                   virtualized
                   label="Tipo"
+                  value={initHourOne}
+                  onChange={setInitHourOne}
                 />
                 <SelectPicker
                   data={dataCodeNumber}
@@ -119,6 +210,8 @@ function CallMeForm(props: any) {
                   searchable={false}
                   virtualized
                   label="Hora"
+                  value={initHourTwo}
+                  onChange={setInitHourTwo}
                 />
               </Form.Group>
               <p>Hasta</p>
@@ -129,6 +222,8 @@ function CallMeForm(props: any) {
                   searchable={false}
                   virtualized
                   label="Tipo"
+                  value={finHourOne}
+                  onChange={setFinHourOne}
                 />
                 <SelectPicker
                   data={dataCodeNumber}
@@ -136,6 +231,8 @@ function CallMeForm(props: any) {
                   searchable={false}
                   virtualized
                   label="Hora"
+                  value={finHourTwo}
+                  onChange={setFinHourTwo}
                 />
               </Form.Group>
             </td>
@@ -151,7 +248,7 @@ function CallMeForm(props: any) {
 
         <Form.Group>
           <ButtonToolbar>
-            <Button id="contact-send-button" appearance="primary">
+            <Button id="contact-send-button" appearance="primary" type="submit">
               Contactar enuciante
             </Button>
           </ButtonToolbar>

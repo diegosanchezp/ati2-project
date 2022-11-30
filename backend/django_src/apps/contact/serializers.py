@@ -10,6 +10,7 @@ class phone_number(serializers.ModelSerializer):
 #Final serializers
 
 class send_email(serializers.Serializer):
+  userId=serializers.IntegerField()
   toEmail = serializers.EmailField()
   name = serializers.CharField()
   lastname = serializers.CharField()
@@ -19,6 +20,7 @@ class send_email(serializers.Serializer):
   mobilePhone = phone_number(required=False)
 
 class send_consult(serializers.Serializer):
+  userId=serializers.IntegerField()
   toEmail = serializers.EmailField()
   name = serializers.CharField()
   lastname = serializers.CharField()
@@ -27,6 +29,7 @@ class send_consult(serializers.Serializer):
   mobilePhone = phone_number(required=False)
 
 class call_me(serializers.Serializer):
+  userId=serializers.IntegerField()
   name = serializers.CharField()
   lastname = serializers.CharField()
   contact_days = serializers.JSONField() #["lunes","martes"....]
@@ -36,6 +39,7 @@ class call_me(serializers.Serializer):
   mobilePhone = phone_number(required=False)
 
 class visit(serializers.Serializer):
+  userId=serializers.IntegerField()
   date = serializers.DateField()
   typeVisit = serializers.CharField()
   email = serializers.EmailField(required=False) 
