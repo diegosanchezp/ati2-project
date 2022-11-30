@@ -58,6 +58,7 @@ function PublicationsPage() {
   let isAdmin = false;
   let isLogin = false;
   let sessionUserId = -1;
+
   setSessionData();
   function setSessionData() {
     const { dispatch, session } = useSession();

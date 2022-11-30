@@ -1,4 +1,5 @@
-import React from "react";
+import { useSession } from "auth";
+import React, { useState } from "react";
 import {
   Container,
   Button,
@@ -11,6 +12,21 @@ const Textarea = React.forwardRef((props, ref) => (
   <Input {...props} as="textarea" ref={ref} />
 ));
 function SendEmailForm(props: any) {
+  console.log("props ", props);
+  const { vehicle } = props;
+  console.log("vehicile form ", vehicle);
+  const { dispatch, session } = useSession();
+  console.log("session user test ", session);
+
+  let userEmail = "";
+  let userFirstName = "";
+  let userLastName = "";
+  if (session.user) {
+    userEmail = session.user.email;
+    userFirstName = session.user.first_name || "";
+    userLastName = session.user.last_name || "";
+  }
+
   const openInNewTab = (url: string) => {
     window.open(
       url,
@@ -35,7 +51,11 @@ function SendEmailForm(props: any) {
             </td>
             <td>
               <Form.Group controlId="to">
-                <Form.Control name="to" />
+                <Form.Control
+                  name="to"
+                  value={vehicle.contact_email}
+                  readOnly
+                />
               </Form.Group>
             </td>
           </tr>
@@ -45,7 +65,7 @@ function SendEmailForm(props: any) {
             </td>
             <td>
               <Form.Group controlId="nombre">
-                <Form.Control name="name" />
+                <Form.Control name="name" value={userFirstName} readOnly />
               </Form.Group>
             </td>
           </tr>
@@ -55,7 +75,7 @@ function SendEmailForm(props: any) {
             </td>
             <td>
               <Form.Group controlId="lastname">
-                <Form.Control name="lastname" />
+                <Form.Control name="lastname" value={userLastName} />
               </Form.Group>
             </td>
           </tr>
@@ -65,7 +85,7 @@ function SendEmailForm(props: any) {
             </td>
             <td>
               <Form.Group controlId="email">
-                <Form.Control name="email" type="email" />
+                <Form.Control name="email" type="email" value={userEmail} />
               </Form.Group>
             </td>
           </tr>

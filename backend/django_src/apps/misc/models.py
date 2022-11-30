@@ -81,7 +81,7 @@ class Frequency(models.Model):
     def __str__(self) -> str:
         return f"{self.user.email} - {self.time}"
 
-class Telephone(models.Model):
+class Telephone(models.Model): 
     """
     Phone Numbers
     """
