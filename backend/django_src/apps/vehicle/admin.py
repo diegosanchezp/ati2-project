@@ -11,6 +11,11 @@ class VehicleImageInline(admin.StackedInline):
     model = models.VehicleImages
     fk_name = "vehicle"
     extra = 1
+    def get_formset(self, request, obj=None, **kwargs):
+        f = super().get_formset(request, obj=None, **kwargs)
+        return f
+        
+
 
 class VehicleVideoInline(admin.StackedInline):
     model = models.VehicleVideos
@@ -48,3 +53,4 @@ class VehicleAdmin(admin.ModelAdmin):
         VehicleVideoInline,
         VehicleTelephonesInline,
     ]
+

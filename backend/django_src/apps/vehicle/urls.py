@@ -9,4 +9,5 @@ urlpatterns = [
     path('vehicle', views.VehicleView.as_view(), name='vehicle-create'),
     # path('vehicle/<int:id>', views.VehicleView.as_view(), name='get-vehicle'),
     path('vehicle/<int:pk>', views.VehicleGetView.as_view(), name='get-vehicle'),
+    path('vehicle/edit/<int:pk>', views.VehicleUpdateView.as_view(), name='get-vehicle'),
 ]

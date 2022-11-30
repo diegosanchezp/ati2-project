@@ -11,8 +11,10 @@ from django_src.apps.country.views import CitiesSerializer, CountriesSerializer,
 from django_src.apps.vehicle.models import Vehicle, VehicleBrand, VehicleImages, VehicleModel, VehicleVideos
 from django_src.apps.finance.models import Currency
 from rest_framework.response import Response
-
+from rest_framework.parsers import FormParser, MultiPartParser
 from .serializers import *
+from .forms import *
+from django.views import View
 # Create your views here.
 
 class VehicleBrandView(APIView):
@@ -149,4 +151,16 @@ class VehicleView(APIView):
                     vehicleImageSerializer.save()
 
             return JsonResponse({'success': True})
+
+class VehicleUpdateView(View):
+    # parser_classes = [FormParser, MultiPartParser]
+
+    def post(self, request, pk, format=None):
+
+        vehicle = Vehicle.objects.get(pk=pk)
+        image_form = VehicleImageFormSet(request.POST, request.FILES, instance=vehicle)
+        if image_form.is_valid():
+            image = image_form.save()
+
+        return JsonResponse({})
 
