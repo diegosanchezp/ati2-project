@@ -54,6 +54,9 @@ export interface VehicleSerializer {
     details?: string;
     accessories?: string;
     services?: string;
+    publication_enabled?: boolean;
+    init_publication_date?: string;
+    finish_publication_date?: string;
     location_zone?: string;
     exact_location?: string;
     rental_price?: number | null;
