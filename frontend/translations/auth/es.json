@@ -22,6 +22,10 @@
     "step5": "Frecuencia e información a recibir",
     "step6": "Datos de facturación",
     "infoFrecuency": "No seleccionaste mantener informado",
+    "succcessRegister": "Registro realizado con existo",
+    "errorRegister": "Error en su registro",
+    "cancel":"Cancelar",
+    "register":"Registrarme",
     "firstStep":{
       "header": "Por favor, coméntenos, como se entero de los servicios de la empresa. Es importante para nosotros, porque nos ayuda a mejorar el servicio que le ofrecemos",
       "webPortal": "Portal web de la empresa",
@@ -34,7 +38,7 @@
     "secondStep":{
       "header": "Selecciona un tipo de usuario",
       "natural": "Persona natural",
-      "business": "Business",
+      "business": "Empresa",
       "name": "Nombre",
       "lastname": "Apellido",
       "ID": "Cédula/pasaporte/DNI",

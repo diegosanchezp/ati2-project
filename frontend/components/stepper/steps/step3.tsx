@@ -8,14 +8,16 @@ export default function Step3({
     handleNext,
     stepTitle
 }){
-    const [idiom, setIdiom] = useState("spanish");
+    const [language, setLanguage] = useState("ES");
     const registerTralation = useTranslations('RegisterPage');
     
-    const handleChangeIdiom = (e) => {
-        setIdiom(e);
+    const handleChangeLanguage = (e) => {
+        setLanguage(e);
     }
     const handleSubmitStep = () =>{
-        handleNext({});
+        handleNext({
+            language
+        });
     }
     return (
         <>
@@ -34,14 +36,14 @@ export default function Step3({
             >
                 <Form style={{padding:'auto'}}>
                     <Form.Group controlId="radioList">
-                        <RadioGroup value={idiom} name="radioList" inline onChange={handleChangeIdiom}>
+                        <RadioGroup value={language} name="radioList" inline onChange={handleChangeLanguage}>
                             <Grid>
                                 <Col md={8} style={{padding:8}}> <p>{registerTralation('thirdStep.header')}</p></Col>
                                 <Col md={8} style={{padding:4}}>
-                                    <Radio value="spanish">{registerTralation('thirdStep.spanish')}</Radio>
+                                    <Radio value="ES">{registerTralation('thirdStep.spanish')}</Radio>
                                 </Col>
                                 <Col md={8} style={{padding:4}}>
-                                    <Radio value="english">{registerTralation('thirdStep.english')}</Radio>
+                                    <Radio value="EN">{registerTralation('thirdStep.english')}</Radio>
                                 </Col>
                             </Grid>
                         </RadioGroup>
