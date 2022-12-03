@@ -70,8 +70,6 @@ class TelephoneRelatedField(serializers.RelatedField):
 class VehicleSerializer(serializers.ModelSerializer):
     location_city = CityNestedSerializer()
     model = VechicleModelNested()
-    images = VehicleImageSerializer(many=True)
-    videos = VehicleVideosSerializer(many=True)
     contact_phone_numbers = TelephoneRelatedField(many=True, queryset=Telephone.objects.all())
 
     class Meta:
