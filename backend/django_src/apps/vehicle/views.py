@@ -1,5 +1,5 @@
 from django_src.apps.misc.models import Telephone
-from .utils import base64ToImageField
+from .utils import base64ToImageField, formsetdata_to_dict
 from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -15,6 +15,7 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from .serializers import *
 from .forms import *
 from django.views import View
+from django.views.generic import UpdateView
 # Create your views here.
 
 class VehicleBrandView(APIView):
@@ -61,10 +62,16 @@ class VehicleGetView(generics.RetrieveAPIView):
 
         cities = City.objects.filter(state=instance.location_city.state.id)
         citiesSerializer = CitiesSerializer(cities, many=True)
+        images_form = VehicleImageFormSet(instance=instance)
+        video_form = VehicleVideosFormSet(instance=instance)
+
+
         new_data = {
+            'images': formsetdata_to_dict(images_form),
+            'videos': formsetdata_to_dict(video_form),
             'countries': countriesSerializer.data,
             'states': statesSerializer.data,
-            'cities': citiesSerializer.data
+            'cities': citiesSerializer.data,
         }
         return Response({**initial_data, **new_data})
 
@@ -97,7 +104,7 @@ class VehicleView(APIView):
     #     if id:
     #         vehicle = Vehicle.objects.filter(id=id).first()
     #         vehicleSerializer = VehicleSerializer(vehicle)
-    #        
+    #
     #
     #         vehicleImages = VehicleImages.objects.filter(vehicle=id)
     #         vehicleImagesSerializer = VehicleImageSerializer(
@@ -152,15 +159,49 @@ class VehicleView(APIView):
 
             return JsonResponse({'success': True})
 
-class VehicleUpdateView(View):
+
+class VehicleUpdateView(UpdateView):
     # parser_classes = [FormParser, MultiPartParser]
+    model = Vehicle
+    queryset = Vehicle.objects.all()
+    form_class = VehicleForm
+    success_url = "/"
 
-    def post(self, request, pk, format=None):
+    def post(self, request,*args, **kwargs):
+        # super fetches the vehicle from db
+        super().post(request, *args, **kwargs)
+        vehicle = self.object
 
-        vehicle = Vehicle.objects.get(pk=pk)
+        # Vehicle Form
+        parent_form = self.get_form()
+
+        # Children Formsets
         image_form = VehicleImageFormSet(request.POST, request.FILES, instance=vehicle)
-        if image_form.is_valid():
-            image = image_form.save()
+        video_form = VehicleVideosFormSet(request.POST, request.FILES, instance=vehicle)
 
-        return JsonResponse({})
+        if all([
+            parent_form.is_valid(),
+            image_form.is_valid(),
+            # video_form.is_valid()
+        ]):
+            # return self.form_valid(parent_form)
+            # parent_form.save()
+            images = image_form.save()
 
+            # video_form.save()
+            return JsonResponse(data={
+                "message": "success"
+            })
+
+
+        # return self.form_invalid(parent_form)
+        return JsonResponse(data={
+            "imageErrors": image_form.errors,
+            "videoErrors": video_form.errors,
+            "vehicleErrors": parent_form.errors.get_json_data()
+        }, status=400)
+
+    # def form_valid(self, parent_form, *formsets):
+    #
+    # def form_invalid(self, form):
+    #     return self.render_to_response(self.get_context_data(form=form))

@@ -41,8 +41,6 @@ export interface VehicleSerializer {
     id?: number;
     location_city: CityNestedSerializer;
     model: VechicleModelNested;
-    images: VehicleImageSerializer[];
-    videos: VehicleVideosSerializer[];
     contact_phone_numbers: TelephoneSerializer[];
     type_vehicle?: "TRUCK" | "CAR" | "VAN";
     contact_days: any;
