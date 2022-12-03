@@ -109,7 +109,7 @@ export default function Stepper({ steps }) {
 
     const validBank = () => {
         const formatErros = {};
-        ['origin_bank_country','origin_bank','destination_bank'].forEach(field => {
+        ['origin_bank_country', 'origin_bank', 'destination_bank'].forEach(field => {
             if (!bankData[field]) {
                 formatErros[field] = 'void'
             }
@@ -176,7 +176,16 @@ export default function Stepper({ steps }) {
             toaster.push(succcessRegister, { placement: 'topEnd' });
             return
         }
-        toaster.push(errorRegister, { placement: 'topEnd' })
+        if (Object.keys(response).length > 0) {
+            for (let error in response) {
+                toaster.push(
+                    <Notification
+                        type={'error'}
+                        header={response[error]}
+                        closable />
+                    , { placement: 'topEnd' })
+            }
+        }
     }
 
     const backToLogin = () => {
