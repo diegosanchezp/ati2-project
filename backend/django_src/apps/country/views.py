@@ -23,8 +23,6 @@ class CitiesSerializer(serializers.ModelSerializer):
         fields= ['id', 'name']
 
 class CountriesView(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
 
     @staticmethod
     def get(request):

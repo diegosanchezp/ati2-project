@@ -13,6 +13,10 @@ from django.middleware.csrf import get_token
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth.hashers import make_password
+from django_src.apps.auth.models import NaturalPerson
+from django_src.apps.misc.models import Empresa, Telephone
+from django_src.apps.finance.models import PaymentInfo
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import (
     AuthenticationForm,
@@ -188,6 +192,108 @@ class ChangeSessionLanguageView(APIView):
         res.set_cookie(settings.LANGUAGE_COOKIE_NAME, user_language["language"])
         return res
 
+class NaturalPersonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NaturalPerson
+        fields = '__all__'
+
+    def create(self, validate_data):
+        return NaturalPerson.objects.create(**validate_data)
+
+class EmpresaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Empresa
+        exclude = ['id']
+
+class TelephoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Telephone
+        fields = '__all__'
+
+class BankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentInfo
+        fields = '__all__'
+
+class RegisterUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        exclude = ['id','last_login','is_superuser','is_staff','is_active','groups','user_permissions', 'date_joined']
+
+    def create(self, validate_data):
+        return get_user_model().objects.create(**validate_data)
+
+class RegisterUserView(APIView):
+    @extend_schema(
+        request=RegisterUserSerializer,
+    )
+    @extend_schema(
+        request=NaturalPersonSerializer,
+    )
+    @extend_schema(
+        request=EmpresaSerializer,
+    )
+    def post(self, request, format=None, **kwargs):
+        request.data['password'] = make_password(request.data.get('password'), salt=None, hasher='default')
+        register_user_serializer = RegisterUserSerializer(data=request.data)
+
+        if not register_user_serializer.is_valid(raise_exception=True):
+            return Response(
+                data={"message": "Invalid user data"},
+                status=400
+            )
+            
+        result_user = register_user_serializer.save()
+
+        if request.data.get('user_type') == 'NATURAL':
+            natural_person_data = request.data.get('natural_person')
+            natural_person_data['user'] = UserSerializer(result_user).data.get('id')
+            natural_person_serializer = NaturalPersonSerializer(data=natural_person_data)
+
+            if not natural_person_serializer.is_valid(raise_exception=True):
+                return Response(
+                    data={"message": "Invalid natural person data"},
+                    status=400
+                )
+
+            natural_person_serializer.save()
+
+        if request.data.get('user_type') == 'ENTERPRISE':
+            empresa_data = request.data.get('empresa')
+            empresa_data['representate'] = UserSerializer(result_user).data.get('id')
+            empresa_serializer = EmpresaSerializer(data=empresa_data)
+            if not empresa_serializer.is_valid(raise_exception = True):
+                return Response(
+                    data={"message": "Invalid empresa data"},
+                    status=400
+                )
+            empresa_serializer.save()
+
+        phone_numbers = request.data.get('phoneNumbers')
+        for phone in phone_numbers:
+            phone['content_type'] = 6
+            phone['object_id'] = UserSerializer(result_user).data.get('id')
+            phone['user'] = UserSerializer(result_user).data.get('id')
+            phone_serializer = TelephoneSerializer(data=phone)
+            if not phone_serializer.is_valid(raise_exception = True):
+                return Response(
+                    data={"message": "Invalid phone data"},
+                    status=400
+                )
+            phone_serializer.save()
+
+        banks = request.data.get('banks')
+        
+        banks_serializer = BankSerializer(data=banks)
+        if not banks_serializer.is_valid(raise_exception = True):
+            return Response(
+                data={"message": "Invalid payment data"},
+                status=400
+            )
+        banks_serializer.save()        
+
+        res = Response(data={"message": "success"})
+        return res
 
 if settings.DEBUG:
     generate_ts(settings.TS_TYPES_DIR / "auth.ts", context='auth')

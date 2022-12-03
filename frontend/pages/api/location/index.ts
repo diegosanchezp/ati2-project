@@ -1,8 +1,8 @@
-import { djRequest } from "utils/apirest";
+import { djRequest,getCSRF } from "utils/apirest";
 
 export const getCountries = async () => {
   const response = await djRequest("countries", {
-    method: "GET",
+    method: "GET"
   });
 
   if (response.ok) {

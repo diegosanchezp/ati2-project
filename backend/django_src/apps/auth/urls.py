@@ -19,4 +19,5 @@ urlpatterns = [
         views.ChangeSessionLanguageView.as_view(),
         name="change_session_lang"
     ),
+    path('register/', views.RegisterUserView.as_view(), name="api-register")
 ]
