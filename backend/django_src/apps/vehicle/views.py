@@ -64,11 +64,13 @@ class VehicleGetView(generics.RetrieveAPIView):
         citiesSerializer = CitiesSerializer(cities, many=True)
         images_form = VehicleImageFormSet(instance=instance)
         video_form = VehicleVideosFormSet(instance=instance)
+        telephone_form = VehicleTelephoneNumber(instance=instance)
 
 
         new_data = {
             'images': formsetdata_to_dict(images_form),
             'videos': formsetdata_to_dict(video_form),
+            'contact_phone_numbers': formsetdata_to_dict(telephone_form),
             'countries': countriesSerializer.data,
             'states': statesSerializer.data,
             'cities': citiesSerializer.data,
@@ -178,17 +180,19 @@ class VehicleUpdateView(UpdateView):
         # Children Formsets
         image_form = VehicleImageFormSet(request.POST, request.FILES, instance=vehicle)
         video_form = VehicleVideosFormSet(request.POST, request.FILES, instance=vehicle)
+        telephone_form = VehicleTelephoneNumber(request.POST, instance=vehicle)
 
         if all([
             parent_form.is_valid(),
             image_form.is_valid(),
-            # video_form.is_valid()
+            video_form.is_valid(),
+            telephone_form.is_valid()
         ]):
-            # return self.form_valid(parent_form)
-            # parent_form.save()
+            parent_form.save()
             images = image_form.save()
+            videos = video_form.save()
+            telephone_form.save()
 
-            # video_form.save()
             return JsonResponse(data={
                 "message": "success"
             })
@@ -198,7 +202,8 @@ class VehicleUpdateView(UpdateView):
         return JsonResponse(data={
             "imageErrors": image_form.errors,
             "videoErrors": video_form.errors,
-            "vehicleErrors": parent_form.errors.get_json_data()
+            "vehicleErrors": parent_form.errors.get_json_data(),
+            "telephoneErrors": telephone_form.errors
         }, status=400)
 
     # def form_valid(self, parent_form, *formsets):

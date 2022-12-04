@@ -41,7 +41,6 @@ export interface VehicleSerializer {
     id?: number;
     location_city: CityNestedSerializer;
     model: VechicleModelNested;
-    contact_phone_numbers: TelephoneSerializer[];
     type_vehicle?: "TRUCK" | "CAR" | "VAN";
     contact_days: any;
     contact_hour_from: string;
