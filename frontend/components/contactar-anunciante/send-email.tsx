@@ -1,4 +1,5 @@
 import { useSession } from "auth";
+import { useTranslations } from "next-intl";
 import React, { useState } from "react";
 import {
   Container,
@@ -7,12 +8,17 @@ import {
   ButtonToolbar,
   Input,
   SelectPicker,
+  Checkbox,
 } from "rsuite";
 const Textarea = React.forwardRef((props, ref) => (
   <Input {...props} as="textarea" ref={ref} />
 ));
 function SendEmailForm(props: any) {
-  const { vehicle } = props;
+  const Tcontact = useTranslations();
+  const Tform = useTranslations("form");
+
+  const { setType, setText, setSendForm } = props.notification;
+  const { vehicle } = props.vehicle;
 
   const { dispatch, session } = useSession();
 
@@ -28,10 +34,11 @@ function SendEmailForm(props: any) {
   const [fixCode, setFixCode] = useState([]);
   const [fixNumber, setFixNumber] = useState("");
   const [fixExt, setFixExt] = useState("");
+  const [selectFix, setSelectFix] = useState(false);
   //number phone (Mov)
   const [movCode, setMovCode] = useState([]);
   const [movNumber, setMovNumber] = useState("");
-  const [movExt, setMovExt] = useState("");
+  const [selectMobile, setSelectMobile] = useState(false);
 
   function handleSubmit() {
     const body = {
@@ -58,6 +65,17 @@ function SendEmailForm(props: any) {
       };
     }
     console.log("body ", body);
+    //fetch
+    const ok = false;
+    if (ok) {
+      setType("success");
+      setText("Solicitud enviada");
+      setSendForm(true);
+    } else {
+      setType("error");
+      setText("Error :/");
+      setSendForm(true);
+    }
   }
 
   const openInNewTab = (url: string) => {
@@ -71,16 +89,30 @@ function SendEmailForm(props: any) {
     label: item,
     value: item,
   }));
-
+  function handleSelectMobile() {
+    setSelectMobile(!selectMobile);
+    if (selectMobile) {
+      setMovCode([]);
+      setMovNumber("");
+    }
+  }
+  function handleSelectFix() {
+    setSelectFix(!selectFix);
+    if (selectFix) {
+      setFixCode([]);
+      setFixNumber("");
+      setFixExt("");
+    }
+  }
   return (
     <Container>
-      <p id="contact-type-title"> Enviar correo electrónico</p>
+      <p id="contact-type-title">{Tcontact("options.send-email")}</p>
 
       <Form fluid onSubmit={handleSubmit}>
         <table id="contact-table">
           <tr>
             <td>
-              <p className="contact-line-name">Para</p>
+              <p className="contact-line-name">{Tform("to")}</p>
             </td>
             <td>
               <Form.Group controlId="to">
@@ -94,7 +126,7 @@ function SendEmailForm(props: any) {
           </tr>
           <tr>
             <td>
-              <p className="contact-line-name">Nombre</p>
+              <p className="contact-line-name">{Tform("name")}</p>
             </td>
             <td>
               <Form.Group controlId="nombre">
@@ -108,7 +140,7 @@ function SendEmailForm(props: any) {
           </tr>
           <tr>
             <td>
-              <p className="contact-line-name">Apellido</p>
+              <p className="contact-line-name">{Tform("lastname")}</p>
             </td>
             <td>
               <Form.Group controlId="lastname">
@@ -122,7 +154,7 @@ function SendEmailForm(props: any) {
           </tr>
           <tr>
             <td>
-              <p className="contact-line-name">Email</p>
+              <p className="contact-line-name">{Tform("email")}</p>
             </td>
             <td>
               <Form.Group controlId="email">
@@ -137,56 +169,73 @@ function SendEmailForm(props: any) {
           </tr>
           <tr>
             <td>
-              <p className="contact-line-name">Teléfono</p>
+              <p className="contact-line-name">{Tform("phone.label")}</p>
             </td>
             <td>
-              <p>Movil</p>
+              <Checkbox
+                value="mobile"
+                checked={selectMobile}
+                onChange={handleSelectMobile}
+              >
+                {Tform("phone.mobile")}
+              </Checkbox>
               <Form.Group controlId="movil" className="contact-number">
                 <SelectPicker
                   data={dataCodeNumber}
-                  style={{ width: 150 }}
+                  style={{ width: 224 }}
                   searchable={false}
                   virtualized
-                  label="Código"
+                  label={Tform("phone.code")}
                   value={movCode}
                   onChange={setMovCode}
+                  disabled={!selectMobile}
                 />
                 <Form.Control
                   name="movil"
-                  placeholder="numero"
                   value={movNumber}
                   onChange={setMovNumber}
+                  placeholder={Tform("phone.number")}
+                  disabled={!selectMobile}
                 />
               </Form.Group>
-              <p>Fijo</p>
+              <Checkbox
+                value="fix"
+                checked={selectFix}
+                onChange={handleSelectFix}
+              >
+                {Tform("phone.fix")}
+              </Checkbox>
               <Form.Group controlId="fijo" className="contact-number">
                 <SelectPicker
                   data={dataCodeNumber}
-                  style={{ width: 150 }}
+                  style={{ width: 224 }}
                   searchable={false}
                   virtualized
-                  label="Código"
+                  label={Tform("phone.code")}
                   value={fixCode}
                   onChange={setFixCode}
+                  disabled={!selectFix}
                 />
                 <Form.Control
                   name="fijo"
-                  placeholder="numero"
+                  placeholder={Tform("phone.number")}
                   value={fixNumber}
                   onChange={setFixNumber}
+                  disabled={!selectFix}
                 />
                 <Form.Control
-                  name="ext"
-                  placeholder="extension"
+                  name="fijo-ext"
+                  placeholder={Tform("phone.ext")}
                   value={fixExt}
                   onChange={setFixExt}
+                  disabled={!selectFix}
                 />
               </Form.Group>
             </td>
           </tr>
           <tr>
             <td>
-              <p className="contact-line-name">Mensaje</p>
+              <p className="contact-line-name">{Tform("message")}</p>
             </td>
             <td>
               <Form.Group controlId="textarea">
@@ -204,15 +253,14 @@ function SendEmailForm(props: any) {
         <p>
           <span style={{ color: "#eb3626" }}>* </span>
           <span style={{ color: "#2589f5" }}>
-            Por favor verifique que sus datos sean los correctos, ya que serán
-            utilizados por el anunciante para contactarlo
+            {Tcontact("message-general")}
           </span>
         </p>
 
         <Form.Group>
           <ButtonToolbar>
             <Button id="contact-send-button" appearance="primary" type="submit">
-              Contactar enuciante
+              {Tcontact("send-button")}
             </Button>
           </ButtonToolbar>
         </Form.Group>

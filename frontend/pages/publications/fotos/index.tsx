@@ -3,20 +3,20 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { djRequest } from "utils/apirest";
 
+import { withTranslations } from "utils/i18n";
+import { useTranslations } from "next-intl";
+export const getServerSideProps = withTranslations({
+  // use translations located in
+  // translations/auth
+  folderPath: "publications",
+});
+
 function PublicationsFotos(props: any) {
   const baseURL = "http://localhost:8000";
-  enum contractTypeEnum {
-    SALE = "SALE",
-    RENTAL = "RENTAL",
-    RENTAL_SALE = "RENTAL_SALE",
-  }
-  enum contractTypeEnumES {
-    SALE = "Venta",
-    RENTAL = "Renta",
-    RENTAL_SALE = "Venta y Renta",
-  }
+
   const router = useRouter();
-  console.log("query id ", router.query.id);
+  const Tw = useTranslations();
+  //console.log("query id ", router.query.id);
   const vehicleId = router.query.id;
   const [vehicle, setVehicle] = useState();
   const [contractType, setcontractType] = useState("");
@@ -36,16 +36,8 @@ function PublicationsFotos(props: any) {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("vehicle ", data);
-        setVehicle(data);
-
-        let auxContractType = contractTypeEnumES.RENTAL_SALE;
-        if (vehicle === contractTypeEnum.RENTAL)
-          auxContractType = contractTypeEnumES.RENTAL;
-        if (vehicle === contractTypeEnum.SALE)
-          auxContractType = contractTypeEnumES.SALE;
-
-        setcontractType(auxContractType);
+        //console.log("vehicle ", data);
+        setVehicle(data.vehicle);
 
         return data;
       }
@@ -85,19 +77,25 @@ function PublicationsFotos(props: any) {
                   {vehicle.model.brand.name}-{vehicle.model.name}
                 </p>
                 <p style={{ color: "#eb3626" }}>{vehicle.year.slice(0, 4)}</p>
-                <p style={{ color: "#eb3626" }}>{contractType}</p>
+                <p style={{ color: "#eb3626" }}>
+                  {vehicle.contract_type === "SALE"
+                    ? Tw("cards.contrat-type.sell")
+                    : vehicle.contract_type === "RENTAL"
+                    ? Tw("cards.contrat-type.rental")
+                    : Tw("cards.contrat-type.sell-rental")}
+                </p>
               </Container>
               <Container>
                 <p>
-                  <b>Pais: </b>
+                  <b>{Tw("cards.addres.country")}: </b>
                   {vehicle.location_city.location.split(">")[0]}
                 </p>
                 <p>
-                  <b>Ciudad: </b>
+                  <b>{Tw("cards.addres.city")}: </b>
                   {vehicle.location_city.name}
                 </p>
                 <p>
-                  <b>Zona: </b>
+                  <b>{Tw("cards.addres.city")}: </b>
                   {vehicle.location_zone}
                 </p>
               </Container>
@@ -106,7 +104,7 @@ function PublicationsFotos(props: any) {
           {vehicle.images.length > 0 ? (
             <Container>
               <p id="publications-window-subtitle">
-                <b>Fotos</b>
+                <b>{Tw("windows.photos")}</b>
               </p>
               <Container id="publications-grid-fotos">
                 {vehicle.images.map((image) => (
@@ -126,7 +124,7 @@ function PublicationsFotos(props: any) {
             onClick={close}
             //href="javascript:window.open('https://www.google.es','','toolbar=yes', 'location=no', 'directories=no', 'status=no','menubar=no', 'scrollbars=no', 'resizable=yes', 'width=650', 'height=450', 'left=0', 'top=0');void 0"
           >
-            Aceptar
+            {Tw("windows.button")}
           </Button>
         </Container>
       ) : (

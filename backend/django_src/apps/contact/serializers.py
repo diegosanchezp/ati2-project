@@ -42,7 +42,6 @@ class visit(serializers.Serializer):
   userId=serializers.IntegerField()
   date = serializers.DateField()
   typeVisit = serializers.CharField()
-  email = serializers.EmailField(required=False) 
   message = serializers.CharField()
   contact_hour_from = serializers.TimeField(required=False)
   contact_hour_to = serializers.TimeField(required=False)

@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { Container, Button, Divider, Pagination } from "rsuite";
 
+import { withTranslations } from "utils/i18n";
+import { useTranslations } from "next-intl";
+export const getServerSideProps = withTranslations({
+  // use translations located in
+  // translations/auth
+  folderPath: "publications",
+});
+
 //COMPONENTS
 import PublicationList from "components/publicationList/publicationList";
 import PublicationPhoto from "components/publicationPhoto/publicationPhoto";
@@ -21,6 +29,9 @@ import { djRequest, getCSRF } from "utils/apirest";
 import { useSession } from "auth";
 
 function PublicationsPage() {
+  const TboxFilter = useTranslations("boxFilter");
+  const TheaderButtons = useTranslations("headerButtons");
+
   //states for query, tal vez agunos deben iniciar de otra forma
   const [continent, setContinent] = useState("");
   const [country, setCountry] = useState("");
@@ -223,6 +234,7 @@ function PublicationsPage() {
     const deleteButton = isLogin && (isAdmin || isOwner);
 
     const activeButtons = len === 1;
+    const noactiveButtons = len === 0;
     const moreCards = len >= 2;
     if (activeButtons) {
       //console.log("tengo que activar botones");
@@ -235,6 +247,9 @@ function PublicationsPage() {
       ]);
     } else {
       //setOptionsButtons([true, true, true, true, true]);
+    }
+    if (noactiveButtons) {
+      setOptionsButtons([true, true, true, true, true]);
     }
     if (moreCards) {
       // console.log("more os 1 card ", len);
@@ -261,40 +276,38 @@ function PublicationsPage() {
             appearance="primary"
             disabled={optionsButtons[0]}
           >
-            Ver detalle
+            {TheaderButtons("see")}
           </Button>
           <Button
             color="green"
             appearance="primary"
             disabled={optionsButtons[1]}
           >
-            Modificar
+            {TheaderButtons("edit")}
           </Button>
           <Button
             color="yellow"
             appearance="primary"
             disabled={optionsButtons[2]}
           >
-            Deshabilitar
+            {TheaderButtons("disable")}
           </Button>
           <Button
             color="violet"
             appearance="primary"
             disabled={optionsButtons[3]}
           >
-            Habilitar
+            {TheaderButtons("enable")}
           </Button>
           <Button color="red" appearance="primary" disabled={optionsButtons[4]}>
-            Eliminar
+            {TheaderButtons("delete")}
           </Button>
         </Container>
         <Divider />
-        <p>
-          Haz clic en el vehículo de tu preferencia, para ver más información
-        </p>
+        <p>{TboxFilter("info")}</p>
         <Container id="publications-options">
           <Container id="publications-options-header">
-            <p>Publicaciones realizadas</p>
+            <p>{TboxFilter("tittle")}</p>
           </Container>
 
           <Container id="pubications-options-bars">
@@ -303,7 +316,7 @@ function PublicationsPage() {
               id="type-publications-bar"
             >
               <Container>
-                <p>Ver listado como:</p>
+                <p>{TboxFilter("typeRender.tittle")}</p>
               </Container>
               <PublicationsType
                 setCardSelected={setCardsSelected}
@@ -313,26 +326,23 @@ function PublicationsPage() {
               />
             </Container>
             <Container className="pubications-options-bar">
-              <p>
-                Seleccione los filtros especificados a continuación, si desea
-                filtrar los resultados obtenidos
-              </p>
+              <p>{TboxFilter("filterInfo")}</p>
             </Container>
             <Container className="pubications-options-bar">
               <Container>
-                <p>Tipo de vehiculo:</p>
+                <p>{TboxFilter("typeVehicle.tittle")}</p>
               </Container>
               <PublicationsTypeVehicle setTypeVehicle={setTypeVehicle} />
             </Container>
             <Container className="pubications-options-bar">
               <Container>
-                <p>Ordenar resultados por:</p>
+                <p>{TboxFilter("order.tittle")}</p>
               </Container>
               <PublicationsOrder setTypeOrder={setTypeOrder} />
             </Container>
             <Container className="pubications-options-bar">
               <Container>
-                <p>Vehículo en:</p>
+                <p>{TboxFilter("contractType.tittle")}</p>
               </Container>
               <PublicationsStatusVehicle setTypeStatus={setTypeStatus} />
             </Container>

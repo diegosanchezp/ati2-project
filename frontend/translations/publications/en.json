@@ -1,0 +1,75 @@
+{
+  "boxFilter": {
+    "tittle": "Publications",
+    "info": "Click on the vehicle of your choice, to see more information",
+    "filterInfo": "Select the filters below, if you want to filter the results obtained",
+    "typeRender": {
+      "tittle": "See list like: ",
+      "options": { "list": "List", "photo": "Photo" }
+    },
+    "typeVehicle": {
+      "tittle": "Type: ",
+      "options": { "car": "Car", "van": "Van", "trunk": "Trunk" }
+    },
+    "order": {
+      "tittle": "Order by: ",
+      "options": { "price": "Price", "rental": "Rental" }
+    },
+    "contractType": {
+      "tittle": "Vehicle for: ",
+      "options": {
+        "sell": "Sale",
+        "rental": "Rental",
+        "sell-rental": "Sale and Rental"
+      }
+    }
+  },
+  "cards": {
+    "buttons": {
+      "seeAllInfo": "See all information",
+      "contactAdvertiser": "Contact advertiser"
+    },
+    "contrat-type": {
+      "sell": "Sale",
+      "rental": "Rental",
+      "sell-rental": "Sale and Rental"
+    },
+    "addres": { "country": "Country", "city": "City", "zone": "Zone" },
+    "status": { "new": "New", "used": "Used" },
+    "brand": "Brand",
+    "model": "Model"
+  },
+  "panels": {
+    "types": {
+      "details": { "name": "See details", "tittle": "Vehicle details" },
+      "accesories": {
+        "name": "See accessories",
+        "tittle": "Vehicle accessories"
+      },
+      "photos": { "name": "See photos", "tittle": "Photos" },
+      "videos": { "name": "See videos", "tittle": "Videos" },
+      "services": { "name": "See services", "tittle": "Services" },
+      "ubication": { "name": "See exact location", "tittle": "Location" }
+    },
+    "see-more": "Click to see more information",
+    "accesories-tittle": "Vehicle accessories",
+    "ubication-tittle": "Exact location"
+  },
+  "windows": {
+    "details": "Vehicle details",
+    "accesories": "Accessories",
+    "photos": "Photos",
+    "videos": "Videos",
+    "services": "Services of the day",
+    "ubication": "Exact location",
+    "click-here": "Click here",
+    "button": "Accept"
+  },
+  "headerButtons": {
+    "see": "See details",
+    "edit": "Edit",
+    "disable": "Disable",
+    "enable": "Enable",
+    "delete": "Delete"
+  }
+}

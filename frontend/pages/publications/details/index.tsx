@@ -3,7 +3,17 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { djRequest, getCSRF } from "utils/apirest";
 
+import { withTranslations } from "utils/i18n";
+import { useTranslations } from "next-intl";
+export const getServerSideProps = withTranslations({
+  // use translations located in
+  // translations/auth
+  folderPath: "publications",
+});
+
 function PublicationsDetails(props: any) {
+  const Tw = useTranslations();
+
   const router = useRouter();
   console.log("query id ", router.query.id);
   const vehicleId = router.query.id;
@@ -31,7 +41,7 @@ function PublicationsDetails(props: any) {
       if (response.ok) {
         const data = await response.json();
         console.log("vehicle ", data);
-        setVehicle(data);
+        setVehicle(data.vehicle);
 
         setAccesorieList(data.accessories ? data.accessories.split(",") : []);
         setDetailsList(data.details ? data.details.split(",") : []);
@@ -62,7 +72,7 @@ function PublicationsDetails(props: any) {
         <Container>
           <Container className="publications-windows-details-section">
             <p className="publications-windows--details-subtitle">
-              <b>Detalles del vehículo</b>
+              <b>{Tw("windows.details")}</b>
             </p>
 
             <Container>
@@ -77,15 +87,15 @@ function PublicationsDetails(props: any) {
           </Container>
           <Container className="publications-windows-details-section">
             <p className="publications-windows--details-subtitle">
-              <b>Accesorios y comodidades</b>
+              <b>{Tw("windows.accesories")}</b>
             </p>
             <Container className="publications-windows-details-section-box">
               <ul className="publications-windows-details-section-list">
-                <li>
-                  {accesorieList.map((accesorie) => (
+                {accesorieList.map((accesorie) => (
+                  <li>
                     <p>{accesorie}</p>
-                  ))}
-                </li>
+                  </li>
+                ))}
               </ul>
             </Container>
           </Container>
@@ -95,7 +105,7 @@ function PublicationsDetails(props: any) {
           >
             <Container>
               <p className="publications-windows--details-subtitle">
-                <b>Fotos</b>
+                <b>{Tw("windows.photos")}</b>
               </p>
               <Container className="publications-windows-details-section-box">
                 <a
@@ -105,13 +115,13 @@ function PublicationsDetails(props: any) {
                   target="popup"
                   onClick={() => openInNewTab(`fotos?id=${vehicle.id}`)}
                 >
-                  Haz click aqui
+                  {Tw("windows.click-here")}
                 </a>
               </Container>
             </Container>
             <Container>
               <p className="publications-windows--details-subtitle">
-                <b>Videos</b>
+                <b>{Tw("windows.videos")}</b>
               </p>
               <Container className="publications-windows-details-section-box">
                 <a
@@ -121,14 +131,14 @@ function PublicationsDetails(props: any) {
                   target="popup"
                   onClick={() => openInNewTab(`videos?id=${vehicle.id}`)}
                 >
-                  Haz click aqui
+                  {Tw("windows.click-here")}
                 </a>
               </Container>
             </Container>
           </Container>
           <Container className="publications-windows-details-section">
             <p className="publications-windows--details-subtitle">
-              <b>Servicios al día</b>
+              <b>{Tw("windows.services")}</b>
             </p>
             <ul className="publications-windows-details-section-list-none">
               <li>
@@ -140,7 +150,7 @@ function PublicationsDetails(props: any) {
           </Container>
           <Container className="publications-windows-details-section">
             <p className="publications-windows--details-subtitle">
-              <b>Ubicación exacta</b>
+              <b>{Tw("windows.ubication")}</b>
             </p>
             <Container className="publications-windows-details-section-box">
               <p>{vehicle.exact_location}</p>
@@ -152,7 +162,7 @@ function PublicationsDetails(props: any) {
             onClick={close}
             //href="javascript:window.open('https://www.google.es','','toolbar=yes', 'location=no', 'directories=no', 'status=no','menubar=no', 'scrollbars=no', 'resizable=yes', 'width=650', 'height=450', 'left=0', 'top=0');void 0"
           >
-            Aceptar
+            {Tw("windows.button")}
           </Button>
         </Container>
       ) : (

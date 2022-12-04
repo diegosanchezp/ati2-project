@@ -3,35 +3,15 @@ import EditIcon from "@rsuite/icons/Edit";
 import WarningRoundIcon from "@rsuite/icons/WarningRound";
 import VisibleIcon from "@rsuite/icons/Visible";
 import UnvisibleIcon from "@rsuite/icons/Unvisible";
-import React, { useState } from "react";
-import {
-  Container,
-  Header,
-  Content,
-  Navbar,
-  Nav,
-  Button,
-  Divider,
-  RadioGroup,
-  Radio,
-  Carousel,
-  Checkbox,
-  Popover,
-  Whisper,
-  IconButton,
-} from "rsuite";
-import { list } from "../../pages/publications/list-DELETE/data";
+import React from "react";
+import { Container, Content, Checkbox, IconButton } from "rsuite";
 import ContactarAnunciante from "components/contactar-anunciante/contactarAnunciante";
-import { ifError } from "assert";
+import { useTranslations } from "next-intl";
 
-const openInNewTab = (url: string) => {
-  window.open(
-    url,
-    "name",
-    "width=600,height=800,toolbar=no, location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,left=100, top=20"
-  );
-};
 function PublicationPhoto(props) {
+  const TCard = useTranslations("cards");
+  const TPanels = useTranslations("panels");
+
   const baseURL = "http://localhost:8000";
   const { data } = props;
   const { isLogin, isAdmin, isClient, sessionUserId } = props.session;
@@ -83,9 +63,9 @@ function PublicationPhoto(props) {
               <Container className="publications-more-data">
                 <CustomPanel
                   placement="auto"
-                  title="Detalles del vehículo"
+                  title={TPanels("types.details.tittle")}
                   url="details"
-                  nameLink="Ver detalles"
+                  nameLink={TPanels("types.details.name")}
                   id={item.id}
                   accessories={item.accessories}
                   details={item.details}
@@ -93,9 +73,9 @@ function PublicationPhoto(props) {
                 />
                 <CustomPanel
                   placement="auto"
-                  title="Accesorios del vehículo"
+                  title={TPanels("types.accesories.tittle")}
                   url="details"
-                  nameLink="Ver accesorios"
+                  nameLink={TPanels("types.accesories.name")}
                   id={item.id}
                   accessories={item.accessories}
                   details={item.details}
@@ -103,9 +83,9 @@ function PublicationPhoto(props) {
                 />
                 <CustomPanel
                   placement="auto"
-                  title="Fotos"
+                  title={TPanels("types.photos.tittle")}
                   url="fotos"
-                  nameLink="Ver fotos"
+                  nameLink={TPanels("types.photos.name")}
                   id={item.id}
                   accessories={item.accessories}
                   details={item.details}
@@ -113,9 +93,9 @@ function PublicationPhoto(props) {
                 />
                 <CustomPanel
                   placement="auto"
-                  title="Videos"
+                  title={TPanels("types.videos.tittle")}
                   url="videos"
-                  nameLink="Ver videos"
+                  nameLink={TPanels("types.videos.name")}
                   id={item.id}
                   accessories={item.accessories}
                   details={item.details}
@@ -123,9 +103,9 @@ function PublicationPhoto(props) {
                 />
                 <CustomPanel
                   placement="auto"
-                  title="Servicios"
+                  title={TPanels("types.services.tittle")}
                   url="details"
-                  nameLink="Ver servicios al día"
+                  nameLink={TPanels("types.services.name")}
                   id={item.id}
                   accessories={item.accessories}
                   details={item.details}
@@ -133,9 +113,9 @@ function PublicationPhoto(props) {
                 />
                 <CustomPanel
                   placement="auto"
-                  title="Ubicacion"
+                  title={TPanels("types.ubication.tittle")}
                   url="details"
-                  nameLink="Ver ubicación exacta"
+                  nameLink={TPanels("types.ubication.name")}
                   id={item.id}
                   accessories={item.accessories}
                   details={item.details}
@@ -148,24 +128,37 @@ function PublicationPhoto(props) {
                 <p style={{ color: "#2589f5" }}>
                   {item.model.brand.name}-{item.model.name}
                 </p>
-                <p style={{ color: "#eb3626" }}>{item.contract_type}</p>
-                <p style={{ color: "#5ea83e" }}>{item.status}</p>
+                <p style={{ color: "#eb3626" }}>
+                  {item.contract_type === "SALE"
+                    ? TCard("contrat-type.sell")
+                    : item.contract_type === "RENTAL"
+                    ? TCard("contrat-type.rental")
+                    : TCard("contrat-type.sell-rental")}
+                </p>
+                <p style={{ color: "#5ea83e" }}>
+                  {item.status === "NEW"
+                    ? TCard("status.new")
+                    : TCard("status.used")}
+                </p>
               </Container>
               <Container className="photo-vehicle-addres-data">
                 <p>
-                  <b>Pais: </b>
+                  <b>{TCard("addres.country")}: </b>
                   {item.location_city.location.split(">")[0]}
                 </p>
                 <p>
-                  <b>Ciudad: </b>
+                  <b>{TCard("addres.city")}: </b>
                   {item.location_city.name}
                 </p>
                 <p>
-                  <b>Zona: </b>
+                  <b>{TCard("addres.zone")}: </b>
                   {item.location_zone}
                 </p>
               </Container>
-              <ContactarAnunciante className="contactar-anunciante-button" />
+              <ContactarAnunciante
+                className="contactar-anunciante-button"
+                id={item.id}
+              />
               {isLogin ? (
                 <Container className="publications-authenticated-buttons">
                   <IconButton
@@ -203,7 +196,7 @@ function PublicationPhoto(props) {
             </Content>
           </Container>
           <Container className="publication-card-photo-see-all">
-            <a href="">Ver información completa</a>
+            <a href="">{TCard("buttons.seeAllInfo")}</a>
           </Container>
         </Container>
       ))}

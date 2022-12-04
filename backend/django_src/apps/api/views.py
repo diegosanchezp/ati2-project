@@ -6,7 +6,8 @@ from django.db.models import Q
 from django.http import Http404
 
 from ..vehicle.models import Vehicle
-from .serializers import VehicleListSerializer, VehicleSerializer
+from ..misc.models import Telephone
+from .serializers import VehicleListSerializer, VehicleSerializer,TelephoneSerializer,VehicleSerializerGet
 
 class VehicleDetailsView(APIView):
     def get(self, request, id):
@@ -14,7 +15,10 @@ class VehicleDetailsView(APIView):
             vehicle = Vehicle.objects.select_related("currency", "location_city__state__country", "model__brand", "owner")\
                 .prefetch_related("images", "videos")\
                 .get(id = id)
-            serializer = VehicleSerializer(vehicle)         
+            phoneData = Telephone.objects.filter(object_id=id)
+            #vehicle.data["contact_phone_numbers"]=phoneData
+            print(phoneData)
+            serializer = VehicleSerializerGet({"vehicle":vehicle,"contact_phone_numbers":phoneData})          
             return Response(serializer.data)
         except:
             raise Http404("Vehicle not found...")

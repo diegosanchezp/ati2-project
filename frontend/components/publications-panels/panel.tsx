@@ -7,7 +7,7 @@ const openInNewTab = (url: string) => {
   window.open(
     url,
     "name",
-    "width=600,height=800,toolbar=no, location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,left=100, top=20"
+    "width=850,height=800,toolbar=no, location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,left=100, top=20"
   );
 };
 

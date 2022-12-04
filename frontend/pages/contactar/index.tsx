@@ -9,6 +9,8 @@ import {
   Form,
   ButtonToolbar,
   Input,
+  Message,
+  useToaster,
 } from "rsuite";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -16,11 +18,42 @@ import FormContactar from "components/contactar-anunciante/contactar-form";
 import { useSession } from "auth";
 import { djRequest } from "utils/apirest";
 
+import { withTranslations } from "utils/i18n";
+import { useTranslations } from "next-intl";
+export const getServerSideProps = withTranslations({
+  // use translations located in
+  // translations/auth
+  folderPath: "contactUser",
+});
+
 function ContactarAnunciante(props: any) {
+  const Tcontact = useTranslations();
   const router = useRouter();
   const vehicleId = router.query.id;
 
   const [vehicle, setVehicle] = useState();
+  const [sendForm, setSendForm] = useState(false);
+  const [type, setType] = useState("");
+  const [text, setText] = useState("");
+  const toaster = useToaster();
+
+  const placement = "topEnd";
+
+  const message = (
+    <Message showIcon type={type} text={text}>
+      {type}: {text}
+    </Message>
+  );
+
+  useEffect(() => {
+    console.log("ok toster");
+    if (sendForm) {
+      toaster.push(message, { placement });
+      setSendForm(false);
+    }
+  }, [sendForm]);
+
+  const notification = { setType, setText, setSendForm };
 
   //session data variables
   let isLogin = false;
@@ -52,7 +85,7 @@ function ContactarAnunciante(props: any) {
         const data = await response.json();
         console.log("vehicle ", data);
         setVehicle(data);
-        isOwner = sessionUserId === data.owner.id;
+        isOwner = sessionUserId === data.vehicle.owner.id;
 
         return data;
       }
@@ -94,35 +127,37 @@ function ContactarAnunciante(props: any) {
       {vehicle ? (
         <Container id="contactar-anunciante-container">
           <Container id="contactar-anunciante-type-container">
-            <p id="contactar-anunciante-type">
-              Selecciona la opción de tu preferencia
-            </p>
+            <p id="contactar-anunciante-type">{Tcontact("tittle-info")}</p>
             <Container>
               <RadioGroup name="radioList">
                 <Radio value="1" checked={optionsForm[0]} onChange={selectType}>
-                  Enviar correo electrónico
+                  {Tcontact("options.send-email")}
                 </Radio>
                 <Radio value="2" checked={optionsForm[1]} onChange={selectType}>
-                  Llamar por teléfono
+                  {Tcontact("options.call")}
                 </Radio>
                 <Radio value="3" checked={optionsForm[2]} onChange={selectType}>
-                  Quiero que me llamen
+                  {Tcontact("options.call-me")}
                 </Radio>
                 <Radio value="4" checked={optionsForm[3]} onChange={selectType}>
-                  Enviar consulta
+                  {Tcontact("options.send-consult")}
                 </Radio>
                 <Radio value="5" checked={optionsForm[4]} onChange={selectType}>
-                  Agendar visita
+                  {Tcontact("options.visit")}
                 </Radio>
               </RadioGroup>
             </Container>
             <Button color="orange" appearance="primary" onClick={close}>
-              Cerrar
+              {Tcontact("close-button")}
             </Button>
           </Container>
           <Container>
             {option ? (
-              <FormContactar option={option} vehicle={vehicle} />
+              <FormContactar
+                option={option}
+                vehicle={vehicle}
+                notification={notification}
+              />
             ) : (
               <Container></Container>
             )}

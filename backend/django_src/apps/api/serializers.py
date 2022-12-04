@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from ..vehicle.models import Vehicle, VehicleImages, VehicleVideos, VehicleModel, VehicleBrand
+from ..misc.models import Telephone
 from ..finance.serializers import CurrencySerializer
 from ..country.serializers import CitySerializer
 from django_typomatic import ts_interface, generate_ts
@@ -49,6 +50,10 @@ class VehicleImageSerializer(serializers.ModelSerializer):
         exclude = [
             "vehicle"
         ]
+class TelephoneSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = Telephone
+        exclude = []
 
 class VehicleSerializer(serializers.ModelSerializer):
     currency = CurrencySerializer(read_only = True)
@@ -57,9 +62,14 @@ class VehicleSerializer(serializers.ModelSerializer):
     owner = OwnerSerializer(read_only = True)
     images = VehicleImageSerializer(many = True, read_only = True)
     videos = VehicleVideosSerializer(many = True, read_only = True)
+    #contact_phone_numbers = TelephoneSerializer(many=True, read_only=True)
     class Meta: 
         model = Vehicle
         exclude = []
+    
+class VehicleSerializerGet(serializers.Serializer):
+    vehicle=VehicleSerializer(read_only=True)
+    contact_phone_numbers = TelephoneSerializer(many=True, read_only=True)
 
 
 class VehicleListSerializer(serializers.Serializer): 

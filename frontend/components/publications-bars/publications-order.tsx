@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import React, { useState } from "react";
 import {
   Container,
@@ -14,6 +15,8 @@ import {
 import { TypeOrderPubliationsEnum } from "../../pages/publications/enums/publications.enum";
 
 function PublicationsOrder(props: any) {
+  const TboxFilter = useTranslations("boxFilter");
+
   const selectTypeOder = (e: any) => {
     const value = e.target.value;
     props.setTypeOrder(value);
@@ -26,7 +29,7 @@ function PublicationsOrder(props: any) {
         onClick={selectTypeOder}
         value={TypeOrderPubliationsEnum.PRECIO}
       >
-        Precio
+        {TboxFilter("order.options.price")}
       </Button>
       <Button
         color="green"
@@ -34,7 +37,7 @@ function PublicationsOrder(props: any) {
         onClick={selectTypeOder}
         value={TypeOrderPubliationsEnum.ALQUILER}
       >
-        Alquiler
+        {TboxFilter("order.options.rental")}
       </Button>
     </Container>
   );

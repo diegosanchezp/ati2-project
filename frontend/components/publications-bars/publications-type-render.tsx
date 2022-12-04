@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import React, { useState } from "react";
 import {
   Container,
@@ -14,6 +15,8 @@ import {
 import { TypeVisualizerEnum } from "../../pages/publications/enums/publications.enum";
 
 function PublicationsType(props: any) {
+  const TboxFilter = useTranslations("boxFilter");
+
   const isPhoto = props.typeVisualizer === TypeVisualizerEnum.PHOTO;
   //true -> list = false | false -> list = true
   const [photo, setPhoto] = useState(isPhoto);
@@ -37,14 +40,14 @@ function PublicationsType(props: any) {
           checked={photo}
           onChange={selectType}
         >
-          Foto
+          {TboxFilter("typeRender.options.photo")}
         </Radio>
         <Radio
           value={TypeVisualizerEnum.LIST}
           checked={list}
           onChange={selectType}
         >
-          Lista
+          {TboxFilter("typeRender.options.list")}
         </Radio>
       </RadioGroup>
     </Container>

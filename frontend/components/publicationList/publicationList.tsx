@@ -71,7 +71,10 @@ function PublicationList(props: any) {
             <p>{item.status}</p>
             <p>Marca {item.model.brand.name}</p>
             <p>Modelo {item.model.name}</p>
-            <ContactarAnunciante className="contactar-anunciante-button" />
+            <ContactarAnunciante
+              className="contactar-anunciante-button"
+              id={item.id}
+            />
           </Content>
 
           <Content>

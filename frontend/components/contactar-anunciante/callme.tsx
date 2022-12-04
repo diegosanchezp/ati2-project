@@ -1,4 +1,5 @@
 import { useSession } from "auth";
+import { useTranslations } from "next-intl";
 import React, { useState } from "react";
 import {
   Container,
@@ -14,7 +15,10 @@ const Textarea = React.forwardRef((props, ref) => (
   <Input {...props} as="textarea" ref={ref} />
 ));
 function CallMeForm(props: any) {
-  const { vehicle } = props;
+  const Tcontact = useTranslations();
+  const Tform = useTranslations("form");
+
+  const { vehicle } = props.vehicle;
 
   const { dispatch, session } = useSession();
 
@@ -31,10 +35,11 @@ function CallMeForm(props: any) {
   const [fixCode, setFixCode] = useState([]);
   const [fixNumber, setFixNumber] = useState("");
   const [fixExt, setFixExt] = useState("");
+  const [selectFix, setSelectFix] = useState(false);
   //number phone (Mov)
   const [movCode, setMovCode] = useState([]);
   const [movNumber, setMovNumber] = useState("");
-  const [movExt, setMovExt] = useState("");
+  const [selectMobile, setSelectMobile] = useState(false);
   //hours
   const [initHourOne, setInitHourOne] = useState("");
   const [initHourTwo, setInitHourTwo] = useState("");
@@ -50,6 +55,7 @@ function CallMeForm(props: any) {
       contact_hour_from: `${initHourOne}:${initHourTwo}`,
       contact_hour_to: `${finHourOne}:${finHourTwo}`,
     };
+
     if (fixCode.length > 0 && fixNumber.length > 0) {
       body["fixedPhone"] = {
         number: fixNumber,
@@ -67,6 +73,21 @@ function CallMeForm(props: any) {
     }
     console.log("body ", body);
   }
+  function handleSelectMobile() {
+    setSelectMobile(!selectMobile);
+    if (selectMobile) {
+      setMovCode([]);
+      setMovNumber("");
+    }
+  }
+  function handleSelectFix() {
+    setSelectFix(!selectFix);
+    if (selectFix) {
+      setFixCode([]);
+      setFixNumber("");
+      setFixExt("");
+    }
+  }
   const openInNewTab = (url: string) => {
     window.open(
       url,
@@ -81,63 +102,79 @@ function CallMeForm(props: any) {
 
   return (
     <Container>
-      <p id="contact-type-title">Quiero que me llamen</p>
+      <p id="contact-type-title">{Tcontact("options.call-me")}</p>
 
       <Form fluid onSubmit={handleSubmit}>
         <table id="contact-table">
           <tr>
             <td>
-              <p className="contact-line-name">Teléfono</p>
+              <p className="contact-line-name">{Tform("phone.label")}</p>
             </td>
             <td>
-              <p>Movil</p>
+              <Checkbox
+                value="mobile"
+                checked={selectMobile}
+                onChange={handleSelectMobile}
+              >
+                {Tform("phone.mobile")}
+              </Checkbox>
               <Form.Group controlId="movil" className="contact-number">
                 <SelectPicker
                   data={dataCodeNumber}
                   style={{ width: 224 }}
                   searchable={false}
                   virtualized
-                  label="Código"
+                  label={Tform("phone.code")}
                   value={movCode}
                   onChange={setMovCode}
+                  disabled={!selectMobile}
                 />
                 <Form.Control
                   name="movil"
                   value={movNumber}
                   onChange={setMovNumber}
-                  placeholder="numero"
+                  placeholder={Tform("phone.number")}
+                  disabled={!selectMobile}
                 />
               </Form.Group>
-              <p>Fijo</p>
+              <Checkbox
+                value="fix"
+                checked={selectFix}
+                onChange={handleSelectFix}
+              >
+                {Tform("phone.fix")}
+              </Checkbox>
               <Form.Group controlId="fijo" className="contact-number">
                 <SelectPicker
                   data={dataCodeNumber}
                   style={{ width: 224 }}
                   searchable={false}
                   virtualized
-                  label="Código"
+                  label={Tform("phone.code")}
                   value={fixCode}
                   onChange={setFixCode}
+                  disabled={!selectFix}
                 />
                 <Form.Control
                   name="fijo"
-                  placeholder="numero"
+                  placeholder={Tform("phone.number")}
                   value={fixNumber}
                   onChange={setFixNumber}
+                  disabled={!selectFix}
                 />
                 <Form.Control
                   name="fijo-ext"
-                  placeholder="extension"
-                  placeholder="extension"
+                  placeholder={Tform("phone.ext")}
                   value={fixExt}
                   onChange={setFixExt}
+                  disabled={!selectFix}
                 />
               </Form.Group>
             </td>
           </tr>
           <tr>
             <td>
-              <p className="contact-line-name">Nombre</p>
+              <p className="contact-line-name">{Tform("name")}</p>
             </td>
             <td>
               <Form.Group controlId="nombre">
@@ -151,7 +188,7 @@ function CallMeForm(props: any) {
           </tr>
           <tr>
             <td>
-              <p className="contact-line-name">Apellido</p>
+              <p className="contact-line-name">{Tform("lastname")}</p>
             </td>
             <td>
               <Form.Group controlId="lastname">
@@ -165,7 +202,7 @@ function CallMeForm(props: any) {
           </tr>
           <tr>
             <td>
-              <p className="contact-line-name">Dias de contacto</p>
+              <p className="contact-line-name">{Tform("days.label")}</p>
             </td>
             <td>
               <Form.Group controlId="days">
@@ -176,13 +213,27 @@ function CallMeForm(props: any) {
                   value={days}
                   onChange={setDays}
                 >
-                  <Checkbox value="LUNES">Lunes</Checkbox>
-                  <Checkbox value="MARTES">Martes</Checkbox>
-                  <Checkbox value="MIERCOLES">Miercoles</Checkbox>
-                  <Checkbox value="JUEVES">Jueves</Checkbox>
-                  <Checkbox value="VIERNES">Viernes</Checkbox>
-                  <Checkbox value="SABADO">Sabado</Checkbox>
-                  <Checkbox value="DOMINGO">Domingo</Checkbox>
+                  <Checkbox value="LUNES">
+                    {Tform("days.daysValues.monday")}
+                  </Checkbox>
+                  <Checkbox value="MARTES">
+                    {Tform("days.daysValues.tuesday")}
+                  </Checkbox>
+                  <Checkbox value="MIERCOLES">
+                    {Tform("days.daysValues.wednesday")}
+                  </Checkbox>
+                  <Checkbox value="JUEVES">
+                    {Tform("days.daysValues.thursday")}
+                  </Checkbox>
+                  <Checkbox value="VIERNES">
+                    {Tform("days.daysValues.friday")}
+                  </Checkbox>
+                  <Checkbox value="SABADO">
+                    {Tform("days.daysValues.saturday")}
+                  </Checkbox>
+                  <Checkbox value="DOMINGO">
+                    {Tform("days.daysValues.sunday")}
+                  </Checkbox>
                 </CheckboxGroup>
               </Form.Group>
             </td>
@@ -190,17 +241,17 @@ function CallMeForm(props: any) {
 
           <tr>
             <td>
-              <p className="contact-line-name">Horas de contacto</p>
+              <p className="contact-line-name">{Tform("hours.label")}</p>
             </td>
             <td>
-              <p>Desde</p>
+              <p>{Tform("hours.from")}</p>
               <Form.Group controlId="movil" className="contact-hour">
                 <SelectPicker
                   data={dataCodeNumber}
-                  style={{ width: 150 }}
+                  style={{ width: 200 }}
                   searchable={false}
                   virtualized
-                  label="Tipo"
+                  label={Tform("hours.hour")}
                   value={initHourOne}
                   onChange={setInitHourOne}
                 />
@@ -209,19 +260,19 @@ function CallMeForm(props: any) {
                   style={{ width: 200 }}
                   searchable={false}
                   virtualized
-                  label="Hora"
+                  label={Tform("hours.minute")}
                   value={initHourTwo}
                   onChange={setInitHourTwo}
                 />
               </Form.Group>
-              <p>Hasta</p>
+              <p>{Tform("hours.to")}</p>
               <Form.Group controlId="fijo" className="contact-hour">
                 <SelectPicker
                   data={dataCodeNumber}
-                  style={{ width: 150 }}
+                  style={{ width: 200 }}
                   searchable={false}
                   virtualized
-                  label="Tipo"
+                  label={Tform("hours.hour")}
                   value={finHourOne}
                   onChange={setFinHourOne}
                 />
@@ -230,7 +281,7 @@ function CallMeForm(props: any) {
                   style={{ width: 200 }}
                   searchable={false}
                   virtualized
-                  label="Hora"
+                  label={Tform("hours.minute")}
                   value={finHourTwo}
                   onChange={setFinHourTwo}
                 />
@@ -241,15 +292,14 @@ function CallMeForm(props: any) {
         <p>
           <span style={{ color: "#eb3626" }}>* </span>
           <span style={{ color: "#2589f5" }}>
-            Por favor verifique que sus datos sean los correctos, ya que serán
-            utilizados por el anunciante para contactarlo
+            {Tcontact("message-general")}
           </span>
         </p>
 
         <Form.Group>
           <ButtonToolbar>
             <Button id="contact-send-button" appearance="primary" type="submit">
-              Contactar enuciante
+              {Tcontact("send-button")}
             </Button>
           </ButtonToolbar>
         </Form.Group>

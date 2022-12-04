@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import React, { useState } from "react";
 import {
   Container,
@@ -14,6 +15,8 @@ import {
 import { TypeVehicleEnum } from "../../pages/publications/enums/publications.enum";
 
 function PublicationsTypeVehicle(props: any) {
+  const TboxFilter = useTranslations("boxFilter");
+
   const selectTypeVehicle = (e: any) => {
     const value = e.target.value;
     props.setTypeVehicle(value);
@@ -26,7 +29,7 @@ function PublicationsTypeVehicle(props: any) {
         value={TypeVehicleEnum.CARRO}
         onClick={selectTypeVehicle}
       >
-        Carro
+        {TboxFilter("typeVehicle.options.car")}
       </Button>
       <Button
         color="green"
@@ -34,7 +37,7 @@ function PublicationsTypeVehicle(props: any) {
         value={TypeVehicleEnum.CAMIONETA}
         onClick={selectTypeVehicle}
       >
-        Camioneta
+        {TboxFilter("typeVehicle.options.van")}
       </Button>
       <Button
         color="yellow"
@@ -42,7 +45,7 @@ function PublicationsTypeVehicle(props: any) {
         value={TypeVehicleEnum.CAMION}
         onClick={selectTypeVehicle}
       >
-        Camión
+        {TboxFilter("typeVehicle.options.trunk")}
       </Button>
     </Container>
   );

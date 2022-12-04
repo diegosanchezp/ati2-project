@@ -1,0 +1,75 @@
+{
+  "boxFilter": {
+    "tittle": "Publicaciones realizadas",
+    "info": "Haz clic en el vehículo de tu preferencia, para ver más información",
+    "filterInfo": "Seleccione los filtros especificados a continuación, sí desea filtrar los resultados obtenidos",
+    "typeRender": {
+      "tittle": "Ver listado como: ",
+      "options": { "list": "lista", "photo": "foto" }
+    },
+    "typeVehicle": {
+      "tittle": "Tipo de vehiculo: ",
+      "options": { "car": "Carro", "van": "Camioneta", "trunk": "Camión" }
+    },
+    "order": {
+      "tittle": "Ordenar resultados por: ",
+      "options": { "price": "Precio", "rental": "Alquiler" }
+    },
+    "contractType": {
+      "tittle": "Vehiculo en: ",
+      "options": {
+        "sell": "Venta",
+        "rental": "Alquiler",
+        "sell-rental": "Venta y Alquiler"
+      }
+    }
+  },
+  "cards": {
+    "buttons": {
+      "seeAllInfo": "Ver información completa",
+      "contactAdvertiser": "Contactar anunciante"
+    },
+    "contrat-type": {
+      "sell": "Venta",
+      "rental": "Alquiler",
+      "sell-rental": "Venta y Alquiler"
+    },
+    "addres": { "country": "País", "city": "Ciudad", "zone": "Zona" },
+    "status": { "new": "Nuevo", "used": "Usado" },
+    "brand": "Marca",
+    "model": "Modelo"
+  },
+  "panels": {
+    "types": {
+      "details": { "name": "Ver detalles", "tittle": "Detalles del vehículo" },
+      "accesories": {
+        "name": "Ver accesorios",
+        "tittle": "Accesorios del vehículo"
+      },
+      "photos": { "name": "Ver fotos", "tittle": "Fotos" },
+      "videos": { "name": "Ver videos", "tittle": "Videos" },
+      "services": { "name": "Ver servicios", "tittle": "Servicios" },
+      "ubication": { "name": "Ver ubicación exacta", "tittle": "Ubicacion" }
+    },
+    "see-more": "Haga click para ver más informacion",
+    "accesories-tittle": "Accesorios de vehículo",
+    "ubication-tittle": "Ubicación exacta"
+  },
+  "windows": {
+    "details": "Detalles del vehículo",
+    "accesories": "Accesorios y comodidades",
+    "photos": "Fotos",
+    "videos": "Videos",
+    "services": "Servicios al día",
+    "ubication": "Ubicación exacta",
+    "click-here": "Haz click aqui",
+    "button": "Aceptar"
+  },
+  "headerButtons": {
+    "see": "Ver detalles",
+    "edit": "Modificar",
+    "disable": "Deshabilitar",
+    "enable": "Habilitar",
+    "delete": "Eliminar"
+  }
+}
