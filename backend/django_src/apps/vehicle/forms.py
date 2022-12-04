@@ -1,7 +1,10 @@
+from django.forms.formsets import BaseFormSet
 from .models import Vehicle, VehicleImages, VehicleVideos
 from django.forms import ModelForm
 from django.forms import inlineformset_factory
-
+from django_src.apps.misc.models import Telephone
+from django import forms
+from django.contrib.contenttypes.forms import generic_inlineformset_factory
 class VehicleForm(ModelForm):
     class Meta:
         model = Vehicle
@@ -21,3 +24,9 @@ VehicleVideosFormSet = inlineformset_factory(
     fields=("video",)
 )
 
+VehicleTelephoneNumber = generic_inlineformset_factory(
+    Telephone,
+    fields=("number", "country_number","ext", "ptype"),
+    max_num=2,
+    extra=0,
+)
