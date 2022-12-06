@@ -20,12 +20,14 @@ function PublicationsTypeVehicle(props: any) {
   const selectTypeVehicle = (e: any) => {
     const value = e.target.value;
     props.setTypeVehicle(value);
+    //props.setSubmit(true);
   };
   return (
     <Container className="options-buttons">
       <Button
         color="blue"
         appearance="primary"
+        active={props.typeVehicle === TypeVehicleEnum.CARRO}
         value={TypeVehicleEnum.CARRO}
         onClick={selectTypeVehicle}
       >
@@ -34,6 +36,7 @@ function PublicationsTypeVehicle(props: any) {
       <Button
         color="green"
         appearance="primary"
+        active={props.typeVehicle === TypeVehicleEnum.CAMIONETA}
         value={TypeVehicleEnum.CAMIONETA}
         onClick={selectTypeVehicle}
       >
@@ -42,6 +45,7 @@ function PublicationsTypeVehicle(props: any) {
       <Button
         color="yellow"
         appearance="primary"
+        active={props.typeVehicle === TypeVehicleEnum.CAMION}
         value={TypeVehicleEnum.CAMION}
         onClick={selectTypeVehicle}
       >

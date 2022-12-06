@@ -4,9 +4,9 @@ export enum TypeVisualizerEnum {
 }
 
 export enum TypeVehicleEnum {
-  CARRO = "CARRO",
-  CAMION = "CAMION",
-  CAMIONETA = "CAMIONETA",
+  CARRO = "CAR",
+  CAMION = "TRUCK",
+  CAMIONETA = "VAN",
   ALL = "ALL",
 }
 

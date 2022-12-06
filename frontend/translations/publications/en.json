@@ -9,7 +9,7 @@
     },
     "typeVehicle": {
       "tittle": "Type: ",
-      "options": { "car": "Car", "van": "Van", "trunk": "Trunk" }
+      "options": { "car": "Car", "van": "Van", "trunk": "truck" }
     },
     "order": {
       "tittle": "Order by: ",

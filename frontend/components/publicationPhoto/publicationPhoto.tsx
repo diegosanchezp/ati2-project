@@ -26,16 +26,15 @@ function PublicationPhoto(props) {
     }
     let aux = props.cardSelected;
     const include = aux.includes(vehicleID);
-    console.log("include", include);
     if (include) {
       aux = aux.filter((id) => id != vehicleID);
     } else {
-      console.log("hago include");
+      //console.log("hago include");
       aux.push(vehicleID);
     }
     props.setCardSelected(aux);
 
-    console.log("ACTUALIZADO ", props.cardSelected);
+    //console.log("ACTUALIZADO ", props.cardSelected);
   };
 
   return (

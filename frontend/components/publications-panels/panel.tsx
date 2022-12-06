@@ -15,7 +15,7 @@ const CustomPopover = React.forwardRef(
   ({ content, title, accessories, address, id, details, ...props }, ref) => {
     const noAccessoriBox =
       title === "Ubicacion" || title === "Detalles del vehículo";
-    console.log("noAccessoriBox ", noAccessoriBox, "detalles ", details);
+    //console.log("noAccessoriBox ", noAccessoriBox, "detalles ", details);
     const listAccesories = accessories ? accessories?.split(",") : [];
     const listDetails = details ? details?.split(",") : [];
     return (

@@ -20,12 +20,14 @@ function PublicationsStatusVehicle(props: any) {
   const selectTypeStatus = (e: any) => {
     const value = e.target.value;
     props.setTypeStatus(value);
+    //props.setSubmit(true);
   };
   return (
     <Container className="options-buttons">
       <Button
         color="blue"
         appearance="primary"
+        active={props.typeStatus === TypeStatusVehicleEnum.VENTA}
         onClick={selectTypeStatus}
         value={TypeStatusVehicleEnum.VENTA}
       >
@@ -34,6 +36,7 @@ function PublicationsStatusVehicle(props: any) {
       <Button
         color="green"
         appearance="primary"
+        active={props.typeStatus === TypeStatusVehicleEnum.ALQUILER}
         onClick={selectTypeStatus}
         value={TypeStatusVehicleEnum.ALQUILER}
       >
@@ -43,6 +46,7 @@ function PublicationsStatusVehicle(props: any) {
         color="yellow"
         appearance="primary"
         onClick={selectTypeStatus}
+        active={props.typeStatus === TypeStatusVehicleEnum.ALQUILER_Y_VENTA}
         value={TypeStatusVehicleEnum.ALQUILER_Y_VENTA}
       >
         {TboxFilter("contractType.options.sell-rental")}

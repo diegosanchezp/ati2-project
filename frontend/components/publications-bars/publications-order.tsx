@@ -20,6 +20,7 @@ function PublicationsOrder(props: any) {
   const selectTypeOder = (e: any) => {
     const value = e.target.value;
     props.setTypeOrder(value);
+    //props.setSubmit(true)
   };
   return (
     <Container className="options-buttons">
@@ -27,6 +28,7 @@ function PublicationsOrder(props: any) {
         color="blue"
         appearance="primary"
         onClick={selectTypeOder}
+        active={props.typeOrder === TypeOrderPubliationsEnum.PRECIO}
         value={TypeOrderPubliationsEnum.PRECIO}
       >
         {TboxFilter("order.options.price")}
@@ -35,6 +37,7 @@ function PublicationsOrder(props: any) {
         color="green"
         appearance="primary"
         onClick={selectTypeOder}
+        active={props.typeOrder === TypeOrderPubliationsEnum.ALQUILER}
         value={TypeOrderPubliationsEnum.ALQUILER}
       >
         {TboxFilter("order.options.rental")}

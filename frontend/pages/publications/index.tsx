@@ -37,7 +37,7 @@ function PublicationsPage() {
   const [country, setCountry] = useState("");
   const [state, setStates] = useState([]);
   const [city, setCity] = useState("");
-  const [typeStatus, setTypeStatus] = useState(TypeStatusVehicleEnum.ALL);
+  const [typeStatus, setTypeStatus] = useState("");
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [typePrice, setTypePrice] = useState("");
@@ -45,9 +45,9 @@ function PublicationsPage() {
   const [maxPrice, setMaxPrice] = useState("");
   const [seeAlso, setSeeAlso] = useState("");
   const [currency, setCurrency] = useState("");
-  const [typeOrder, setTypeOrder] = useState(TypeOrderPubliationsEnum.PRECIO);
+  const [typeOrder, setTypeOrder] = useState("");
   //other filters
-  const [typeVehicle, setTypeVehicle] = useState(TypeVehicleEnum.ALL);
+  const [type_vehicle, setTypeVehicle] = useState("");
 
   const [submit, setSubmit] = useState(true);
   const [cleanStatesQuery, setCleanStatesQuery] = useState(true);
@@ -73,11 +73,11 @@ function PublicationsPage() {
   setSessionData();
   function setSessionData() {
     const { dispatch, session } = useSession();
-    console.log("session user test ", session);
-    console.log("login  ", isLogin);
+    //console.log("session user test ", session);
+    //console.log("login  ", isLogin);
     if (session.user) {
       isLogin = true;
-      console.log("Publications user ", session.user);
+      //console.log("Publications user ", session.user);
       isAdmin = session.user?.is_superuser || false;
       sessionUserId = session.user.id || -1;
       isClient = !isAdmin; //en cada carta si el ownerId es igual al session cliente
@@ -103,7 +103,7 @@ function PublicationsPage() {
     setCleanStatesQuery,
   };
   //states para generar url, NOTA los nombres deben ser iguales a el key del query a recibir en el back
-  const queryStates = { state, continent };
+  const queryStates = { state, continent, type_vehicle };
 
   //effect para construir el url, se llama al presionar buscar, cambiando el valor del state se puede llamar en cualquier punto
   useEffect(() => {
@@ -132,7 +132,7 @@ function PublicationsPage() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("data ", data.data);
+          //console.log("data ", data.data);
           setVehicles(data.data);
           setTotalVehicles(data.total_elements);
           return data;
@@ -198,7 +198,7 @@ function PublicationsPage() {
         if (value !== "") validValue = true;
       }
       if (typeValue === "object") {
-        console.log(Object.keys(value));
+        //console.log(Object.keys(value));
         if (value && Object.keys(value).length > 0) validValue = true;
       }
 
@@ -332,19 +332,31 @@ function PublicationsPage() {
               <Container>
                 <p>{TboxFilter("typeVehicle.tittle")}</p>
               </Container>
-              <PublicationsTypeVehicle setTypeVehicle={setTypeVehicle} />
+              <PublicationsTypeVehicle
+                typeVehicle={type_vehicle}
+                setTypeVehicle={setTypeVehicle}
+                setSubmit={setSubmit}
+              />
             </Container>
             <Container className="pubications-options-bar">
               <Container>
                 <p>{TboxFilter("order.tittle")}</p>
               </Container>
-              <PublicationsOrder setTypeOrder={setTypeOrder} />
+              <PublicationsOrder
+                typeOrder={typeOrder}
+                setTypeOrder={setTypeOrder}
+                setSubmit={setSubmit}
+              />
             </Container>
             <Container className="pubications-options-bar">
               <Container>
                 <p>{TboxFilter("contractType.tittle")}</p>
               </Container>
-              <PublicationsStatusVehicle setTypeStatus={setTypeStatus} />
+              <PublicationsStatusVehicle
+                typeStatus={typeStatus}
+                setTypeStatus={setTypeStatus}
+                setSubmit={setSubmit}
+              />
             </Container>
           </Container>
         </Container>
