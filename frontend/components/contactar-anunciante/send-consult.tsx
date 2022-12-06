@@ -11,10 +11,19 @@ import {
   Radio,
   Checkbox,
 } from "rsuite";
+import Metadata from "react-phone-number-input";
+import { djRequest, getCSRF } from "../../utils/apirest";
 const Textarea = React.forwardRef((props, ref) => (
   <Input {...props} as="textarea" ref={ref} />
 ));
 function SendConsultaForm(props: any) {
+  const codePhone = Object.keys(
+    Metadata.defaultProps.metadata["country_calling_codes"]
+  ).map((item) => ({
+    label: item,
+    value: item,
+  }));
+
   const Tcontact = useTranslations();
   const Tform = useTranslations("form");
 
@@ -40,7 +49,7 @@ function SendConsultaForm(props: any) {
   const [movCode, setMovCode] = useState([]);
   const [movNumber, setMovNumber] = useState("");
   const [selectMobile, setSelectMobile] = useState(false);
-
+  const { setType, setText, setSendForm } = props.notification;
   function handleSubmit() {
     const body = {
       userId: vehicle.owner.id,
@@ -49,7 +58,7 @@ function SendConsultaForm(props: any) {
       lastname: lastName,
       message,
     };
-    if (fixCode.length > 0 && fixNumber.length > 0) {
+    if (fixCode.length > 0 && fixNumber.length > 0 && selectFix) {
       body["fixedPhone"] = {
         number: fixNumber,
         country_number: parseInt(fixCode),
@@ -57,14 +66,41 @@ function SendConsultaForm(props: any) {
         ptype: "FIXED",
       };
     }
-    if (movCode.length > 0 && movNumber.length > 0) {
+    if (movCode.length > 0 && movNumber.length > 0 && selectMobile) {
       body["mobilePhone"] = {
         number: movNumber,
         country_number: parseInt(movCode),
         ptype: "MOBILE",
       };
     }
-    console.log("body ", body);
+    const fetchData = async () => {
+      const url = `contact/send-consult/`;
+      const { csrfToken, csrfRes } = await getCSRF();
+      console.log("url details ", url);
+      const response = await djRequest(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken as string,
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+      console.log(data);
+      if (response.ok) {
+        setType("success");
+        setText(Tcontact("send"));
+        setSendForm(true);
+        return data;
+      } else {
+        setType("error");
+        setText("Error");
+        setSendForm(true);
+      }
+    };
+
+    fetchData();
+    //console.log("body ", body);
   }
   const openInNewTab = (url: string) => {
     window.open(
@@ -157,7 +193,7 @@ function SendConsultaForm(props: any) {
               </Checkbox>
               <Form.Group controlId="movil" className="contact-number">
                 <SelectPicker
-                  data={dataCodeNumber}
+                  data={codePhone}
                   style={{ width: 224 }}
                   searchable={false}
                   virtualized
@@ -183,7 +219,7 @@ function SendConsultaForm(props: any) {
               </Checkbox>
               <Form.Group controlId="fijo" className="contact-number">
                 <SelectPicker
-                  data={dataCodeNumber}
+                  data={codePhone}
                   style={{ width: 224 }}
                   searchable={false}
                   virtualized

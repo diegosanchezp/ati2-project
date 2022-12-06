@@ -61,5 +61,6 @@
   },
   "message-general": "Por favor verifique que sus datos sean los correctos, ya que serán utilizados por el anunciante para contactarlo",
   "close-button": "Cerrar",
-  "send-button": "Contactar anunciante"
+  "send-button": "Contactar anunciante",
+  "send": "Solicitud enviada"
 }

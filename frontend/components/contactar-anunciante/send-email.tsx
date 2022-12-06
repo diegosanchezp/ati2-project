@@ -10,10 +10,20 @@ import {
   SelectPicker,
   Checkbox,
 } from "rsuite";
+import { djRequest, getCSRF } from "../../utils/apirest";
+import Metadata from "react-phone-number-input";
 const Textarea = React.forwardRef((props, ref) => (
   <Input {...props} as="textarea" ref={ref} />
 ));
 function SendEmailForm(props: any) {
+  const codePhone = Object.keys(
+    Metadata.defaultProps.metadata["country_calling_codes"]
+  ).map((item) => ({
+    label: item,
+    value: item,
+  }));
+
+  //console.log("country code ", codePhone);
   const Tcontact = useTranslations();
   const Tform = useTranslations("form");
 
@@ -49,7 +59,7 @@ function SendEmailForm(props: any) {
       fromEmail: email,
       message,
     };
-    if (fixCode.length > 0 && fixNumber.length > 0) {
+    if (fixCode.length > 0 && fixNumber.length > 0 && selectMobile) {
       body["fixedPhone"] = {
         number: fixNumber,
         country_number: parseInt(fixCode),
@@ -57,25 +67,42 @@ function SendEmailForm(props: any) {
         ptype: "FIXED",
       };
     }
-    if (fixCode.length > 0 && fixNumber.length > 0) {
+    if (movCode.length > 0 && movNumber.length > 0 && selectFix) {
       body["mobilePhone"] = {
         number: movNumber,
         country_number: parseInt(movCode),
         ptype: "MOBILE",
       };
     }
-    console.log("body ", body);
+    //console.log("body ", body);
     //fetch
-    const ok = false;
-    if (ok) {
-      setType("success");
-      setText("Solicitud enviada");
-      setSendForm(true);
-    } else {
-      setType("error");
-      setText("Error :/");
-      setSendForm(true);
-    }
+    const fetchData = async () => {
+      const url = `contact/send-email/`;
+      const { csrfToken, csrfRes } = await getCSRF();
+      console.log("url details ", url);
+      const response = await djRequest(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken as string,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setType("success");
+        setText(Tcontact("send"));
+        setSendForm(true);
+        return data;
+      } else {
+        setType("error");
+        setText("Error");
+        setSendForm(true);
+      }
+    };
+
+    fetchData();
   }
 
   const openInNewTab = (url: string) => {
@@ -181,7 +208,7 @@ function SendEmailForm(props: any) {
               </Checkbox>
               <Form.Group controlId="movil" className="contact-number">
                 <SelectPicker
-                  data={dataCodeNumber}
+                  data={codePhone}
                   style={{ width: 224 }}
                   searchable={false}
                   virtualized
@@ -207,7 +234,7 @@ function SendEmailForm(props: any) {
               </Checkbox>
               <Form.Group controlId="fijo" className="contact-number">
                 <SelectPicker
-                  data={dataCodeNumber}
+                  data={codePhone}
                   style={{ width: 224 }}
                   searchable={false}
                   virtualized

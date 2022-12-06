@@ -20,13 +20,20 @@ class sendEmail(APIView):
         serializer = send_email(data=request.data)
         if serializer.is_valid():
             print('data ',serializer.data)
-            phoneData = phone_number(serializer.data["fixedPhone"])
-            if "mobilePhone" not in serializer.data:
-                print("no exsgdf")
+            phoneDataMov = {}
+            phoneDataFix = {}
+
+            if "mobilePhone" in serializer.data:
+                phoneDataMov = phone_number(serializer.data["mobilePhone"])
+        
+            if "fixedPhone" in serializer.data:
+                phoneDataFix = phone_number(serializer.data["fixedPhone"])
             message = serializer.data["message"]
             toEmail = serializer.data["toEmail"]
-            print(message)
+            print(serializer.data["userId"])
             print(toEmail)
+            #print('data ',serializer.data)
+            
             
             return Response(data=serializer.data)
         else:
@@ -47,9 +54,11 @@ class sendConsult(APIView):
         serializer = send_consult(data=request.data)
         if serializer.is_valid():
             print('data ',serializer.data)
-            phoneData = phone_number(serializer.data["fixedPhone"])
-            if "mobilePhone" not in serializer.data:
-                print("no exsgdf")
+            if "mobilePhone" in serializer.data:
+                phoneDataMov = phone_number(serializer.data["mobilePhone"])
+        
+            if "fixedPhone" in serializer.data:
+                phoneDataFix = phone_number(serializer.data["fixedPhone"])
             return Response(data=serializer.data)
         else:
             return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST) 
@@ -59,9 +68,11 @@ class visitView(APIView):
         serializer = visit(data=request.data)
         if serializer.is_valid():
             print('data ',serializer.data)
-            phoneData = phone_number(serializer.data["fixedPhone"])
-            if "mobilePhone" not in serializer.data:
-                print("no exsgdf")
+            if "mobilePhone" in serializer.data:
+                phoneDataMov = phone_number(serializer.data["mobilePhone"])
+        
+            if "fixedPhone" in serializer.data:
+                phoneDataFix = phone_number(serializer.data["fixedPhone"])
             return Response(data=serializer.data)
         else:
             return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST) 

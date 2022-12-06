@@ -15,10 +15,20 @@ import {
   Checkbox,
 } from "rsuite";
 import { useTranslations } from "next-intl";
+import Metadata from "react-phone-number-input";
+import { djRequest, getCSRF } from "../../utils/apirest";
+
 const Textarea = React.forwardRef((props, ref) => (
   <Input {...props} as="textarea" ref={ref} />
 ));
 function ScheduleVisitForm(props: any) {
+  const codePhone = Object.keys(
+    Metadata.defaultProps.metadata["country_calling_codes"]
+  ).map((item) => ({
+    label: item,
+    value: item,
+  }));
+
   const Tcontact = useTranslations();
   const Tform = useTranslations("form");
   const { vehicle } = props.vehicle;
@@ -51,7 +61,7 @@ function ScheduleVisitForm(props: any) {
   const [finHourTwo, setFinHourTwo] = useState("");
   const [typeTime, setTypeTime] = useState("");
   const [selectMobile, setSelectMobile] = useState(false);
-
+  const { setType, setText, setSendForm } = props.notification;
   function handleSubmit() {
     let dateMonth = "00";
     let dateDay = "00";
@@ -82,7 +92,7 @@ function ScheduleVisitForm(props: any) {
       body["contact_hour_from"] = `${initHourOne}:${initHourTwo}`;
       body["contact_hour_to"] = `${finHourOne}:${finHourTwo}`;
     }
-    if (fixCode.length > 0 && fixNumber.length > 0) {
+    if (fixCode.length > 0 && fixNumber.length > 0 && selectFix) {
       body["fixedPhone"] = {
         number: fixNumber,
         country_number: parseInt(fixCode),
@@ -90,7 +100,7 @@ function ScheduleVisitForm(props: any) {
         ptype: "FIXED",
       };
     }
-    if (movCode.length > 0 && movNumber.length > 0) {
+    if (movCode.length > 0 && movNumber.length > 0 && selectMobile) {
       body["mobilePhone"] = {
         number: movNumber,
         country_number: parseInt(movCode),
@@ -98,6 +108,33 @@ function ScheduleVisitForm(props: any) {
       };
     }
     console.log("body ", body);
+    const fetchData = async () => {
+      const url = `contact/visit/`;
+      const { csrfToken, csrfRes } = await getCSRF();
+      console.log("url details ", url);
+      const response = await djRequest(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken as string,
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+      console.log(data);
+      if (response.ok) {
+        setType("success");
+        setText(Tcontact("send"));
+        setSendForm(true);
+        return data;
+      } else {
+        setType("error");
+        setText("Error");
+        setSendForm(true);
+      }
+    };
+
+    fetchData();
   }
   function handleSelectMobile() {
     setSelectMobile(!selectMobile);
@@ -126,6 +163,21 @@ function ScheduleVisitForm(props: any) {
     label: item,
     value: item,
   }));
+  const dataHourList = [...Array(24).keys()].map((item) => {
+    let value = `${item}`;
+    if (item < 10) {
+      value = `0${item}`;
+    }
+    return { label: value, value };
+  });
+
+  const dataMinuteList = [...Array(60).keys()].map((item) => {
+    let value = `${item}`;
+    if (item < 10) {
+      value = `0${item}`;
+    }
+    return { label: value, value };
+  });
 
   return (
     <Container>
@@ -196,7 +248,7 @@ function ScheduleVisitForm(props: any) {
                 <p>{Tform("hours.from")}</p>
                 <Form.Group controlId="deste-hora" className="contact-hour">
                   <SelectPicker
-                    data={dataCodeNumber}
+                    data={dataHourList}
                     style={{ width: 150 }}
                     searchable={false}
                     virtualized
@@ -206,7 +258,7 @@ function ScheduleVisitForm(props: any) {
                     disabled={typeTime === "PERSONALIZED"}
                   />
                   <SelectPicker
-                    data={dataCodeNumber}
+                    data={dataMinuteList}
                     style={{ width: 200 }}
                     searchable={false}
                     virtualized
@@ -219,7 +271,7 @@ function ScheduleVisitForm(props: any) {
                 <p>{Tform("hours.to")}</p>
                 <Form.Group controlId="hasta-hora" className="contact-hour">
                   <SelectPicker
-                    data={dataCodeNumber}
+                    data={dataHourList}
                     style={{ width: 150 }}
                     searchable={false}
                     virtualized
@@ -229,7 +281,7 @@ function ScheduleVisitForm(props: any) {
                     disabled={typeTime === "PERSONALIZED"}
                   />
                   <SelectPicker
-                    data={dataCodeNumber}
+                    data={dataMinuteList}
                     style={{ width: 200 }}
                     searchable={false}
                     virtualized
@@ -263,7 +315,7 @@ function ScheduleVisitForm(props: any) {
               </Checkbox>
               <Form.Group controlId="movil" className="contact-number">
                 <SelectPicker
-                  data={dataCodeNumber}
+                  data={codePhone}
                   style={{ width: 224 }}
                   searchable={false}
                   virtualized
@@ -289,7 +341,7 @@ function ScheduleVisitForm(props: any) {
               </Checkbox>
               <Form.Group controlId="fijo" className="contact-number">
                 <SelectPicker
-                  data={dataCodeNumber}
+                  data={codePhone}
                   style={{ width: 224 }}
                   searchable={false}
                   virtualized

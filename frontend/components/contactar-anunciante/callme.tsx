@@ -10,14 +10,23 @@ import {
   SelectPicker,
   Checkbox,
   CheckboxGroup,
+  DatePicker,
 } from "rsuite";
+import { djRequest, getCSRF } from "../../utils/apirest";
+import Metadata from "react-phone-number-input";
 const Textarea = React.forwardRef((props, ref) => (
   <Input {...props} as="textarea" ref={ref} />
 ));
 function CallMeForm(props: any) {
+  const codePhone = Object.keys(
+    Metadata.defaultProps.metadata["country_calling_codes"]
+  ).map((item) => ({
+    label: item,
+    value: item,
+  }));
   const Tcontact = useTranslations();
   const Tform = useTranslations("form");
-
+  const { setType, setText, setSendForm } = props.notification;
   const { vehicle } = props.vehicle;
 
   const { dispatch, session } = useSession();
@@ -26,6 +35,7 @@ function CallMeForm(props: any) {
   if (session.user) {
     userEmail = session.user.email;
   }
+  const [timeFrom, setimeFrom] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState(userEmail);
@@ -52,11 +62,11 @@ function CallMeForm(props: any) {
       name: firstName,
       lastname: lastName,
       contact_days: days,
-      contact_hour_from: `${initHourOne}:${initHourTwo}`,
-      contact_hour_to: `${finHourOne}:${finHourTwo}`,
+      contact_hour_from: `${initHourOne}:${initHourTwo}:00`,
+      contact_hour_to: `${finHourOne}:${finHourTwo}:00`,
     };
 
-    if (fixCode.length > 0 && fixNumber.length > 0) {
+    if (fixCode.length > 0 && fixNumber.length > 0 && selectFix) {
       body["fixedPhone"] = {
         number: fixNumber,
         country_number: parseInt(fixCode),
@@ -64,13 +74,40 @@ function CallMeForm(props: any) {
         ptype: "FIXED",
       };
     }
-    if (fixCode.length > 0 && fixNumber.length > 0) {
+    if (movCode.length > 0 && movNumber.length > 0 && selectMobile) {
       body["mobilePhone"] = {
         number: movNumber,
         country_number: parseInt(movCode),
         ptype: "MOBILE",
       };
     }
+    const fetchData = async () => {
+      const url = `contact/call-me/`;
+      const { csrfToken, csrfRes } = await getCSRF();
+      console.log("url details ", url);
+      const response = await djRequest(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken as string,
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+      console.log("data response", data);
+      if (response.ok) {
+        setType("success");
+        setText(Tcontact("send"));
+        setSendForm(true);
+        return data;
+      } else {
+        setType("error");
+        setText("Error");
+        setSendForm(true);
+      }
+    };
+
+    fetchData();
     console.log("body ", body);
   }
   function handleSelectMobile() {
@@ -95,10 +132,25 @@ function CallMeForm(props: any) {
       "width=1200,height=900,toolbar=no, location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,left=100, top=20"
     );
   };
-  const dataCodeNumber = ["54", "53"].map((item) => ({
+  const dataCodeNumber = ["10", "11"].map((item) => ({
     label: item,
     value: item,
   }));
+  const dataHourList = [...Array(24).keys()].map((item) => {
+    let value = `${item}`;
+    if (item < 10) {
+      value = `0${item}`;
+    }
+    return { label: value, value };
+  });
+
+  const dataMinuteList = [...Array(60).keys()].map((item) => {
+    let value = `${item}`;
+    if (item < 10) {
+      value = `0${item}`;
+    }
+    return { label: value, value };
+  });
 
   return (
     <Container>
@@ -120,7 +172,7 @@ function CallMeForm(props: any) {
               </Checkbox>
               <Form.Group controlId="movil" className="contact-number">
                 <SelectPicker
-                  data={dataCodeNumber}
+                  data={codePhone}
                   style={{ width: 224 }}
                   searchable={false}
                   virtualized
@@ -146,7 +198,7 @@ function CallMeForm(props: any) {
               </Checkbox>
               <Form.Group controlId="fijo" className="contact-number">
                 <SelectPicker
-                  data={dataCodeNumber}
+                  data={codePhone}
                   style={{ width: 224 }}
                   searchable={false}
                   virtualized
@@ -247,7 +299,7 @@ function CallMeForm(props: any) {
               <p>{Tform("hours.from")}</p>
               <Form.Group controlId="movil" className="contact-hour">
                 <SelectPicker
-                  data={dataCodeNumber}
+                  data={dataHourList}
                   style={{ width: 200 }}
                   searchable={false}
                   virtualized
@@ -256,7 +308,7 @@ function CallMeForm(props: any) {
                   onChange={setInitHourOne}
                 />
                 <SelectPicker
-                  data={dataCodeNumber}
+                  data={dataMinuteList}
                   style={{ width: 200 }}
                   searchable={false}
                   virtualized
@@ -268,7 +320,7 @@ function CallMeForm(props: any) {
               <p>{Tform("hours.to")}</p>
               <Form.Group controlId="fijo" className="contact-hour">
                 <SelectPicker
-                  data={dataCodeNumber}
+                  data={dataHourList}
                   style={{ width: 200 }}
                   searchable={false}
                   virtualized
@@ -277,7 +329,7 @@ function CallMeForm(props: any) {
                   onChange={setFinHourOne}
                 />
                 <SelectPicker
-                  data={dataCodeNumber}
+                  data={dataMinuteList}
                   style={{ width: 200 }}
                   searchable={false}
                   virtualized

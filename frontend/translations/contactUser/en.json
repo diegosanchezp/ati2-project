@@ -61,5 +61,6 @@
   },
   "message-general": "Please verify that your data is correct, they will be used by the advertiser to contact you",
   "close-button": "Close",
-  "send-button": "Contact advertiser"
+  "send-button": "Contact advertiser",
+  "send": "Request sent"
 }
