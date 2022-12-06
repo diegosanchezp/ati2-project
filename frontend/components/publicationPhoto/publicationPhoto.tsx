@@ -19,20 +19,35 @@ function PublicationPhoto(props) {
   const selectCard = (e) => {
     const vehicleID = e;
 
-    if (props.lastCard == vehicleID) {
-      props.setLastCard(0);
-    } else {
-      props.setLastCard(vehicleID);
-    }
     let aux = props.cardSelected;
     const include = aux.includes(vehicleID);
     if (include) {
+      //se desselecciono -> se elimina
+      //console.log("elimno id");
       aux = aux.filter((id) => id != vehicleID);
     } else {
       //console.log("hago include");
       aux.push(vehicleID);
     }
     props.setCardSelected(aux);
+    if (aux.length === 1) {
+      props.setLastCard(aux[0]);
+    }
+    if (aux.length === 0 || aux.length > 1) {
+      props.setLastCard(0);
+    }
+
+    /*
+    if (props.lastCard === vehicleID) {
+      console.log("len ", props.cardSelected.length);
+      if (props.cardSelected.length === 1) {
+       
+      } else {
+        props.setLastCard(0); //caso des-selecciona la misma carta
+      }
+    } else {
+      props.setLastCard(vehicleID);
+    }*/
 
     //console.log("ACTUALIZADO ", props.cardSelected);
   };

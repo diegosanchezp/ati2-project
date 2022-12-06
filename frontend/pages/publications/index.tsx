@@ -167,11 +167,11 @@ function PublicationsPage() {
           "X-CSRFToken": csrfToken as string,
         },
       });
-      console.log("fetch of getVehicles");
+      //console.log("fetch of getVehicles");
 
       if (response.ok) {
         const data = await response.json();
-        console.log("vehicles of change page data ", data.data);
+        //console.log("vehicles of change page data ", data.data);
         setVehicles(data.data);
         setTotalVehicles(data.total_elements);
         return data;
@@ -218,11 +218,14 @@ function PublicationsPage() {
     //console.log("en effect ", cardsSelected);
     let isOwner = false;
     const len = cardsSelected.length;
-    // console.log("leeen ", len);
+    //console.log("leeen ", len);
+    //console.log("cards selected ", cardsSelected);
+    //console.log("last card ", lastCard);
     if (len === 1) {
       const vehicleSelect = vehicles.filter(
         (vehicle) => vehicle?.id === lastCard
       )[0];
+      //console.log("vehicle selected ", vehicleSelect);
       isOwner = vehicleSelect.owner.id === sessionUserId;
     }
 

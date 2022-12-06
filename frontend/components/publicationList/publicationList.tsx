@@ -23,21 +23,23 @@ function PublicationList(props: any) {
   const selectCard = (e) => {
     const vehicleID = e;
 
-    if (props.lastCard == vehicleID) {
-      props.setLastCard(0);
-    } else {
-      props.setLastCard(vehicleID);
-    }
     let aux = props.cardSelected;
     const include = aux.includes(vehicleID);
-    //console.log("include", include);
     if (include) {
+      //se desselecciono -> se elimina
+      //console.log("elimno id");
       aux = aux.filter((id) => id != vehicleID);
     } else {
       //console.log("hago include");
       aux.push(vehicleID);
     }
     props.setCardSelected(aux);
+    if (aux.length === 1) {
+      props.setLastCard(aux[0]);
+    }
+    if (aux.length === 0 || aux.length > 1) {
+      props.setLastCard(0);
+    }
 
     //console.log("ACTUALIZADO ", props.cardSelected);
   };
