@@ -6,13 +6,14 @@ from drf_spectacular.views import (
 from rest_framework import routers
 
 from django.urls import path, include
-from . import views
+from .views import VehicleDetailsView, VehiclesView
 from rest_framework.routers import DefaultRouter, SimpleRouter
 from django.conf import settings
 from django_src.apps.auth.urls import urlpatterns as authurls
 from django_src.apps.country.urls import urlpatterns as countryUrls
 from django_src.apps.vehicle.urls import urlpatterns as vehicleUrls
 from django_src.apps.finance.urls import urlpatterns as financeUrls
+from django_src.apps.contact.urls import urlpatterns as contactUrls
 
 if settings.DEBUG:
     router = DefaultRouter()
@@ -20,6 +21,8 @@ else:
     router = SimpleRouter()
 
 urlpatterns = [
+    path("vehicle/<int:id>/", VehicleDetailsView.as_view(), name = "vehicle_details"),
+    path("vehicles/", VehiclesView.as_view(), name="vehicles_list"),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "docs/",
@@ -40,3 +43,4 @@ urlpatterns += countryUrls
 urlpatterns += vehicleUrls
 urlpatterns += financeUrls
 urlpatterns += router.urls
+urlpatterns += contactUrls

@@ -1,0 +1,66 @@
+{
+  "tittle-info": "Selecciona la opción de tu preferencia",
+  "options": {
+    "send-email": "Enviar correo electrónico",
+    "call": "Llamar por teléfono",
+    "call-me": "Quiero que me llamen",
+    "send-consult": "Enviar consulta",
+    "visit": "Agendar visita"
+  },
+  "form": {
+    "to": "Para",
+    "name": "Nombre",
+    "lastname": "Apellido",
+    "email": "Email",
+    "phone": {
+      "label": "Teléfono",
+      "code": "Código",
+      "number": "Número",
+      "ext": "Ext (opcional)",
+      "mobile": "Movil",
+      "fix": "Fijo"
+    },
+    "message": "Mensaje",
+    "fullname": "Nombre y apellido",
+    "country": "Pais",
+    "days": {
+      "label": "Días de contacto",
+      "days": [
+        "Lunes",
+        "Martes",
+        "Miercoles",
+        "Jueves",
+        "Viernes",
+        "Sabado",
+        "Domingo"
+      ],
+      "daysValues": {
+        "monday": "Lunes",
+        "tuesday": "Martes",
+        "wednesday": "Miercoles",
+        "thursday": "Jueves",
+        "friday": "Viernes",
+        "saturday": "Sabado",
+        "sunday": "Domingo"
+      }
+    },
+    "hours": {
+      "label": "Horas de contacto",
+      "from": "Deste",
+      "to": "Hasta",
+      "minute": "Minuto",
+      "hour": "Hora"
+    },
+    "date": "Fecha",
+    "schedule": {
+      "label": "Horario",
+      "specific": "Especificar horario",
+      "to-agree": "A convenir"
+    },
+    "details": "Otros detalles"
+  },
+  "message-general": "Por favor verifique que sus datos sean los correctos, ya que serán utilizados por el anunciante para contactarlo",
+  "close-button": "Cerrar",
+  "send-button": "Contactar anunciante",
+  "send": "Solicitud enviada"
+}

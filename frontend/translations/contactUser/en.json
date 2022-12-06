@@ -1,0 +1,66 @@
+{
+  "tittle-info": "Select the option of your preference",
+  "options": {
+    "send-email": "Send email",
+    "call": "Call",
+    "call-me": "Call me",
+    "send-consult": "Send consult",
+    "visit": "Schedule visit"
+  },
+  "form": {
+    "to": "To",
+    "name": "Name",
+    "lastname": "Last name",
+    "email": "Email",
+    "phone": {
+      "label": "Phone number",
+      "code": "Code",
+      "number": "Number",
+      "ext": "Ext (optional)",
+      "mobile": "Mobile",
+      "fix": "Fix"
+    },
+    "message": "Message",
+    "fullname": "Full name",
+    "country": "Country",
+    "days": {
+      "label": "Contact days",
+      "days": [
+        "Lunes",
+        "Martes",
+        "Miercoles",
+        "Jueves",
+        "Viernes",
+        "Sabado",
+        "Domingo"
+      ],
+      "daysValues": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      }
+    },
+    "hours": {
+      "label": "Contact hours",
+      "from": "From",
+      "to": "To",
+      "minute": "Minute",
+      "hour": "Hour"
+    },
+    "date": "Date",
+    "schedule": {
+      "label": "Schedule",
+      "specific": "Specify schedule",
+      "to-agree": "At convenience"
+    },
+    "details": "Other details"
+  },
+  "message-general": "Please verify that your data is correct, they will be used by the advertiser to contact you",
+  "close-button": "Close",
+  "send-button": "Contact advertiser",
+  "send": "Request sent"
+}

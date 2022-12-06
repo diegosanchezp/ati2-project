@@ -1,0 +1,279 @@
+//PUBLICATIONS
+#publications-panel {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 10px 0px;
+  margin-bottom: 25px;
+}
+
+////SEARCH
+#publications,
+#publications-search {
+  padding: 0 30px;
+}
+#publications-search {
+  margin-top: 25px;
+}
+#publications-search Button {
+  margin: 7px 0;
+  width: 224px;
+}
+
+#panel-busqueda-rapida {
+  display: flex;
+  flex-direction: column;
+}
+#panel-busqueda-rapida > * {
+  margin-bottom: 3px;
+}
+
+//
+.publication-container {
+  margin: 10px 25px;
+}
+
+.publication-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.publication-card-list {
+  display: flex;
+  flex-direction: row;
+  border: 1px white solid;
+  border-radius: 1%;
+  margin: 5px;
+  padding: 20px;
+}
+
+.publication-card-list .vehicle-data {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 3;
+}
+
+.publication-card-list .vehicle-data p {
+  margin-bottom: 4px;
+}
+
+.publication-card-list .vehicle-data button {
+  align-self: center;
+  margin: 10px;
+}
+.contactar-anunciante-button button {
+  margin: 0 auto;
+}
+//TODO fix
+.contactar-anunciante-button {
+  width: 150px !important;
+}
+
+.publication-card-list-img {
+  height: 140px;
+  width: 140px;
+}
+
+.options-buttons {
+  margin: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#type-publications {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid white;
+  justify-content: center;
+}
+
+#publications-options {
+  border: 1px solid orange;
+  margin: 5px 0;
+}
+
+#publications-options-header {
+  background-color: orange;
+  padding: 8px 5px;
+}
+#publications-options-header p {
+  color: white;
+  font-size: 15px;
+}
+#pubications-options-bars {
+  display: flex;
+  flex-direction: column;
+  //padding: 7px 5px;
+  border: 1px solid orange;
+}
+#pubications-options-bars .pubications-options-bar {
+  border: 1px solid orange;
+}
+#type-publications-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#type-publications RadioGroup {
+  border: solid 1px yellow;
+}
+
+.options-buttons button {
+  margin: 5px 10px;
+}
+
+#publications-pagination {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+//////publcations photos
+.publication-photo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 10px;
+}
+.publication-card-photo-columns {
+  display: flex;
+  flex-direction: row;
+}
+.publication-card-photo {
+  border: 1px solid #cfe1e8;
+  border-radius: 1%;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+.publication-card-photo-see-all a {
+  padding: 15px 0;
+  text-align: center;
+  font-size: 20px;
+  color: #eb3626;
+}
+
+.price-photo {
+  font-size: 20px;
+  //text-align: center;
+}
+
+.publication-card-photo-img {
+  height: 120px;
+  width: 120px;
+  margin-bottom: 20px;
+}
+.publication-card-list .publications-more-data {
+  display: flex;
+  flex-direction: column;
+}
+.publications-more-data {
+  margin-top: 15px;
+}
+
+.publications-more-data a {
+  color: #2589f5;
+  margin-bottom: 7px;
+}
+.photo-vehicle-status-data,
+.photo-vehicle-addres-data {
+  margin-bottom: 10px;
+}
+.photo-vehicle-status-data p {
+  text-align: center;
+  font-size: 22px;
+}
+.photo-data {
+  margin-right: 15px;
+}
+.photo-data-addres button {
+  margin: 20px 0;
+}
+.publication-photo .publications-authenticated-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.publication-list .publications-authenticated-buttons {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+}
+.publication-list-photo-see-all a {
+  padding: 10px 0;
+  font-size: 15px;
+  color: #eb3626;
+}
+.publications-authenticated-buttons button {
+  margin: 3px;
+}
+//////publcations list
+
+/////publications videos
+#publications-windows-videos,
+#publications-windows-fotos,
+#publications-windows-details {
+  margin: 20px 15px 10px 15px;
+  display: flex;
+  flex-direction: column;
+}
+#publications-windows-videos button,
+#publications-windows-details button,
+#publications-windows-fotos button {
+  width: 200px;
+  margin: 20px auto;
+}
+#publications-grid-videos,
+#publications-grid-fotos {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px 10px;
+}
+#publications-grid-videos video,
+#publications-grid-fotos img {
+  width: 100%;
+  height: auto;
+}
+#publications-vehicle-videos img,
+#publications-vehicle-fotos img {
+  height: 140px;
+  width: 140px;
+  margin-right: 15px;
+}
+#publications-vehicle-videos,
+#publications-vehicle-fotos {
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr;
+}
+#publications-window-subtitle {
+  margin: 15px 0;
+  font-size: 20px;
+}
+#publications-window-vehicle-info {
+  margin-bottom: 5px;
+}
+#publications-window-vehicle-info p {
+  font-size: 17px;
+}
+.publications-windows--details-subtitle {
+  font-size: 18px;
+  color: #2589f5;
+  margin-top: 10px;
+}
+.publications-windows--details-sub-subtitle {
+  font-size: 15px;
+  color: #eb3626;
+  margin-top: 5px;
+}
+.publications-windows-details-section {
+  margin-bottom: 10px;
+}
+#publications-windows-details-subtitle-rows {
+  display: flex;
+  flex-direction: row;
+}
+.publications-windows-details-section-box {
+  margin-left: 15px;
+}
+.publications-windows-details-section-list-none li {
+  list-style: none;
+}
