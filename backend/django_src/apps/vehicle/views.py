@@ -126,3 +126,15 @@ class VehicleView(APIView):
                     'states': statesSerializer.data,
                     'cities': citiesSerializer.data
                 })
+
+
+class VehicleDeleteView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def post(request):
+        ids = request.data.get('ids')
+        vehicles_to_delete = Vehicle.objects.filter(pk__in=ids)
+        vehicles_to_delete.delete()
+        return JsonResponse({'success': True})

@@ -19,7 +19,7 @@ function PublicationPhoto(props) {
   const selectCard = (e) => {
     const vehicleID = e;
 
-    let aux = props.cardSelected;
+    let aux = [...props.cardSelected];
     const include = aux.includes(vehicleID);
     if (include) {
       //se desselecciono -> se elimina
