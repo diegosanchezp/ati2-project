@@ -216,11 +216,11 @@ function PublicationsPage() {
       )[0];
       //console.log("vehicle selected ", vehicleSelect);
       isOwner = vehicleSelect.owner.id === sessionUserId;
-    }else if(len > 1){
+    } else if (len > 1) {
       const vehicleSelect = vehicles.filter(
         (vehicle) => cardsSelected.includes(vehicle?.id)
       );
-      for(let vehicleSelected of vehicleSelect){
+      for (let vehicleSelected of vehicleSelect) {
         isOwner = vehicleSelected.owner.id !== sessionUserId ? false : isOwner;
       }
     }
@@ -262,10 +262,10 @@ function PublicationsPage() {
     }
     //console.log("----------------------------------");
   }, [cardsSelected]);
-  
+
   const sessionObj = { isLogin, isAdmin, isClient, sessionUserId };
 
-  const handleClickDelete = async () => {
+  const handleClickDeleteLot = async () => {
     //console.log(cardsSelected);
     const { csrfToken } = await getCSRF();
     const response = await djRequest("deletevehicle", {
@@ -275,6 +275,21 @@ function PublicationsPage() {
         "X-CSRFToken": csrfToken as string,
       },
       body: JSON.stringify({ ids: cardsSelected })
+    });
+    setCardsSelected([]);
+    setSubmit(true);
+  }
+
+  const handleClickDeleteItem = async (id: number) => {
+    //console.log(cardsSelected);
+    const { csrfToken } = await getCSRF();
+    const response = await djRequest("deletevehicle", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken as string,
+      },
+      body: JSON.stringify({ ids: [id] })
     });
     setCardsSelected([]);
     setSubmit(true);
@@ -313,7 +328,7 @@ function PublicationsPage() {
           >
             {TheaderButtons("enable")}
           </Button>
-          <Button color="red" appearance="primary" onClick={handleClickDelete} disabled={optionsButtons[4]}>
+          <Button color="red" appearance="primary" onClick={handleClickDeleteLot} disabled={optionsButtons[4]}>
             {TheaderButtons("delete")}
           </Button>
         </Container>
@@ -403,6 +418,7 @@ function PublicationsPage() {
               setCardSelected={setCardsSelected}
               setLastCard={setLastCard}
               lastCard={lastCard}
+              handleClickDeleteItem={handleClickDeleteItem}
               data={vehicles}
               session={sessionObj}
             />
@@ -412,6 +428,7 @@ function PublicationsPage() {
               setCardSelected={setCardsSelected}
               setLastCard={setLastCard}
               lastCard={lastCard}
+              handleClickDeleteItem={handleClickDeleteItem}
               data={vehicles}
               session={sessionObj}
             />

@@ -48,7 +48,7 @@ function PublicationList(props: any) {
       {data.map((item) => (
         <Container className="publication-card-list">
           <Content className="button-select">
-            <Checkbox value={item.id} onChange={selectCard}></Checkbox>
+            <Checkbox checked={props.cardSelected.includes(item.id)} value={item.id} onChange={selectCard}></Checkbox>
           </Content>
 
           <Content>
@@ -142,6 +142,7 @@ function PublicationList(props: any) {
 
               <IconButton
                 icon={<WarningRoundIcon />}
+                onClick = {()=>{props.handleClickDeleteItem(item.id)}}
                 disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño
                 circle
                 size="sm"
