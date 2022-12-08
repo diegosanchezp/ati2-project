@@ -56,18 +56,21 @@ export const getVehicle = async (_id: string) => {
 export const editVehicle = async (_vehicleData: any, _id: string) => {
   const { csrfToken } = await getCSRF();
 
-  const response = await fetch(`http://localhost:8000/api/vehicle/edit/${_id}`, {
-    method: "POST",
-    body: _vehicleData,
-    credentials: "include",
-    headers: {
-      "X-CSRFToken": csrfToken as string,
-    },
-  });
+  const response = await fetch(
+    `http://localhost:8000/api/vehicle/edit/${_id}`,
+    {
+      method: "POST",
+      body: _vehicleData,
+      credentials: "include",
+      headers: {
+        "X-CSRFToken": csrfToken as string,
+      },
+    }
+  );
 
   if (response.ok) {
-    const { success } = await response.json();
-    return success;
+    const { message } = await response.json();
+    return { success: message === 'success' };
   } else {
     return { success: false };
   }

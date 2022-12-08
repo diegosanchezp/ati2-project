@@ -1,5 +1,5 @@
 import "@/styles/custom/index.less";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { withAuth, useSession } from "auth";
 import type { PageWithSession } from "types";
 import type {
@@ -40,6 +40,9 @@ import {
   SelectPicker,
   Uploader,
   useToaster,
+  Schema,
+  Message,
+  Field,
 } from "rsuite";
 
 import { getCountries, getStates, getCities } from "pages/api/location";
@@ -50,7 +53,6 @@ import {
 } from "pages/api/vehicle";
 import { getCurrencies } from "pages/api/finance";
 import dayjs from "dayjs";
-import { djRequest, getCSRF } from "utils/apirest";
 import {
   continents,
   timeSystem,
@@ -72,40 +74,52 @@ type GeneralStateList = {
 const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   const toaster = useToaster();
   const { vehicleData, user } = props;
+  const vehicleModel = Schema.Model({
+    location_zone: Schema.Types.StringType().isRequired(
+      "This field is required."
+    ),
+    contact_first_name: Schema.Types.StringType().isRequired(
+      "This field is required."
+    ),
+    contact_last_name: Schema.Types.StringType().isRequired(
+      "This field is required."
+    ),
+    contact_email: Schema.Types.StringType()
+      .isRequired("This field is required.")
+      .isEmail("This field must be an email"),
+    city: Schema.Types.NumberType().isRequired("This field is required."),
+  });
+  const toasterPlacement = {
+    placement: "bottomEnd",
+  };
+  const vehicleRef = useRef();
 
   const [vehicleState, setVehicleState] =
-    React.useState<VehicleSerializer>(vehicleData);
-  const [mobileNumberState, setMobileNumberState] = React.useState(
+    useState<VehicleSerializer>(vehicleData);
+  const [mobileNumberState, setMobileNumberState] = useState(
     Boolean(getVehicleNumberPhone("MOBILE"))
   );
-  const [phoneNumberState, setPhoneNumberState] = React.useState(
+  const [phoneNumberState, setPhoneNumberState] = useState(
     Boolean(getVehicleNumberPhone("FIXED"))
   );
-  const [vehicleImagesState, setVehicleImagesState] = React.useState({});
-  const [vehicleVideosState, setVehicleVideosState] = React.useState({});
-  const [showVideosState, setShowVideosState] = React.useState(false);
-  const [countriesState, setCountriesState] = React.useState<
-    GeneralStateList[]
-  >([]);
-  const [statesState, setStatesState] = React.useState<GeneralStateList[]>([]);
-  const [citiesState, setCitiesState] = React.useState<GeneralStateList[]>([]);
-  const [vehicleBrandsState, setVehicleBrandsState] = React.useState([]);
-  const [vehicleModelsState, setVehicleModelsState] = React.useState([]);
-  const [vehicleTypesState, setVehicleTypesState] =
-    React.useState(vehicleTypes);
-  const [vehicleStatusState, setVehicleStatusState] =
-    React.useState(vehicleStatus);
-  const [currenciesState, setCurrenciesState] = React.useState([]);
-  const [continentsState, setContinentsState] = React.useState(continents);
-  const [yearsState, setYearsState] = React.useState([]);
-  const [vehicleVideosList, setVehicleVideosList] = React.useState([]);
-  const [vehicleImagesList, setVehicleImagesList] = React.useState([]);
-  const [vehicleVideosQuantity, setVehicleVideosQuantity] = React.useState(1);
+  const [vehicleImagesState, setVehicleImagesState] = useState({});
+  const [vehicleVideosState, setVehicleVideosState] = useState({});
+  const [countriesState, setCountriesState] = useState<GeneralStateList[]>([]);
+  const [statesState, setStatesState] = useState<GeneralStateList[]>([]);
+  const [citiesState, setCitiesState] = useState<GeneralStateList[]>([]);
+  const [vehicleBrandsState, setVehicleBrandsState] = useState([]);
+  const [vehicleModelsState, setVehicleModelsState] = useState([]);
+  const [vehicleTypesState, setVehicleTypesState] = useState(vehicleTypes);
+  const [vehicleStatusState, setVehicleStatusState] = useState(vehicleStatus);
+  const [currenciesState, setCurrenciesState] = useState([]);
+  const [continentsState, setContinentsState] = useState(continents);
+  const [yearsState, setYearsState] = useState([]);
+  const [vehicleVideosList, setVehicleVideosList] = useState([]);
+  const [vehicleImagesList, setVehicleImagesList] = useState([]);
 
   function onInputVehicleImages(_fileList: Array<any>, _index: number) {
     const _file = _fileList.length > 0 ? _fileList[0] : null;
     let newFile = {};
-    if (!vehicleImagesState[_index]) _file = { ..._file, isNew: true };
     newFile[_index] = _file ? [] : null;
     if (_file) newFile[_index].push(_file);
 
@@ -118,11 +132,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     newFile[_index] = _file ? [] : null;
     if (_file) newFile[_index].push(_file);
 
-    setVehicleVideosState({ ...vehicleVideosState, ...newFile });
-  }
-
-  function onChangeShowVideos(_value: Boolean) {
-    setShowVideosState(_value);
+    setVehicleVideosState((prevState) => ({ ...prevState, ...newFile }));
   }
 
   function onChangeMobile(_: any, checked: boolean) {
@@ -137,6 +147,9 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     checkStatus: boolean,
     _form: React.FormEvent<HTMLFormElement>
   ) {
+    console.log(vehicleRef.current);
+    if (!vehicleRef.current.check()) return;
+
     let _vehicleState = vehicleState;
     let vehicleFormData = new FormData();
 
@@ -216,6 +229,82 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       vehicleFormData.append("images-MIN_NUM_FORMS", "0");
     }
 
+    if (vehicleVideosState) {
+      let vehicleVideos = Object.values(vehicleVideosState);
+      let vehicleVideosIndexes = Object.keys(vehicleVideosState);
+
+      vehicleVideosIndexes.forEach((index, orderedIndex) => {
+        if (vehicleVideosState[index]) {
+          if (
+            vehicleData.videos[`${vehicleData.videos.prefix}-${index}-id`] !=
+              undefined &&
+            vehicleData.videos[`${vehicleData.videos.prefix}-${index}-id`] !=
+              null
+          ) {
+            vehicleFormData.append(
+              `${vehicleData.videos.prefix}-${orderedIndex}-id`,
+              vehicleData.videos[`${vehicleData.videos.prefix}-${index}-id`]
+            );
+            vehicleFormData.append(
+              `${vehicleData.videos.prefix}-${orderedIndex}-video`,
+              vehicleVideosState[index][0].blobFile
+            );
+            vehicleFormData.append(
+              `${vehicleData.videos.prefix}-${orderedIndex}-DELETE`,
+              ""
+            );
+            vehicleFormData.append(
+              `${vehicleData.videos.prefix}-${orderedIndex}-vehicle`,
+              vehicleData.videos[
+                `${vehicleData.videos.prefix}-${index}-vehicle`
+              ]
+            );
+          } else {
+            vehicleFormData.append(
+              `${vehicleData.videos.prefix}-${orderedIndex}-video`,
+              vehicleVideosState[index][0].blobFile
+            );
+            vehicleFormData.append(
+              `${vehicleData.videos.prefix}-${orderedIndex}-vehicle`,
+              String(vehicleData.id)
+            );
+          }
+        } else {
+          if (vehicleData.videos[`${vehicleData.videos.prefix}-${index}-id`]) {
+            vehicleFormData.append(
+              `${vehicleData.videos.prefix}-${orderedIndex}-id`,
+              vehicleData.videos[`${vehicleData.videos.prefix}-${index}-id`]
+            );
+            vehicleFormData.append(
+              `${vehicleData.videos.prefix}-${orderedIndex}-image`,
+              vehicleData.videos[`${vehicleData.videos.prefix}-${index}-video`]
+            );
+            vehicleFormData.append(
+              `${vehicleData.videos.prefix}-${orderedIndex}-DELETE`,
+              "True"
+            );
+            vehicleFormData.append(
+              `${vehicleData.videos.prefix}-${orderedIndex}-vehicle`,
+              vehicleData.videos[
+                `${vehicleData.videos.prefix}-${index}-vehicle`
+              ]
+            );
+          }
+        }
+      });
+
+      vehicleFormData.append(
+        "videos-INITIAL_FORMS",
+        vehicleData.videos["videos-INITIAL_FORMS"]
+      );
+      vehicleFormData.append(
+        "videos-TOTAL_FORMS",
+        String(vehicleVideos.length)
+      );
+      vehicleFormData.append("videos-MAX_NUM_FORMS", "5");
+      vehicleFormData.append("videos-MIN_NUM_FORMS", "0");
+    }
+
     if (_vehicleState.contract_type == "RENTAL")
       vehicleFormData.append("rental_price", _vehicleState.rental_price);
     else if (_vehicleState.contract_type == "SALE")
@@ -226,9 +315,6 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     }
 
     if (_vehicleState.contact_days) {
-      /*Object.values(_vehicleState.contact_days).forEach((day: any) => {
-        vehicleFormData.append("contact_days[]", day);
-      });*/
       vehicleFormData.append(
         "contact_days",
         JSON.stringify(_vehicleState.contact_days)
@@ -239,11 +325,6 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       _vehicleState.contact_hour_from &&
       _vehicleState.contact_hour_from_system
     ) {
-      console.log(
-        `01-01-01 ${_vehicleState.contact_hour_from}:00:00 ${String(
-          _vehicleState.contact_hour_from_system
-        ).toLocaleUpperCase()}`
-      );
       vehicleFormData.append(
         "contact_hour_from",
         dayjs(
@@ -497,18 +578,27 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       dayjs().format("YYYY-MM-DD")
     );
 
-    for (const value of vehicleFormData.entries()) {
+    /*for (const value of vehicleFormData.entries()) {
       console.log(value);
+    }*/
+
+    const response = await editVehicle(vehicleFormData, String(vehicleData.id));
+
+    if (response.success) {
+      toaster.push(
+        <Message duration={6000} closable type="success">
+          {"La información se ha guardado correctamente"}
+        </Message>,
+        toasterPlacement
+      );
+    } else {
+      toaster.push(
+        <Message duration={6000} closable type="error">
+          {"Ha ocurrido un error al intenrar guardar la información"}
+        </Message>,
+        toasterPlacement
+      );
     }
-
-    await editVehicle(vehicleFormData, String(vehicleData.id));
-  }
-
-  function onChangeVideosQuantity(_quantity: Number) {
-    setVehicleVideosQuantity(_quantity);
-    let _vehicleVideos = Array(_quantity);
-    _vehicleVideos.fill(1);
-    setVehicleVideosList(_vehicleVideos);
   }
 
   function PhoneNumberSection() {
@@ -562,14 +652,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     return null;
   }
 
-  const toastOptions = {
-    placement: "bottomCenter",
-  };
-
   async function getInitialData() {
-    console.log(vehicleData);
-    console.log(user);
-
     let _vehicleImagesList = Array(20);
     let _vehicleVideosList = Array(5);
 
@@ -667,6 +750,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
 
       if (vehicleData.images) {
         let _vehicleImages = {};
+        let _vehicleVideos = {};
         let indexes = [
           0,
           1,
@@ -690,6 +774,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
           18,
           19,
         ];
+        let videosIndexes = [0, 1, 2, 3, 4, 5];
 
         indexes.forEach((imageIndex) => {
           if (
@@ -719,6 +804,36 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
         setVehicleImagesState((prevState) => ({
           ...prevState,
           ..._vehicleImages,
+        }));
+
+        videosIndexes.forEach((videoIndex) => {
+          if (
+            vehicleData.videos[`videos-${videoIndex}-id`] != undefined &&
+            vehicleData.videos[`videos-${videoIndex}-id`] != null
+          ) {
+            const _imageName =
+              vehicleData.videos[`videos-${videoIndex}-video`].split("/")[
+                vehicleData.videos[`videos-${videoIndex}-video`].split("/")
+                  .length - 1
+              ];
+
+            const currentVideo = {
+              id: vehicleData.videos[`videos-${videoIndex}-id`],
+              url: `http://127.0.0.1:8000${
+                vehicleData.videos[`videos-${videoIndex}-video`]
+              }`,
+              name: _imageName,
+              fileKey: vehicleData.videos[`videos-${videoIndex}-id`],
+              delete: vehicleData.videos[`videos-${videoIndex}-DELETE`],
+            };
+            _vehicleVideos[videoIndex] = [];
+            _vehicleVideos[videoIndex].push(currentVideo);
+          }
+        });
+
+        setVehicleVideosState((prevState) => ({
+          ...prevState,
+          ..._vehicleVideos,
         }));
       }
     }
@@ -893,7 +1008,11 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     >
       <FlexboxGrid.Item colspan={12} style={{ width: "100%" }}>
         <Panel header={<h3>Editar publicación</h3>} bordered>
-          <Form onSubmit={onSubmitEditVehicle}>
+          <Form
+            ref={vehicleRef}
+            model={vehicleModel}
+            onSubmit={onSubmitEditVehicle}
+          >
             <Grid>
               <Row gutter={16} style={{ marginBottom: 32 }}>
                 <FlexboxGrid justify="center">
@@ -987,12 +1106,13 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                         >
                           Ciudad
                         </Form.ControlLabel>
-                        <SelectPicker
+                        <Form.Control
                           name="city"
+                          accepter={SelectPicker}
                           placeholder="Selecciona una ciudad"
                           data={citiesState}
                           value={
-                            vehicleState ? vehicleState.location_city.id : null
+                            vehicleState ? vehicleState.location_city.id : ""
                           }
                           onChange={onChangeCity}
                         />
@@ -1008,7 +1128,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           Zona
                         </Form.ControlLabel>
                         <Form.Control
-                          name="zone"
+                          name="location_zone"
                           style={{ maxWidth: "100%" }}
                           value={vehicleState ? vehicleState.location_zone : ""}
                           onChange={(_value: any) => {
@@ -1040,6 +1160,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                               "contract_type"
                             )
                           }
+                          required
                         >
                           <Radio value={"RENTAL"}>Alquiler</Radio>
                           <Radio value={"SALE"}>Venta</Radio>
@@ -1244,6 +1365,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           <Uploader
                             name="vehicleImages"
                             multiple
+                            fileList={vehicleVideosState[index] ?? null}
                             action=""
                             listType="picture"
                             accept=".mp4"
@@ -1433,7 +1555,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                   <Form.Group>
                     <Form.ControlLabel>Nombre</Form.ControlLabel>
                     <Form.Control
-                      name="contactName"
+                      name="contact_first_name"
                       placeholder="Jesús Antonio"
                       value={
                         vehicleState ? vehicleState.contact_first_name : null
@@ -1449,7 +1571,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                   <Form.Group>
                     <Form.ControlLabel>Apellido</Form.ControlLabel>
                     <Form.Control
-                      name="contactLastName"
+                      name="contact_last_name"
                       placeholder="Perez Castillo"
                       value={
                         vehicleState ? vehicleState.contact_last_name : null
@@ -1465,7 +1587,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                   <Form.Group>
                     <Form.ControlLabel>Correo electrócnico</Form.ControlLabel>
                     <Form.Control
-                      name="contactEmail"
+                      name="contact_email"
                       placeholder="jesusp@test.com"
                       value={vehicleState ? vehicleState.contact_email : null}
                       onChange={(_value: any) =>
