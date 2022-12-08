@@ -1,5 +1,6 @@
 from django_src.apps.misc.models import Telephone
 from .utils import base64ToImageField, formsetdata_to_dict
+from .serializers import VehicleModelSerializer
 from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -31,15 +32,26 @@ class VehicleBrandView(APIView):
 
         return JsonResponse({'brands': vehicleBrandsSerializer.data})
 
-
-class VehicleModelView(APIView):
+class CitiesByStateView(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     @staticmethod
-    def get(request):
-        vehicleModels = VehicleModel.objects.all()
-        vehicleModelsSerializer = VehicleBrandSerializer(
+    def get(request, id):
+        cities = City.objects.filter(state=id)
+        citiesSerializer = CitiesSerializer(cities, many=True)
+
+        return JsonResponse({'cities': citiesSerializer.data})
+
+
+class VehicleModelsByBrandView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def get(request, pk):
+        vehicleModels = VehicleModel.objects.filter(brand=pk)
+        vehicleModelsSerializer = VehicleModelSerializer(
             vehicleModels, many=True)
 
         return JsonResponse({'models': vehicleModelsSerializer.data})
@@ -61,6 +73,11 @@ class VehicleGetView(generics.RetrieveAPIView):
             country=instance.location_city.state.country.id)
         statesSerializer = StatesSerializer(states, many=True)
 
+        models = VehicleModel.objects.filter(
+            brand=instance.brand.id
+        )
+        modelsSerializer = VehicleModelSerializer(models, many=True)
+
         cities = City.objects.filter(state=instance.location_city.state.id)
         citiesSerializer = CitiesSerializer(cities, many=True)
         images_form = VehicleImageFormSet(instance=instance)
@@ -75,6 +92,7 @@ class VehicleGetView(generics.RetrieveAPIView):
             'countries': countriesSerializer.data,
             'states': statesSerializer.data,
             'cities': citiesSerializer.data,
+            'models': modelsSerializer.data
         }
         return Response({**initial_data, **new_data})
 

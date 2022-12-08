@@ -4,6 +4,7 @@ import { withAuth, useSession } from "auth";
 import type { PageWithSession } from "types";
 import type {
   VehicleGetSerializer,
+  VehicleModelSerializer,
   VehicleSerializer as OriginalVehicleSerializer,
 } from "djtypes/vehicle";
 import type {
@@ -16,6 +17,7 @@ type VehicleSerializer = OriginalVehicleSerializer & {
   countries: CountriesSerializer[];
   states: StatesSerializer[];
   cities: CitiesSerializer[];
+  models: VehicleModelSerializer[];
   contact_hour_to_system?: string;
   contact_hour_from_system?: string;
 };
@@ -41,7 +43,11 @@ import {
 } from "rsuite";
 
 import { getCountries, getStates, getCities } from "pages/api/location";
-import { getVehiclesBrands, getVehiclesModels, editVehicle } from "pages/api/vehicle";
+import {
+  getVehiclesBrands,
+  getVehiclesModelsByBrand,
+  editVehicle,
+} from "pages/api/vehicle";
 import { getCurrencies } from "pages/api/finance";
 import dayjs from "dayjs";
 import { djRequest, getCSRF } from "utils/apirest";
@@ -55,6 +61,7 @@ import {
 
 type EditVehiclePageProps = {
   vehicleData: VehicleSerializer;
+  user: any;
 };
 
 type GeneralStateList = {
@@ -64,7 +71,7 @@ type GeneralStateList = {
 
 const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   const toaster = useToaster();
-  const { vehicleData } = props;
+  const { vehicleData, user } = props;
 
   const [vehicleState, setVehicleState] =
     React.useState<VehicleSerializer>(vehicleData);
@@ -91,6 +98,9 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   const [currenciesState, setCurrenciesState] = React.useState([]);
   const [continentsState, setContinentsState] = React.useState(continents);
   const [yearsState, setYearsState] = React.useState([]);
+  const [vehicleVideosList, setVehicleVideosList] = React.useState([]);
+  const [vehicleImagesList, setVehicleImagesList] = React.useState([]);
+  const [vehicleVideosQuantity, setVehicleVideosQuantity] = React.useState(1);
 
   function onInputVehicleImages(_fileList: Array<any>, _index: number) {
     const _file = _fileList.length > 0 ? _fileList[0] : null;
@@ -363,7 +373,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
           `${vehicleData.contact_phone_numbers.prefix}-${
             _vehicleState.contact_phone ? 1 : 0
           }-number`,
-          _vehicleState.contact_phone
+          _vehicleState.contact_mobile
         );
         vehicleFormData.append(
           `${vehicleData.contact_phone_numbers.prefix}-${
@@ -470,7 +480,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       "contract_type",
       String(_vehicleState.contract_type)
     );
-    vehicleFormData.append("currency", String(_vehicleState.currency.id));
+    vehicleFormData.append("currency", String(_vehicleState.currency));
     vehicleFormData.append("model", String(_vehicleState.model.id));
     vehicleFormData.append("brand", _vehicleState.model.brand.id);
     vehicleFormData.append("status", _vehicleState.status);
@@ -491,29 +501,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       console.log(value);
     }
 
-    await editVehicle(vehicleFormData, String(vehicleData.id), false);
-  }
-
-  async function editVehicle(_formData: any, _vehicleId: string) {
-    const { csrfToken, csrfRes } = await getCSRF();
-
-    const response = await fetch(
-      `http://localhost:8000/api/vehicle/edit/${_vehicleId}`,
-      {
-        method: "POST",
-        body: _formData,
-        credentials: "include",
-        headers: {
-          "X-CSRFToken": csrfToken as string,
-        },
-      }
-    );
-
-    if (response.ok) {
-      return { success: true };
-    } else {
-      return { success: false };
-    }
+    await editVehicle(vehicleFormData, String(vehicleData.id));
   }
 
   function onChangeVideosQuantity(_quantity: Number) {
@@ -522,23 +510,6 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     _vehicleVideos.fill(1);
     setVehicleVideosList(_vehicleVideos);
   }
-
-  let vehicleImagesList = Array(20);
-  const [vehicleVideosList, setVehicleVideosList] = React.useState([]);
-  const [vehicleVideosQuantity, setVehicleVideosQuantity] = React.useState(1);
-
-  vehicleImagesList.fill(1);
-
-  let vehicleVideoQuantityList = [
-    {
-      label: 2,
-      value: 2,
-    },
-    {
-      label: 5,
-      value: 5,
-    },
-  ];
 
   function PhoneNumberSection() {
     if (phoneNumberState) {
@@ -597,6 +568,17 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
 
   async function getInitialData() {
     console.log(vehicleData);
+    console.log(user);
+
+    let _vehicleImagesList = Array(20);
+    let _vehicleVideosList = Array(5);
+
+    _vehicleImagesList.fill(1);
+    _vehicleVideosList.fill(1);
+
+    setVehicleImagesList(_vehicleImagesList);
+    setVehicleVideosList(_vehicleVideosList);
+
     const countries = await getCountries();
     setCountriesState(
       countries.map((country: any) => ({
@@ -613,17 +595,9 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       }))
     );
 
-    const vehicleModels = await getVehiclesModels();
-    setVehicleModelsState(
-      vehicleModels.map((model: any) => ({
-        label: model.name,
-        value: model.id,
-      }))
-    );
-
     const currencies = await getCurrencies();
     setCurrenciesState(
-      currencies.map((currency) => ({
+      currencies.map((currency: any) => ({
         label: `${currency.name} - ${currency.code}`,
         value: currency.id,
       }))
@@ -635,26 +609,27 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       const contactPhone = getVehicleNumberPhone("FIXED");
       const contactMobile = getVehicleNumberPhone("MOBILE");
 
-      setVehicleState((prevState) => ({
+      setVehicleState((prevState: any) => ({
         ...prevState,
         year: vehicleData
           ? parseInt(dayjs(vehicleData.year).format("YYYY"))
-          : '',
+          : "",
         contact_hour_from: vehicleData
           ? dayjs(`2022-01-01 ${vehicleData.contact_hour_from}`).format("hh")
-          : '',
+          : "",
         contact_hour_from_system: vehicleData
           ? dayjs(`2022-01-01 ${vehicleData.contact_hour_from}`).format("a")
-          : '',
+          : "",
         contact_hour_to: vehicleData
           ? dayjs(`2022-01-01 ${vehicleData.contact_hour_to}`).format("hh")
-          : '',
+          : "",
         contact_hour_to_system: vehicleData
           ? dayjs(`2022-01-01 ${vehicleData.contact_hour_to}`).format("a")
-          : '',
-        contact_phone: contactPhone ? contactPhone.number : '',
-        contact_phone_ext: contactPhone ? contactPhone.ext : '',
-        contact_mobile: contactMobile ? contactMobile.number : '',
+          : "",
+        contact_phone: contactPhone ? contactPhone.number : "",
+        contact_phone_ext: contactPhone ? contactPhone.ext : "",
+        contact_mobile: contactMobile ? contactMobile.number : "",
+        currency: vehicleData.currency ? vehicleData.currency.id : null,
       }));
       setCountriesState(() =>
         vehicleData.countries
@@ -677,6 +652,15 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
           ? vehicleData.cities.map((city: any) => ({
               label: city.name,
               value: city.id,
+            }))
+          : []
+      );
+
+      setVehicleModelsState(() =>
+        vehicleData.models
+          ? vehicleData.models.map((model: any) => ({
+              label: model.name,
+              value: model.id,
             }))
           : []
       );
@@ -785,11 +769,28 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     _vehicleState.location_city.id = _cityId;
 
     setVehicleState((prevState: any) => ({ ...prevState, ..._vehicleState }));
-    if (_cityId)
-      setVehicleState((prevState: any) => ({
-        ...prevState,
-        location_city: _cityId,
-      }));
+  }
+
+  async function onChangeBrand(_brandId: number) {
+    const _vehicleState = vehicleState;
+    _vehicleState.model.brand.id = _brandId;
+    setVehicleState((prevState: any) => ({ ...prevState, ..._vehicleState }));
+    setVehicleModelsState(() => []);
+
+    if (!_brandId) return;
+    const vehicleModels = await getVehiclesModelsByBrand(String(_brandId));
+    setVehicleModelsState(
+      vehicleModels.map((model: any) => ({
+        label: model.name,
+        value: model.id,
+      }))
+    );
+  }
+
+  async function onChangeModel(_modelId: number) {
+    const _vehicleState = vehicleState;
+    _vehicleState.model.id = _modelId;
+    setVehicleState((prevState: any) => ({ ...prevState, ..._vehicleState }));
   }
 
   function onChangeCreateVehicleRequest(_value: any, _field: string) {
@@ -918,10 +919,11 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           placeholder="Selecciona un continente"
                           data={continentsState}
                           value={
-                            vehicleState
+                            vehicleState.location_continent ??
+                            (vehicleState.location_city
                               ? vehicleState.location_city.state.country
                                   .continent
-                              : null
+                              : vehicleState.location_continent)
                           }
                           onChange={(_value: any) =>
                             onChangeCreateVehicleRequest(
@@ -1009,12 +1011,12 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           name="zone"
                           style={{ maxWidth: "100%" }}
                           value={vehicleState ? vehicleState.location_zone : ""}
-                          onChange={(_value: any) =>
+                          onChange={(_value: any) => {
                             onChangeCreateVehicleRequest(
                               _value,
                               "location_zone"
-                            )
-                          }
+                            );
+                          }}
                         />
                       </Form.Group>
                     </Col>
@@ -1072,11 +1074,13 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           placeholder="Selecciona una marca"
                           data={vehicleBrandsState}
                           value={
-                            vehicleState ? vehicleState.model.brand.id : null
+                            vehicleState.model
+                              ? vehicleState.model.brand
+                                ? vehicleState.model.brand.id
+                                : null
+                              : null
                           }
-                          onChange={(_value: any) =>
-                            onChangeCreateVehicleRequest(_value, "brand")
-                          }
+                          onChange={onChangeBrand}
                         />
                       </Form.Group>
                     </Col>
@@ -1093,10 +1097,10 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           name="model"
                           placeholder="Selecciona un modelo"
                           data={vehicleModelsState}
-                          value={vehicleState ? vehicleState.model.id : null}
-                          onChange={(_value: any) =>
-                            onChangeCreateVehicleRequest(_value, "model")
+                          value={
+                            vehicleState.model ? vehicleState.model.id : null
                           }
+                          onChange={onChangeModel}
                         />
                       </Form.Group>
                     </Col>
@@ -1229,78 +1233,52 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                       ¿Desea agregar videos?
                     </p>
                   </FlexboxGrid>
-                  <Grid style={{ width: "100%" }}>
-                    <FlexboxGrid justify="center">
-                      <RadioGroup
-                        inline
-                        name="radio-name"
-                        value={showVideosState}
-                        onChange={onChangeShowVideos}
-                      >
-                        <Radio value={true}>Si</Radio>
-                        <Radio value={false}>No</Radio>
-                      </RadioGroup>
-                    </FlexboxGrid>
-                    {showVideosState ? (
-                      <FlexboxGrid justify="center">
-                        <p className="button button--blue">
-                          Cantidad de videos
-                        </p>
-                        <SelectPicker
-                          data={vehicleVideoQuantityList}
-                          onChange={onChangeVideosQuantity}
-                          style={{ marginLeft: 16 }}
-                        />
-                      </FlexboxGrid>
-                    ) : null}
-
-                    {showVideosState ? (
-                      <p style={{ textAlign: "center", paddingTop: 32 }}>
-                        Arrastre los videos que desea cargar en cada uno de los
-                        recuadros
-                      </p>
-                    ) : null}
-                    {showVideosState
-                      ? vehicleVideosList.map((number, index) => (
-                          <Col key={index} xs={24 / vehicleVideosQuantity}>
-                            <Uploader
-                              name="vehicleImages"
-                              multiple
-                              action=""
-                              listType="picture"
-                              accept=".mp4"
-                              className={
-                                vehicleVideosState[index] != undefined &&
-                                vehicleVideosState[index] != {} &&
-                                vehicleVideosState[index] != null
-                                  ? "remove-file-input-uploader"
-                                  : ""
-                              }
-                              maxPreviewFileSize={6242880}
-                              autoUpload={false}
-                              disabled={
-                                vehicleVideosState[index] != undefined &&
-                                vehicleVideosState[index] != {} &&
-                                vehicleVideosState[index] != null
-                              }
-                              onChange={(_fileList: Array<any>) =>
-                                onInputVehicleVideos(_fileList, index)
-                              }
+                  <div>
+                    <p style={{ textAlign: "center", paddingTop: 32 }}>
+                      Arrastre los videos que desea cargar en cada uno de los
+                      recuadros
+                    </p>
+                    <Grid style={{ width: "100%" }}>
+                      {vehicleVideosList.map((number, index) => (
+                        <Col key={index} xs={6}>
+                          <Uploader
+                            name="vehicleImages"
+                            multiple
+                            action=""
+                            listType="picture"
+                            accept=".mp4"
+                            className={
+                              vehicleVideosState[index] != undefined &&
+                              vehicleVideosState[index] != {} &&
+                              vehicleVideosState[index] != null
+                                ? "remove-file-input-uploader"
+                                : ""
+                            }
+                            maxPreviewFileSize={6242880}
+                            autoUpload={false}
+                            disabled={
+                              vehicleVideosState[index] != undefined &&
+                              vehicleVideosState[index] != {} &&
+                              vehicleVideosState[index] != null
+                            }
+                            onChange={(_fileList: Array<any>) =>
+                              onInputVehicleVideos(_fileList, index)
+                            }
+                          >
+                            <section
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
                             >
-                              <section
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "center",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <CameraRetroIcon />
-                              </section>
-                            </Uploader>
-                          </Col>
-                        ))
-                      : null}
-                  </Grid>
+                              <CameraRetroIcon />
+                            </section>
+                          </Uploader>
+                        </Col>
+                      ))}
+                    </Grid>
+                  </div>
                 </Col>
               </Row>
 
@@ -1425,10 +1403,10 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                     <SelectPicker
                       name="currency"
                       placeholder="Selecciona una moneda"
-                      value={vehicleState ? vehicleState.currency.id : null}
-                      onChange={(_value: any) =>
-                        onChangeCreateVehicleRequest(_value, "currency")
-                      }
+                      value={vehicleState.currency.id ?? vehicleState.currency}
+                      onChange={(_value: any) => {
+                        onChangeCreateVehicleRequest(_value, "currency");
+                      }}
                       data={currenciesState}
                     />
                   </Form.Group>
@@ -1677,7 +1655,7 @@ interface VehiclesPageProps {
 }
 
 export const getServerSideProps = withAuth<EditVehiclePageProps>({
-  async getServerSideProps({ params, djRequest }) {
+  async getServerSideProps({ params, djRequest, user }) {
     const response = await djRequest(`api/vehicle/${params.vehicleId}`, {
       method: "GET",
     });
@@ -1687,6 +1665,7 @@ export const getServerSideProps = withAuth<EditVehiclePageProps>({
     return {
       props: {
         vehicleData: data,
+        user: user,
       },
     };
   },
