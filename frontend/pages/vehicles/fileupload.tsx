@@ -45,12 +45,37 @@ type UploadTestPageProps = {
 };
 
 
+type GetFileListParams = {
+  regex: RegExp
+  formset: formSet
+};
+
+const indexRegex = /[0-9]+/
+
+function getFileList(params: GetFileListParams){
+  const {regex, formset} = params;
+  return Object.keys(formset).filter(key => regex.test(key)).map((key)=>{
+    return {
+      url: `http://127.0.0.1:8000${formset[key]}`,
+      index: key.match(indexRegex)[0], // Get the index from the key
+    } as FileType
+  })
+}
+
+type GetFormsetKeyRegexParams = {
+  fieldname: string
+  prefix: string
+}
+
+function getFormsetKeyRegex(params: GetFormsetKeyRegexParams): RegExp {
+  const {fieldname, prefix} = params;
+  return new RegExp(`${prefix}-([0-9])+-${fieldname}`, 'g');
+}
 
 const UploadTest: PageWithSession<UploadTestPageProps> = (props) => {
   const vehicleId = 1;
   const {countries, states, cities, ...vehicleData} = props.vehicleData;
   const telephoneFormPrefix = vehicleData.contact_phone_numbers.prefix;
-  const indexRegex = /[0-9]+/
   // Esta expresion regular la utilizas para obtener
   // los datos de los telefonos
   const telephoneKeyRegex = new RegExp(`${telephoneFormPrefix}-[0-9]+-[a-z]+`);
@@ -58,7 +83,8 @@ const UploadTest: PageWithSession<UploadTestPageProps> = (props) => {
 
   const [formState, setFormState] = React.useState(vehicleData);
   const imagePrefix = vehicleData.images.prefix;
-  const imageUrlRegex = new RegExp(`${imagePrefix}-([0-9])+-image`, 'g');
+  
+  const imageUrlRegex = getFormsetKeyRegex({prefix: imagePrefix, fieldname: "image"});
 
   // Obtener los keys de un tipo de telephone
   function getVehicleNumberPhone(_type: string){
@@ -86,34 +112,40 @@ const UploadTest: PageWithSession<UploadTestPageProps> = (props) => {
   // Mapear formset data a fileType para poder ser
   // usado por el componente Uploader
   const [fileList, setFileList] = React.useState<FileType[]>(
-    Object.keys(vehicleData.images).filter(key => imageUrlRegex.test(key)).map((key)=>{
-      return {
-        url: `http://127.0.0.1:8000${vehicleData.images[key]}`,
-        index: key.match(indexRegex)[0], // Get the index from the key
-      } as FileType
+    getFileList({
+      formset: vehicleData.images,
+      regex: imageUrlRegex
     })
+  );
+
+  const videoPrefix = vehicleData.videos.prefix;
+  const [videoFileList, setVideosFiles] = React.useState<FileType[]>(
+    getFileList({formset: vehicleData.videos, regex: getFormsetKeyRegex({fieldname: "video", prefix: videoPrefix})})
   );
 
   // Descomentar esto para debuggear
   console.log(fileList);
-  console.log(formState.images);
+  console.log(formState.videos);
 
   // Alguno de estos dos numeros deberia de obtenerse
-  console.log(getVehicleNumberPhone("MOBILE"));
-  console.log(getVehicleNumberPhone("FIXED"));
+  // console.log(getVehicleNumberPhone("MOBILE"));
+  // console.log(getVehicleNumberPhone("FIXED"));
 
   // Borrar imagen que ya esta en base de datos
-  function removeImage(file: FileType){
-    if(!file.index) return
-    setFormState((prevState)=>{
-      return {
-        ...prevState,
-        images: {
-          ...prevState.images,
-          [`${imagePrefix}-${file.index}-DELETE`]: "on"
+  function removeFile(params: {stateKey: string, prefix: string}){
+    const {stateKey, prefix} = params;
+    return (file: FileType) => {
+      if(!file.index) return
+      setFormState((prevState)=>{
+        return {
+          ...prevState,
+          [stateKey]: {
+            ...prevState[stateKey],
+            [`${prefix}-${file.index}-DELETE`]: "on"
+          }
         }
-      }
-    })
+      })
+    }
   }
 
   async function uploadFile(){
@@ -131,6 +163,7 @@ const UploadTest: PageWithSession<UploadTestPageProps> = (props) => {
        que sirven de metadata
      */
     let nextId = (Object.keys(formState.images).length - 5) / 4;
+    let nextVideoId = (Object.keys(formState.videos).length - 5) / 4
 
     for(const [key, value] of Object.entries(formState)){
       // Saltar las propiedades que son objetos
@@ -141,6 +174,12 @@ const UploadTest: PageWithSession<UploadTestPageProps> = (props) => {
     }
 
     for (const [key, value] of Object.entries(formState.images)) {
+      // El null de DELETE hay que convertirlo a un string vacio
+      // Si no la imagen se borra
+      formData.append(key, value ? value : "");
+    }
+
+    for (const [key, value] of Object.entries(formState.videos)) {
       // El null de DELETE hay que convertirlo a un string vacio
       // Si no la imagen se borra
       formData.append(key, value ? value : "");
@@ -161,6 +200,22 @@ const UploadTest: PageWithSession<UploadTestPageProps> = (props) => {
 
     // Actualizar el numero de formularios que se envian
     formData.set(`${imagePrefix}-TOTAL_FORMS`,String(nextId))
+
+    for (const file of videoFileList){
+
+      const keyPrefix = `${videoPrefix}-${nextVideoId}`
+
+      // Salir del ciclo si vemos una imagen que ya esta
+      // en Base de datos
+      if(file.index){continue}
+
+      formData.append(`${keyPrefix}-video`, file.blobFile),
+      formData.append(`${keyPrefix}-vehicle`, String(vehicleId))
+      nextVideoId++;
+    }
+
+    // Actualizar el numero de formularios que se envian
+    formData.set(`${videoPrefix}-TOTAL_FORMS`,String(nextVideoId))
 
     // Actualizar el numero de formularios de telphones
     // 6 es el numero de propiedades de un telephone
@@ -192,16 +247,30 @@ const UploadTest: PageWithSession<UploadTestPageProps> = (props) => {
         listType="picture"
         fileList={fileList}
         onChange={setFileList}
-        onRemove={removeImage}
+        onRemove={removeFile({prefix: imagePrefix, stateKey: "images"})}
         action="">
         <button>
           <CameraRetroIcon />
         </button>
       </Uploader>
+
+      <p>Videos</p>
+      <Uploader
+        multiple
+        autoUpload={false}
+        listType="picture"
+        fileList={videoFileList}
+        onChange={setVideosFiles}
+        onRemove={removeFile({prefix: videoPrefix, stateKey: "videos"})}
+        action="">
+        <button>
+          <CameraRetroIcon />
+        </button>
+      </Uploader>
+
       <Button onClick={uploadFile}>
         Upload Files
       </Button>
-
     </>
   );
 };
