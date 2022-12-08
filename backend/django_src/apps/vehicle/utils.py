@@ -10,7 +10,7 @@ def base64ToImageField(image):
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
             return data
 
-from django.db.models.fields.files import FileField, ImageFieldFile
+from django.db.models.fields.files import FieldFile, ImageFieldFile
 
 def formsetdata_to_dict(formset):
     fields_values = {
@@ -26,7 +26,7 @@ def formsetdata_to_dict(formset):
         for field in form:
             html_name = field.html_name
             field_value = field.value()
-            if isinstance(field_value, ImageFieldFile) or isinstance(field_value, FileField):
+            if isinstance(field_value, ImageFieldFile) or isinstance(field_value, FieldFile):
                 fields_values[html_name] = field_value.url
             else:
                 fields_values[html_name] = field_value

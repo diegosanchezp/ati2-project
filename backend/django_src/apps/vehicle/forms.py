@@ -21,6 +21,8 @@ VehicleImageFormSet = inlineformset_factory(
 VehicleVideosFormSet = inlineformset_factory(
     Vehicle,
     VehicleVideos,
+    max_num=5,
+    extra=0,
     fields=("video",)
 )
 
