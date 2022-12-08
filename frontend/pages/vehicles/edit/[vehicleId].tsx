@@ -41,16 +41,17 @@ import {
 } from "rsuite";
 
 import { getCountries, getStates, getCities } from "pages/api/location";
-import {
-  getVehiclesBrands,
-  getVehiclesModels,
-  editVehicle,
-  getVehicle,
-} from "pages/api/vehicle";
+import { getVehiclesBrands, getVehiclesModels, editVehicle } from "pages/api/vehicle";
 import { getCurrencies } from "pages/api/finance";
 import dayjs from "dayjs";
-import { useRouter } from "next/router";
-import { readFileAsync } from "utils/file";
+import { djRequest, getCSRF } from "utils/apirest";
+import {
+  continents,
+  timeSystem,
+  hours,
+  vehicleStatus,
+  vehicleTypes,
+} from "utils/vehicle-lists";
 
 type EditVehiclePageProps = {
   vehicleData: VehicleSerializer;
@@ -63,119 +64,7 @@ type GeneralStateList = {
 
 const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   const toaster = useToaster();
-  const router = useRouter();
   const { vehicleData } = props;
-
-  const continents = [
-    {
-      label: "Americas",
-      value: "Americas",
-    },
-    {
-      label: "Asia",
-      value: "Asia",
-    },
-    {
-      label: "Oceania",
-      value: "Oceania",
-    },
-    {
-      label: "Europe",
-      value: "Europe",
-    },
-    {
-      label: "Africa",
-      value: "Africa",
-    },
-  ];
-
-  const timeSystem = [
-    {
-      label: "AM",
-      value: "am",
-    },
-    {
-      label: "PM",
-      value: "pm",
-    },
-  ];
-
-  const hours = [
-    {
-      label: "01",
-      value: "01",
-    },
-    {
-      label: "02",
-      value: "02",
-    },
-    {
-      label: "03",
-      value: "03",
-    },
-    {
-      label: "04",
-      value: "04",
-    },
-    {
-      label: "05",
-      value: "05",
-    },
-    {
-      label: "06",
-      value: "06",
-    },
-    {
-      label: "07",
-      value: "07",
-    },
-    {
-      label: "08",
-      value: "08",
-    },
-    {
-      label: "09",
-      value: "09",
-    },
-    {
-      label: "10",
-      value: "10",
-    },
-    {
-      label: "11",
-      value: "11",
-    },
-    {
-      label: "12",
-      value: "12",
-    },
-  ];
-
-  const vehicleStatus = [
-    {
-      label: "New",
-      value: "NEW",
-    },
-    {
-      label: "Used",
-      value: "USED",
-    },
-  ];
-
-  const vehicleTypes = [
-    {
-      label: "truck",
-      value: "TRUCK",
-    },
-    {
-      label: "Van",
-      value: "VAN",
-    },
-    {
-      label: "Car",
-      value: "CAR",
-    },
-  ];
 
   const [vehicleState, setVehicleState] =
     React.useState<VehicleSerializer>(vehicleData);
@@ -206,6 +95,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   function onInputVehicleImages(_fileList: Array<any>, _index: number) {
     const _file = _fileList.length > 0 ? _fileList[0] : null;
     let newFile = {};
+    if (!vehicleImagesState[_index]) _file = { ..._file, isNew: true };
     newFile[_index] = _file ? [] : null;
     if (_file) newFile[_index].push(_file);
 
@@ -233,77 +123,76 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     setPhoneNumberState(() => checked);
   }
 
-  function onUploadVehicleImages(_list: any) {
-    setVehicleImagesState(_list);
-  }
-
-  function onUploadVehicleVideos(_list: any) {
-    setVehicleVideosState(_list);
-  }
-
   async function onSubmitEditVehicle(
     checkStatus: boolean,
     _form: React.FormEvent<HTMLFormElement>
   ) {
-    let _editVehicleRequest = vehicleState;
+    let _vehicleState = vehicleState;
     let vehicleFormData = new FormData();
 
     if (vehicleImagesState) {
       let vehicleImages = Object.values(vehicleImagesState);
+      let vehicleImagesIndexes = Object.keys(vehicleImagesState);
 
-      for (let index = 0; index < 20; index++) {
+      vehicleImagesIndexes.forEach((index, orderedIndex) => {
         if (vehicleImagesState[index]) {
           if (
-            vehicleImagesState[index][0].fileKey !=
-            vehicleImagesState[index][0].id
+            vehicleData.images[`${vehicleData.images.prefix}-${index}-id`] !=
+              undefined &&
+            vehicleData.images[`${vehicleData.images.prefix}-${index}-id`] !=
+              null
           ) {
             vehicleFormData.append(
-              `images-${index}-image`,
-              vehicleImagesState[index][0]
-            );
-          } else {
-            vehicleFormData.append(
-              `images-${index}-id`,
+              `${vehicleData.images.prefix}-${orderedIndex}-id`,
               vehicleData.images[`${vehicleData.images.prefix}-${index}-id`]
             );
             vehicleFormData.append(
-              `${vehicleData.images.prefix}-${index}-image`,
-              vehicleData.images[`${vehicleData.images.prefix}-${index}-image`]
+              `${vehicleData.images.prefix}-${orderedIndex}-image`,
+              vehicleImagesState[index][0].blobFile
             );
             vehicleFormData.append(
-              `${vehicleData.images.prefix}-${index}-DELETE`,
-              "None"
+              `${vehicleData.images.prefix}-${orderedIndex}-DELETE`,
+              ""
             );
             vehicleFormData.append(
-              `${vehicleData.images.prefix}-${index}-vehicle`,
+              `${vehicleData.images.prefix}-${orderedIndex}-vehicle`,
               vehicleData.images[
                 `${vehicleData.images.prefix}-${index}-vehicle`
               ]
+            );
+          } else {
+            vehicleFormData.append(
+              `${vehicleData.images.prefix}-${orderedIndex}-image`,
+              vehicleImagesState[index][0].blobFile
+            );
+            vehicleFormData.append(
+              `${vehicleData.images.prefix}-${orderedIndex}-vehicle`,
+              String(vehicleData.id)
             );
           }
         } else {
           if (vehicleData.images[`${vehicleData.images.prefix}-${index}-id`]) {
             vehicleFormData.append(
-              `${vehicleData.images.prefix}-${index}-id`,
+              `${vehicleData.images.prefix}-${orderedIndex}-id`,
               vehicleData.images[`${vehicleData.images.prefix}-${index}-id`]
             );
             vehicleFormData.append(
-              `${vehicleData.images.prefix}-${index}-image`,
+              `${vehicleData.images.prefix}-${orderedIndex}-image`,
               vehicleData.images[`${vehicleData.images.prefix}-${index}-image`]
             );
             vehicleFormData.append(
-              `${vehicleData.images.prefix}-${index}-DELETE`,
+              `${vehicleData.images.prefix}-${orderedIndex}-DELETE`,
               "True"
             );
             vehicleFormData.append(
-              `${vehicleData.images.prefix}-${index}-vehicle`,
+              `${vehicleData.images.prefix}-${orderedIndex}-vehicle`,
               vehicleData.images[
                 `${vehicleData.images.prefix}-${index}-vehicle`
               ]
             );
           }
         }
-      }
+      });
 
       vehicleFormData.append(
         "images-INITIAL_FORMS",
@@ -317,52 +206,62 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       vehicleFormData.append("images-MIN_NUM_FORMS", "0");
     }
 
-    if (_editVehicleRequest.contract_type == "RENTAL")
-      vehicleFormData.append("rental_price", _editVehicleRequest.rental_price);
-    else if (_editVehicleRequest.contract_type == "SALE")
-      vehicleFormData.append("sale_price", _editVehicleRequest.sale_price);
-    else if (_editVehicleRequest.contract_type == "RENTAL_SALE") {
-      vehicleFormData.append("sale_price", _editVehicleRequest.sale_price);
-      vehicleFormData.append("rental_price", _editVehicleRequest.rental_price);
+    if (_vehicleState.contract_type == "RENTAL")
+      vehicleFormData.append("rental_price", _vehicleState.rental_price);
+    else if (_vehicleState.contract_type == "SALE")
+      vehicleFormData.append("sale_price", _vehicleState.sale_price);
+    else if (_vehicleState.contract_type == "RENTAL_SALE") {
+      vehicleFormData.append("sale_price", _vehicleState.sale_price);
+      vehicleFormData.append("rental_price", _vehicleState.rental_price);
     }
 
-    if (_editVehicleRequest.contact_days) {
-      Object.values(_editVehicleRequest.contact_days).forEach((day: any) => {
+    if (_vehicleState.contact_days) {
+      /*Object.values(_vehicleState.contact_days).forEach((day: any) => {
         vehicleFormData.append("contact_days[]", day);
-      });
-    }
-
-    if (
-      _editVehicleRequest.contact_hour_from &&
-      _editVehicleRequest.contact_hour_from_system
-    ) {
+      });*/
       vehicleFormData.append(
-        "contact_hour_from",
-        dayjs(
-          `01-01-01 ${_editVehicleRequest.contact_hour_from}:00 ${_editVehicleRequest.contact_hour_from_system}`
-        ).format("HH")
+        "contact_days",
+        JSON.stringify(_vehicleState.contact_days)
       );
     }
 
     if (
-      _editVehicleRequest.contact_hour_to &&
-      _editVehicleRequest.contact_hour_to_system
+      _vehicleState.contact_hour_from &&
+      _vehicleState.contact_hour_from_system
     ) {
+      console.log(
+        `01-01-01 ${_vehicleState.contact_hour_from}:00:00 ${String(
+          _vehicleState.contact_hour_from_system
+        ).toLocaleUpperCase()}`
+      );
+      vehicleFormData.append(
+        "contact_hour_from",
+        dayjs(
+          `01-01-01 ${_vehicleState.contact_hour_from}:00:00 ${String(
+            _vehicleState.contact_hour_from_system
+          ).toLocaleUpperCase()}`
+        ).format("HH:mm:ss")
+      );
+    }
+
+    if (_vehicleState.contact_hour_to && _vehicleState.contact_hour_to_system) {
       vehicleFormData.append(
         "contact_hour_to",
         dayjs(
-          `01-01-01 ${_editVehicleRequest.contact_hour_from}:00 ${_editVehicleRequest.contact_hour_from_system}`
-        ).format("HH")
+          `01-01-01 ${_vehicleState.contact_hour_to}:00:00 ${String(
+            _vehicleState.contact_hour_to_system
+          ).toLocaleUpperCase()}`
+        ).format("HH:mm:ss")
       );
     }
     let contactPhone = getVehicleNumberPhone("FIXED");
     let contactMobile = getVehicleNumberPhone("MOBILE");
 
-    if (_editVehicleRequest.contact_phone) {
+    if (_vehicleState.contact_phone) {
       if (contactPhone) {
         vehicleFormData.append(
           `${vehicleData.contact_phone_numbers.prefix}-${contactPhone.index}-number`,
-          _editVehicleRequest.contact_phone
+          _vehicleState.contact_phone
         );
         vehicleFormData.append(
           `${vehicleData.contact_phone_numbers.prefix}-${contactPhone.index}-id`,
@@ -380,26 +279,34 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
           `${vehicleData.contact_phone_numbers.prefix}-${contactPhone.index}-ptype`,
           String(contactPhone.ptype)
         );
-        if (_editVehicleRequest.contact_phone_ext) {
+        if (_vehicleState.contact_phone_ext) {
           vehicleFormData.append(
             `${vehicleData.contact_phone_numbers.prefix}-${contactPhone.index}-ext`,
-            String(_editVehicleRequest.contact_phone_ext)
+            String(_vehicleState.contact_phone_ext)
           );
         } else {
           vehicleFormData.append(
             `${vehicleData.contact_phone_numbers.prefix}-${contactPhone.index}-ext`,
-            String(_editVehicleRequest.contact_phone_ext)
+            String(_vehicleState.contact_phone_ext)
           );
         }
       } else {
         vehicleFormData.append(
           `${vehicleData.contact_phone_numbers.prefix}-0-number`,
-          _editVehicleRequest.contact_phone
+          _vehicleState.contact_phone
         );
-        if (_editVehicleRequest.contact_phone_ext)
+        vehicleFormData.append(
+          `${vehicleData.contact_phone_numbers.prefix}-0-country_number`,
+          "123"
+        );
+        vehicleFormData.append(
+          `${vehicleData.contact_phone_numbers.prefix}-0-ptype`,
+          "FIXED"
+        );
+        if (_vehicleState.contact_phone_ext)
           vehicleFormData.append(
             `${vehicleData.contact_phone_numbers.prefix}-0-ext`,
-            String(_editVehicleRequest.contact_phone_ext)
+            String(_vehicleState.contact_phone_ext)
           );
       }
     } else {
@@ -429,11 +336,11 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       }
     }
 
-    if (_editVehicleRequest.contact_mobile) {
+    if (_vehicleState.contact_mobile) {
       if (contactMobile) {
         vehicleFormData.append(
           `${vehicleData.contact_phone_numbers.prefix}-${contactMobile.index}-number`,
-          _editVehicleRequest.contact_phone
+          _vehicleState.contact_phone
         );
         vehicleFormData.append(
           `${vehicleData.contact_phone_numbers.prefix}-${contactMobile.index}-id`,
@@ -454,9 +361,21 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       } else {
         vehicleFormData.append(
           `${vehicleData.contact_phone_numbers.prefix}-${
-            _editVehicleRequest.contact_phone ? 1 : 0
+            _vehicleState.contact_phone ? 1 : 0
           }-number`,
-          _editVehicleRequest.contact_phone
+          _vehicleState.contact_phone
+        );
+        vehicleFormData.append(
+          `${vehicleData.contact_phone_numbers.prefix}-${
+            _vehicleState.contact_phone ? 1 : 0
+          }-country_number`,
+          "123"
+        );
+        vehicleFormData.append(
+          `${vehicleData.contact_phone_numbers.prefix}-${
+            _vehicleState.contact_phone ? 1 : 0
+          }-ptype`,
+          "MOBILE"
         );
       }
     } else {
@@ -487,8 +406,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     }
 
     let numberCount = 0;
-    if (_editVehicleRequest.contact_phone) numberCount++;
-    if (_editVehicleRequest.contact_mobile) numberCount++;
+    if (_vehicleState.contact_phone) numberCount++;
+    if (_vehicleState.contact_mobile) numberCount++;
 
     vehicleFormData.append(
       `${vehicleData.contact_phone_numbers.prefix}-INITIAL_FORMS`,
@@ -513,67 +432,88 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       String(numberCount)
     );
 
-    /*if (_editVehicleRequest.contact_days) {
-      vehicleFormData.append(
-        "contact_days",
-        _editVehicleRequest.contact_days.join(",")
-      );
-    }*/
-
-    if (_editVehicleRequest.year) {
+    if (_vehicleState.year) {
       vehicleFormData.append(
         "year",
-        dayjs().set("year", _editVehicleRequest.year).format("YYYY")
+        dayjs().set("year", _vehicleState.year).format("YYYY-MM-DD")
       );
     }
 
-    vehicleFormData.append(
-      "accessories",
-      String(_editVehicleRequest.accessories)
-    );
-    vehicleFormData.append("services", String(_editVehicleRequest.services));
+    vehicleFormData.append("accessories", String(_vehicleState.accessories));
+    vehicleFormData.append("services", String(_vehicleState.services));
     vehicleFormData.append(
       "exac_location",
-      String(_editVehicleRequest.exact_location)
+      String(_vehicleState.exact_location)
     );
-    vehicleFormData.append("accessories", String(_editVehicleRequest.details));
+    vehicleFormData.append("accessories", String(_vehicleState.details));
     vehicleFormData.append(
       "location_city",
-      String(_editVehicleRequest.location_city.id)
+      String(_vehicleState.location_city.id)
     );
     vehicleFormData.append(
       "location_zone",
-      String(_editVehicleRequest.location_zone)
+      String(_vehicleState.location_zone)
     );
     vehicleFormData.append(
       "contact_first_name",
-      String(_editVehicleRequest.contact_first_name)
+      String(_vehicleState.contact_first_name)
     );
     vehicleFormData.append(
       "contact_last_name",
-      String(_editVehicleRequest.contact_last_name)
+      String(_vehicleState.contact_last_name)
     );
     vehicleFormData.append(
       "contact_email",
-      String(_editVehicleRequest.contact_email)
+      String(_vehicleState.contact_email)
     );
     vehicleFormData.append(
       "contract_type",
-      String(_editVehicleRequest.contract_type)
+      String(_vehicleState.contract_type)
     );
-    vehicleFormData.append("model", String(_editVehicleRequest.model.id));
-    vehicleFormData.append("brand", _editVehicleRequest.model.brand.id);
-    vehicleFormData.append("status", _editVehicleRequest.status);
+    vehicleFormData.append("currency", String(_vehicleState.currency.id));
+    vehicleFormData.append("model", String(_vehicleState.model.id));
+    vehicleFormData.append("brand", _vehicleState.model.brand.id);
+    vehicleFormData.append("status", _vehicleState.status);
+    vehicleFormData.append("exact_location", _vehicleState.exact_location);
+    vehicleFormData.append("details", _vehicleState.details);
+
+    vehicleFormData.append("type_vehicle", String(_vehicleState.type_vehicle));
     vehicleFormData.append(
-      "type_vehicle",
-      String(_editVehicleRequest.type_vehicle)
+      "init_publication_date",
+      dayjs().format("YYYY-MM-DD")
+    );
+    vehicleFormData.append(
+      "finish_publication_date",
+      dayjs().format("YYYY-MM-DD")
     );
 
     for (const value of vehicleFormData.entries()) {
       console.log(value);
     }
 
-    //await editVehicle(_editVehicleRequest, _editVehicleRequest.id);
+    await editVehicle(vehicleFormData, String(vehicleData.id), false);
+  }
+
+  async function editVehicle(_formData: any, _vehicleId: string) {
+    const { csrfToken, csrfRes } = await getCSRF();
+
+    const response = await fetch(
+      `http://localhost:8000/api/vehicle/edit/${_vehicleId}`,
+      {
+        method: "POST",
+        body: _formData,
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": csrfToken as string,
+        },
+      }
+    );
+
+    if (response.ok) {
+      return { success: true };
+    } else {
+      return { success: false };
+    }
   }
 
   function onChangeVideosQuantity(_quantity: Number) {
@@ -605,9 +545,9 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       return (
         <FlexboxGrid>
           <PhoneInput
-            specialLabel={"Phone"}
+            label={"Phone"}
             style={{ marginBottom: 16, flex: 1, marginRight: 16 }}
-            inputClass="phone-number-input"
+            className="phone-number-input"
             value={
               vehicleState.contact_phone ??
               getVehicleNumberPhone("FIXED")?.number
@@ -636,8 +576,8 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     if (mobileNumberState) {
       return (
         <PhoneInput
-          specialLabel={"Mobile"}
-          inputClass="phone-number-input"
+          label={"Mobile"}
+          className="phone-number-input"
           value={
             vehicleState.contact_mobile ??
             getVehicleNumberPhone("MOBILE")?.number
@@ -699,22 +639,22 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
         ...prevState,
         year: vehicleData
           ? parseInt(dayjs(vehicleData.year).format("YYYY"))
-          : null,
+          : '',
         contact_hour_from: vehicleData
-          ? dayjs(`2022-01-01 ${vehicleData.contact_hour_from}`).format("HH")
-          : null,
+          ? dayjs(`2022-01-01 ${vehicleData.contact_hour_from}`).format("hh")
+          : '',
         contact_hour_from_system: vehicleData
           ? dayjs(`2022-01-01 ${vehicleData.contact_hour_from}`).format("a")
-          : null,
+          : '',
         contact_hour_to: vehicleData
-          ? dayjs(`2022-01-01 ${vehicleData.contact_hour_to}`).format("HH")
-          : null,
+          ? dayjs(`2022-01-01 ${vehicleData.contact_hour_to}`).format("hh")
+          : '',
         contact_hour_to_system: vehicleData
           ? dayjs(`2022-01-01 ${vehicleData.contact_hour_to}`).format("a")
-          : null,
-        contact_phone: contactPhone ? contactPhone.number : null,
-        contact_phone_ext: contactPhone ? contactPhone.ext : null,
-        contact_mobile: contactMobile ? contactMobile.number : null,
+          : '',
+        contact_phone: contactPhone ? contactPhone.number : '',
+        contact_phone_ext: contactPhone ? contactPhone.ext : '',
+        contact_mobile: contactMobile ? contactMobile.number : '',
       }));
       setCountriesState(() =>
         vehicleData.countries
@@ -743,52 +683,59 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
 
       if (vehicleData.images) {
         let _vehicleImages = {};
+        let indexes = [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          ,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+        ];
 
-        for (let index = 0; index < 20; index++) {
-          if (vehicleData.images[`images-${index}-id`]) {
+        indexes.forEach((imageIndex) => {
+          if (
+            vehicleData.images[`images-${imageIndex}-id`] != undefined &&
+            vehicleData.images[`images-${imageIndex}-id`] != null
+          ) {
             const _imageName =
-              vehicleData.images[`images-${index}-image`].split("/")[
-                vehicleData.images[`images-${index}-image`].split("/").length -
-                  1
+              vehicleData.images[`images-${imageIndex}-image`].split("/")[
+                vehicleData.images[`images-${imageIndex}-image`].split("/")
+                  .length - 1
               ];
-            let currentImage = {
-              id: vehicleData.images[`images-${index}-id`],
+
+            const currentImage = {
+              id: vehicleData.images[`images-${imageIndex}-id`],
               url: `http://127.0.0.1:8000${
-                vehicleData.images[`images-${index}-image`]
+                vehicleData.images[`images-${imageIndex}-image`]
               }`,
               name: _imageName,
-              fileKey: vehicleData.images[`images-${index}-id`],
-              delete: vehicleData.images[`images-${index}-DELETE`],
+              fileKey: vehicleData.images[`images-${imageIndex}-id`],
+              delete: vehicleData.images[`images-${imageIndex}-DELETE`],
             };
-            _vehicleImages[index] = [];
-            _vehicleImages[index].push(currentImage);
+            _vehicleImages[imageIndex] = [];
+            _vehicleImages[imageIndex].push(currentImage);
           }
-        }
-
-        setVehicleImagesState((prevState) => ({
-          ...prevState,
-          ..._vehicleImages,
-        }));
-        /*vehicleData.images.forEach(async (image: any, index: number) => {
-          const _imageName =
-            image.image.split("/")[image.image.split("/").length - 1];
-          _vehicleImages[index] = [];
-          initialImages.push({
-            url: image.image,
-            name: _imageName,
-            fileKey: image.id,
-          });
-          _vehicleImages[index].push({
-            url: image.image,
-            name: _imageName,
-            fileKey: image.id,
-          });
         });
 
         setVehicleImagesState((prevState) => ({
           ...prevState,
           ..._vehicleImages,
-        }));*/
+        }));
       }
     }
   }
@@ -846,11 +793,11 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   }
 
   function onChangeCreateVehicleRequest(_value: any, _field: string) {
-    let _editVehicleRequest = vehicleState;
-    _editVehicleRequest[_field] = _value;
+    let _vehicleState = vehicleState;
+    _vehicleState[_field] = _value;
     setVehicleState((prevState: any) => ({
       ...prevState,
-      ..._editVehicleRequest,
+      ..._vehicleState,
     }));
   }
 
