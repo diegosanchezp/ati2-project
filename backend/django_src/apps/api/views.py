@@ -47,7 +47,8 @@ class VehiclesView(APIView):
 
         contract_type = request.GET.get("contract_type", "any")
         if(contract_type != "any"):
-            filters &= Q(contract_type__icontains = contract_type)
+            print(contract_type)
+            filters &= Q(contract_type = contract_type)
 
         minimum_price = request.GET.get("minimum_price", -1)
         if(minimum_price != -1):
@@ -81,7 +82,18 @@ class VehiclesView(APIView):
         if(type_vehicle != "any"):
             filters &= Q(type_vehicle__iexact = type_vehicle)
 
-        order_by = request.GET.get("order_by", "-id") #-1 DESC | 1 ASC
+        order_by_type = request.GET.get("order_by_type", "any")
+        if(order_by_type != "any"):
+            if(order_by_type == "PRICE"):
+                order_by = request.GET.get("order_by", "-sale_price")
+            
+            elif(order_by_type == "RENTAL"):
+                order_by = request.GET.get("order_by", "-rental_price")
+            
+            else:
+                order_by = request.GET.get("order_by", "id") #-1 DESC | 1 ASC
+        else:
+            order_by = request.GET.get("order_by", "id") #-1 DESC | 1 ASC
         
         page_number = request.GET.get("page", 1)
         page_quantity = request.GET.get("page_quantity", 10)

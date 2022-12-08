@@ -20,7 +20,7 @@ function PublicationsOrder(props: any) {
   const selectTypeOder = (e: any) => {
     const value = e.target.value;
     props.setTypeOrder(value);
-    //props.setSubmit(true)
+    props.setSubmit(true);
   };
   return (
     <Container className="options-buttons">

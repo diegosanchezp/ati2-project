@@ -55,10 +55,14 @@ function PublicationPhoto(props) {
   return (
     <Container className="publication-photo">
       {data.map((item) => (
-        <Container className="publication-card-photo">
+        <Container className="publication-card-photo" key={item.id}>
           <Container className="publication-card-photo-columns">
             <Content className="button-select">
-              <Checkbox checked={props.cardSelected.includes(item.id)} value={item.id} onChange={selectCard}></Checkbox>
+              <Checkbox
+                checked={props.cardSelected.includes(item.id)}
+                value={item.id}
+                onChange={selectCard}
+              ></Checkbox>
             </Content>
             <Content className="photo-data">
               <img
@@ -180,6 +184,8 @@ function PublicationPhoto(props) {
                     disabled={sessionUserId !== item.owner.id} ////solo  el dueño
                     circle
                     size="sm"
+                    onClick={() => open(`vehicles/${item.id}/edit`)}
+                    //href={`vehicles/${item.id}/edit`}
                   />
                   {item.publication_enabled ? (
                     <IconButton
@@ -198,7 +204,9 @@ function PublicationPhoto(props) {
                   )}
 
                   <IconButton
-                    onClick = {()=>{props.handleClickDeleteItem(item.id)}}
+                    onClick={() => {
+                      props.handleClickDeleteItem(item.id);
+                    }}
                     icon={<WarningRoundIcon />}
                     disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño
                     circle
@@ -211,7 +219,17 @@ function PublicationPhoto(props) {
             </Content>
           </Container>
           <Container className="publication-card-photo-see-all">
-            <a href="">{TCard("buttons.seeAllInfo")}</a>
+            {isLogin ? (
+              sessionUserId === item.owner.id ? (
+                <a href={`vehicles/${item.id}/edit`}>
+                  {TCard("buttons.seeAllInfo")}
+                </a>
+              ) : (
+                <Container></Container>
+              )
+            ) : (
+              <Container></Container>
+            )}
           </Container>
         </Container>
       ))}

@@ -11,13 +11,12 @@ export enum TypeVehicleEnum {
 }
 
 export enum TypeOrderPubliationsEnum {
-  PRECIO = "PRECIO",
-  ALQUILER = "ALQUILER",
+  PRECIO = "PRICE",
+  ALQUILER = "RENTAL",
 }
 
 export enum TypeStatusVehicleEnum {
-  VENTA = "VENTA",
-  ALQUILER = "ALQUILER",
-  ALQUILER_Y_VENTA = "ALQUILER_Y_VENTA",
-  ALL = "ALL",
+  VENTA = "RENTAL",
+  ALQUILER = "SALE",
+  ALQUILER_Y_VENTA = "RENTAL_SALE",
 }

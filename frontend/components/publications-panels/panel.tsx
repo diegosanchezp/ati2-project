@@ -10,6 +10,13 @@ const openInNewTab = (url: string) => {
     "width=850,height=800,toolbar=no, location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,left=100, top=20"
   );
 };
+import { withTranslations } from "utils/i18n";
+import { useTranslations } from "next-intl";
+export const getServerSideProps = withTranslations({
+  // use translations located in
+  // translations/auth
+  folderPath: "publications",
+});
 
 const CustomPopover = React.forwardRef(
   ({ content, title, accessories, address, id, details, ...props }, ref) => {
@@ -18,6 +25,8 @@ const CustomPopover = React.forwardRef(
     //console.log("noAccessoriBox ", noAccessoriBox, "detalles ", details);
     const listAccesories = accessories ? accessories?.split(",") : [];
     const listDetails = details ? details?.split(",") : [];
+    const TCard = useTranslations("cards");
+    const TPanels = useTranslations("panels");
     return (
       <Popover ref={ref} title={title} {...props}>
         {noAccessoriBox ? (
@@ -32,7 +41,7 @@ const CustomPopover = React.forwardRef(
           </Container>
         ) : (
           <Container>
-            <p>Accesorios del vehiculo </p>
+            <p>{TPanels("types.accesories.name")} </p>
             <ul>
               {listAccesories.map((accesorie) => (
                 <li>

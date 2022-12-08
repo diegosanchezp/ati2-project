@@ -20,7 +20,7 @@ function PublicationsStatusVehicle(props: any) {
   const selectTypeStatus = (e: any) => {
     const value = e.target.value;
     props.setTypeStatus(value);
-    //props.setSubmit(true);
+    props.setSubmit(true);
   };
   return (
     <Container className="options-buttons">

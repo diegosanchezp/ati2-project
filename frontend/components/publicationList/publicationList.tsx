@@ -11,11 +11,14 @@ import {
   IconButton,
   Checkbox,
 } from "rsuite";
-import { list } from "../../pages/publications/list-DELETE/data";
 import CustomPanel from "components/publications-panels/panel";
 import ContactarAnunciante from "components/contactar-anunciante/contactarAnunciante";
+import { useTranslations } from "next-intl";
 
 function PublicationList(props: any) {
+  const TCard = useTranslations("cards");
+  const TPanels = useTranslations("panels");
+
   const baseURL = "http://localhost:8000";
   const { data } = props;
   const { isLogin, isAdmin, isClient, sessionUserId } = props.session;
@@ -46,9 +49,13 @@ function PublicationList(props: any) {
   return (
     <Container className="publication-list">
       {data.map((item) => (
-        <Container className="publication-card-list">
+        <Container className="publication-card-list" key={item.id}>
           <Content className="button-select">
-            <Checkbox checked={props.cardSelected.includes(item.id)} value={item.id} onChange={selectCard}></Checkbox>
+            <Checkbox
+              checked={props.cardSelected.includes(item.id)}
+              value={item.id}
+              onChange={selectCard}
+            ></Checkbox>
           </Content>
 
           <Content>
@@ -69,10 +76,20 @@ function PublicationList(props: any) {
           </Content>
 
           <Content className="vehicle-data">
-            <p>{item.sale_price}</p>
-            <p>{item.status}</p>
-            <p>Marca {item.model.brand.name}</p>
-            <p>Modelo {item.model.name}</p>
+            <p>
+              {item.sale_price} {item.currency.code}
+            </p>
+            <p>
+              {item.status === "NEW"
+                ? TCard("status.new")
+                : TCard("status.used")}
+            </p>
+            <p>
+              {TCard("brand")}: {item.model.brand.name}{" "}
+            </p>
+            <p>
+              {TCard("model")}: {item.model.name}
+            </p>
             <ContactarAnunciante
               className="contactar-anunciante-button"
               id={item.id}
@@ -81,22 +98,23 @@ function PublicationList(props: any) {
 
           <Content>
             <p>
-              <b>Pais</b> {item.location_city.location.split(">")[0]}
+              <b>{TCard("addres.country")}: </b>{" "}
+              {item.location_city.location.split(">")[0]}
             </p>
             <p>
-              <b>Ciudad</b> {item.location_city.name}
+              <b>{TCard("addres.city")}: </b> {item.location_city.name}
             </p>
             <p>
-              <b>Direccion</b> {item.location_zone}
+              <b>{TCard("addres.zone")}: </b> {item.location_zone}
             </p>
           </Content>
 
           <Content className="publications-more-data">
             <CustomPanel
               placement="auto"
-              title="Fotos"
-              url="fotos"
-              nameLink="Ver fotos"
+              title={TPanels("types.videos.tittle")}
+              url="videos"
+              nameLink={TPanels("types.videos.name")}
               id={item.id}
               accessories={item.accessories}
               details={item.details}
@@ -104,21 +122,33 @@ function PublicationList(props: any) {
             />
             <CustomPanel
               placement="auto"
-              title="Videos"
-              url="videos"
-              nameLink="Ver videos"
+              title={TPanels("types.photos.tittle")}
+              url="fotos"
+              nameLink={TPanels("types.photos.name")}
               id={item.id}
               accessories={item.accessories}
               details={item.details}
               address={item.exact_location}
             />
             <Container className="publication-list-photo-see-all">
-              <a href="">Ver información completa</a>
+              {isLogin ? (
+                sessionUserId === item.owner.id ? (
+                  <a href={`vehicles/${item.id}/edit`}>
+                    {TCard("buttons.seeAllInfo")}
+                  </a>
+                ) : (
+                  <Container></Container>
+                )
+              ) : (
+                <Container></Container>
+              )}
             </Container>
           </Content>
           {isLogin ? (
             <Container className="publications-authenticated-buttons">
               <IconButton
+                onClick={() => open(`vehicles/${item.id}/edit`)}
+                //href={`vehicles/${item.id}/edit`}
                 icon={<EditIcon />}
                 disabled={sessionUserId !== item.owner.id} ////solo  el dueño
                 circle
@@ -142,7 +172,9 @@ function PublicationList(props: any) {
 
               <IconButton
                 icon={<WarningRoundIcon />}
-                onClick = {()=>{props.handleClickDeleteItem(item.id)}}
+                onClick={() => {
+                  props.handleClickDeleteItem(item.id);
+                }}
                 disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño
                 circle
                 size="sm"

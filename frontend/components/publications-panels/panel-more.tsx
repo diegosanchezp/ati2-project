@@ -2,6 +2,13 @@ import React, { useState } from "react";
 import { Container } from "rsuite";
 
 import { TypeOrderPubliationsEnum } from "../../pages/publications/enums/publications.enum";
+import { withTranslations } from "utils/i18n";
+import { useTranslations } from "next-intl";
+export const getServerSideProps = withTranslations({
+  // use translations located in
+  // translations/auth
+  folderPath: "publications",
+});
 
 function PanelPublicationSeeMore({ address, id }) {
   const openInNewTab = (url: string) => {
@@ -11,9 +18,10 @@ function PanelPublicationSeeMore({ address, id }) {
       "width=600,height=800,toolbar=no, location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,left=100, top=20"
     );
   };
+  const TPanels = useTranslations("panels");
   return (
     <Container>
-      <p>Haga click oara ver mas informacion</p>
+      <p>{TPanels("see-more")}</p>
       <ul>
         <li>
           <a
@@ -22,7 +30,7 @@ function PanelPublicationSeeMore({ address, id }) {
             target="popup"
             onClick={() => openInNewTab(`publications/fotos?id=${id}`)}
           >
-            Ver fotos
+            {TPanels("types.photos.tittle")}
           </a>
         </li>
         <li>
@@ -32,7 +40,7 @@ function PanelPublicationSeeMore({ address, id }) {
             target="popup"
             onClick={() => openInNewTab(`publications/videos?id=${id}`)}
           >
-            Ver videos
+            {TPanels("types.videos.tittle")}
           </a>
         </li>
         <li>
@@ -42,11 +50,13 @@ function PanelPublicationSeeMore({ address, id }) {
             target="popup"
             onClick={() => openInNewTab(`publications/details?id=${id}`)}
           >
-            Ver ubicación exacta
+            {TPanels("types.ubication.name")}
           </a>
         </li>
       </ul>
-      <p>Ublicacion exacta: {address} </p>
+      <p>
+        {TPanels("types.ubication.tittle")}: {address}{" "}
+      </p>
     </Container>
   );
 }

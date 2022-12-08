@@ -14,9 +14,7 @@ import PublicationList from "components/publicationList/publicationList";
 import PublicationPhoto from "components/publicationPhoto/publicationPhoto";
 
 //UTILS
-import {
-  TypeVisualizerEnum
-} from "./enums/publications.enum";
+import { TypeVisualizerEnum } from "./enums/publications.enum";
 import PublicationsType from "components/publications-bars/publications-type-render";
 import PublicationsTypeVehicle from "components/publications-bars/publications-type-vehicle";
 import PublicationsOrder from "components/publications-bars/publications-order";
@@ -32,9 +30,9 @@ function PublicationsPage() {
   //states for query, tal vez agunos deben iniciar de otra forma
   const [continent, setContinent] = useState("");
   const [state, setStates] = useState([]);
-  const [typeStatus, setTypeStatus] = useState("");
+  const [contract_type, setTypeStatus] = useState("");
   const [typePrice, setTypePrice] = useState("");
-  const [typeOrder, setTypeOrder] = useState("");
+  const [order_by_type, setTypeOrder] = useState("");
   //other filters
   const [type_vehicle, setTypeVehicle] = useState("");
 
@@ -92,26 +90,34 @@ function PublicationsPage() {
     setCleanStatesQuery,
   };
   //states para generar url, NOTA los nombres deben ser iguales a el key del query a recibir en el back
-  const queryStates = { state, continent, type_vehicle };
+  const queryStates = {
+    state,
+    continent,
+    type_vehicle,
+    contract_type,
+    order_by_type,
+  };
 
   //effect para construir el url, se llama al presionar buscar, cambiando el valor del state se puede llamar en cualquier punto
   useEffect(() => {
+    //console.log("submit");
     if (submit) {
+      //console.log("submit true");
       let url = getURLQuery();
 
       const paginationString = `page=${activePage}&page_quantity=${vehiclesPerPage}`;
+
       if (url.length > 0) {
         url = `${url}&${paginationString}`;
       } else {
         url = `?${paginationString}`;
       }
       //console.log("ejecutar busqueda a ", url);
-      setSubmit(false);
 
       const fetchData = async () => {
         const { csrfToken, csrfRes } = await getCSRF();
 
-        const response = await djRequest("vehicles", {
+        const response = await djRequest(`vehicles/${url}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -129,6 +135,7 @@ function PublicationsPage() {
       };
 
       fetchData();
+      setSubmit(false);
     }
   }, [submit]);
 
@@ -205,7 +212,7 @@ function PublicationsPage() {
   //efect para seleccion de vehiculo
   useEffect(() => {
     //console.log("en effect ", cardsSelected);
-    let isOwner = true;
+    let isOwner = false;
     const len = cardsSelected.length;
     //console.log("leeen ", len);
     //console.log("cards selected ", cardsSelected);
@@ -217,8 +224,8 @@ function PublicationsPage() {
       //console.log("vehicle selected ", vehicleSelect);
       isOwner = vehicleSelect.owner.id === sessionUserId;
     } else if (len > 1) {
-      const vehicleSelect = vehicles.filter(
-        (vehicle) => cardsSelected.includes(vehicle?.id)
+      const vehicleSelect = vehicles.filter((vehicle) =>
+        cardsSelected.includes(vehicle?.id)
       );
       for (let vehicleSelected of vehicleSelect) {
         isOwner = vehicleSelected.owner.id !== sessionUserId ? false : isOwner;
@@ -226,7 +233,7 @@ function PublicationsPage() {
     }
 
     //Relacion botones-session
-    const seeButton = true;
+    const seeButton = isLogin && isOwner;
     const editButton = isLogin && isOwner;
     const deshabilitarButton = isLogin && (isAdmin || isOwner);
     const habilitarButton = isLogin && (isAdmin || isOwner);
@@ -234,6 +241,7 @@ function PublicationsPage() {
     const activeButtons = len === 1;
     const noactiveButtons = len === 0;
     const moreCards = len >= 2;
+    //console.log("see ", seeButton);
     if (activeButtons) {
       //console.log("tengo que activar botones");
       setOptionsButtons([
@@ -274,11 +282,11 @@ function PublicationsPage() {
         "Content-Type": "application/json",
         "X-CSRFToken": csrfToken as string,
       },
-      body: JSON.stringify({ ids: cardsSelected })
+      body: JSON.stringify({ ids: cardsSelected }),
     });
     setCardsSelected([]);
     setSubmit(true);
-  }
+  };
 
   const handleClickDeleteItem = async (id: number) => {
     //console.log(cardsSelected);
@@ -289,11 +297,11 @@ function PublicationsPage() {
         "Content-Type": "application/json",
         "X-CSRFToken": csrfToken as string,
       },
-      body: JSON.stringify({ ids: [id] })
+      body: JSON.stringify({ ids: [id] }),
     });
     setCardsSelected([]);
     setSubmit(true);
-  }
+  };
 
   return (
     <Container id="publications-panel">
@@ -304,6 +312,8 @@ function PublicationsPage() {
             color="blue"
             appearance="primary"
             disabled={optionsButtons[0]}
+            onClick={() => open(`vehicles/${lastCard}/edit`)}
+            //href={`vehicles/${lastCard}/edit`}
           >
             {TheaderButtons("see")}
           </Button>
@@ -311,6 +321,8 @@ function PublicationsPage() {
             color="green"
             appearance="primary"
             disabled={optionsButtons[1]}
+            onClick={() => open(`vehicles/${lastCard}/edit`)}
+            //href={`vehicles/${lastCard}/edit`}
           >
             {TheaderButtons("edit")}
           </Button>
@@ -328,7 +340,12 @@ function PublicationsPage() {
           >
             {TheaderButtons("enable")}
           </Button>
-          <Button color="red" appearance="primary" onClick={handleClickDeleteLot} disabled={optionsButtons[4]}>
+          <Button
+            color="red"
+            appearance="primary"
+            onClick={handleClickDeleteLot}
+            disabled={optionsButtons[4]}
+          >
             {TheaderButtons("delete")}
           </Button>
         </Container>
@@ -372,7 +389,7 @@ function PublicationsPage() {
                 <p>{TboxFilter("order.tittle")}</p>
               </Container>
               <PublicationsOrder
-                typeOrder={typeOrder}
+                typeOrder={order_by_type}
                 setTypeOrder={setTypeOrder}
                 setSubmit={setSubmit}
               />
@@ -382,7 +399,7 @@ function PublicationsPage() {
                 <p>{TboxFilter("contractType.tittle")}</p>
               </Container>
               <PublicationsStatusVehicle
-                typeStatus={typeStatus}
+                typeStatus={contract_type}
                 setTypeStatus={setTypeStatus}
                 setSubmit={setSubmit}
               />
