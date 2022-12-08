@@ -19,7 +19,7 @@ function PublicationPhoto(props) {
   const selectCard = (e) => {
     const vehicleID = e;
 
-    let aux = props.cardSelected;
+    let aux = [...props.cardSelected];
     const include = aux.includes(vehicleID);
     if (include) {
       //se desselecciono -> se elimina
@@ -58,7 +58,7 @@ function PublicationPhoto(props) {
         <Container className="publication-card-photo">
           <Container className="publication-card-photo-columns">
             <Content className="button-select">
-              <Checkbox value={item.id} onChange={selectCard}></Checkbox>
+              <Checkbox checked={props.cardSelected.includes(item.id)} value={item.id} onChange={selectCard}></Checkbox>
             </Content>
             <Content className="photo-data">
               <img
@@ -198,6 +198,7 @@ function PublicationPhoto(props) {
                   )}
 
                   <IconButton
+                    onClick = {()=>{props.handleClickDeleteItem(item.id)}}
                     icon={<WarningRoundIcon />}
                     disabled={sessionUserId !== item.owner.id && !isAdmin} //solo admin o el dueño
                     circle

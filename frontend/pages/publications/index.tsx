@@ -15,10 +15,7 @@ import PublicationPhoto from "components/publicationPhoto/publicationPhoto";
 
 //UTILS
 import {
-  TypeVisualizerEnum,
-  TypeVehicleEnum,
-  TypeOrderPubliationsEnum,
-  TypeStatusVehicleEnum,
+  TypeVisualizerEnum
 } from "./enums/publications.enum";
 import PublicationsType from "components/publications-bars/publications-type-render";
 import PublicationsTypeVehicle from "components/publications-bars/publications-type-vehicle";
@@ -34,17 +31,9 @@ function PublicationsPage() {
 
   //states for query, tal vez agunos deben iniciar de otra forma
   const [continent, setContinent] = useState("");
-  const [country, setCountry] = useState("");
   const [state, setStates] = useState([]);
-  const [city, setCity] = useState("");
   const [typeStatus, setTypeStatus] = useState("");
-  const [brand, setBrand] = useState("");
-  const [model, setModel] = useState("");
   const [typePrice, setTypePrice] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [seeAlso, setSeeAlso] = useState("");
-  const [currency, setCurrency] = useState("");
   const [typeOrder, setTypeOrder] = useState("");
   //other filters
   const [type_vehicle, setTypeVehicle] = useState("");
@@ -116,7 +105,7 @@ function PublicationsPage() {
       } else {
         url = `?${paginationString}`;
       }
-      console.log("ejecutar busqueda a ", url);
+      //console.log("ejecutar busqueda a ", url);
       setSubmit(false);
 
       const fetchData = async () => {
@@ -154,7 +143,7 @@ function PublicationsPage() {
     } else {
       url = `?${paginationString}`;
     }
-    console.log("ejecutar busqueda a ", url);
+    //console.log("ejecutar busqueda a ", url);
     setSubmit(false);
 
     const fetchData = async () => {
@@ -216,7 +205,7 @@ function PublicationsPage() {
   //efect para seleccion de vehiculo
   useEffect(() => {
     //console.log("en effect ", cardsSelected);
-    let isOwner = false;
+    let isOwner = true;
     const len = cardsSelected.length;
     //console.log("leeen ", len);
     //console.log("cards selected ", cardsSelected);
@@ -227,6 +216,13 @@ function PublicationsPage() {
       )[0];
       //console.log("vehicle selected ", vehicleSelect);
       isOwner = vehicleSelect.owner.id === sessionUserId;
+    } else if (len > 1) {
+      const vehicleSelect = vehicles.filter(
+        (vehicle) => cardsSelected.includes(vehicle?.id)
+      );
+      for (let vehicleSelected of vehicleSelect) {
+        isOwner = vehicleSelected.owner.id !== sessionUserId ? false : isOwner;
+      }
     }
 
     //Relacion botones-session
@@ -235,7 +231,6 @@ function PublicationsPage() {
     const deshabilitarButton = isLogin && (isAdmin || isOwner);
     const habilitarButton = isLogin && (isAdmin || isOwner);
     const deleteButton = isLogin && (isAdmin || isOwner);
-
     const activeButtons = len === 1;
     const noactiveButtons = len === 0;
     const moreCards = len >= 2;
@@ -266,8 +261,39 @@ function PublicationsPage() {
       ]);
     }
     //console.log("----------------------------------");
-  }, [lastCard]);
+  }, [cardsSelected]);
+
   const sessionObj = { isLogin, isAdmin, isClient, sessionUserId };
+
+  const handleClickDeleteLot = async () => {
+    //console.log(cardsSelected);
+    const { csrfToken } = await getCSRF();
+    const response = await djRequest("deletevehicle", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken as string,
+      },
+      body: JSON.stringify({ ids: cardsSelected })
+    });
+    setCardsSelected([]);
+    setSubmit(true);
+  }
+
+  const handleClickDeleteItem = async (id: number) => {
+    //console.log(cardsSelected);
+    const { csrfToken } = await getCSRF();
+    const response = await djRequest("deletevehicle", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken as string,
+      },
+      body: JSON.stringify({ ids: [id] })
+    });
+    setCardsSelected([]);
+    setSubmit(true);
+  }
 
   return (
     <Container id="publications-panel">
@@ -302,7 +328,7 @@ function PublicationsPage() {
           >
             {TheaderButtons("enable")}
           </Button>
-          <Button color="red" appearance="primary" disabled={optionsButtons[4]}>
+          <Button color="red" appearance="primary" onClick={handleClickDeleteLot} disabled={optionsButtons[4]}>
             {TheaderButtons("delete")}
           </Button>
         </Container>
@@ -392,6 +418,7 @@ function PublicationsPage() {
               setCardSelected={setCardsSelected}
               setLastCard={setLastCard}
               lastCard={lastCard}
+              handleClickDeleteItem={handleClickDeleteItem}
               data={vehicles}
               session={sessionObj}
             />
@@ -401,6 +428,7 @@ function PublicationsPage() {
               setCardSelected={setCardsSelected}
               setLastCard={setLastCard}
               lastCard={lastCard}
+              handleClickDeleteItem={handleClickDeleteItem}
               data={vehicles}
               session={sessionObj}
             />
