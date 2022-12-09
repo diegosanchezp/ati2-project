@@ -1,3 +1,5 @@
+import "@/styles/custom/index.less";
+
 import React from "react";
 import {withAuth, useSession} from "auth";
 import type {PageWithSession} from "types"
@@ -11,6 +13,8 @@ import type {
   CountriesSerializer,
 } from "djtypes/country";
 
+import "react-phone-number-input/style.css";
+
 import {
   Uploader,
   Button
@@ -23,6 +27,8 @@ import CameraRetroIcon from '@rsuite/icons/legacy/CameraRetro';
 type FileType = OFileType & {
   index: string
 }
+
+import PhoneInput, {Value as PhoneInputValue} from "react-phone-number-input";
 
 type formSet = {
     prefix: string,
@@ -123,13 +129,19 @@ const UploadTest: PageWithSession<UploadTestPageProps> = (props) => {
     getFileList({formset: vehicleData.videos, regex: getFormsetKeyRegex({fieldname: "video", prefix: videoPrefix})})
   );
 
+  const [phoneNumber, setPhoneNumber] = React.useState<PhoneInputValue>("")
   // Descomentar esto para debuggear
-  console.log(fileList);
-  console.log(formState.videos);
+  // console.log(fileList);
+  // console.log(formState.videos);
 
+  console.log(phoneNumber);
   // Alguno de estos dos numeros deberia de obtenerse
   // console.log(getVehicleNumberPhone("MOBILE"));
   // console.log(getVehicleNumberPhone("FIXED"));
+
+  function onPhoneNumChange(value: PhoneInputValue){
+    setPhoneNumber(value);
+  }
 
   // Borrar imagen que ya esta en base de datos
   function removeFile(params: {stateKey: string, prefix: string}){
@@ -223,9 +235,16 @@ const UploadTest: PageWithSession<UploadTestPageProps> = (props) => {
     for(const [key, value] of Object.entries(formState.contact_phone_numbers)){
       formData.append(key, value ? value : "");
     }
+    // Add fixed phone number for testing
+
+    const fixedPhonePrefix = `${telephoneFormPrefix}-${phoneNum}`;
+    formData.append(`${fixedPhonePrefix}-number`, phoneNumber)
+    formData.append(`${fixedPhonePrefix}-country_number`, "58")
+    formData.append(`${fixedPhonePrefix}-ext`, "")
+    formData.append(`${fixedPhonePrefix}-ptype`, "FIXED")
 
     // Faltaria hacer esto
-    formData.set(`${telephoneFormPrefix}-TOTAL_FORMS`, String(phoneNum));
+    formData.set(`${telephoneFormPrefix}-TOTAL_FORMS`, String(phoneNum + 1));
 
     const res = await fetch(
           `http://localhost:8000/api/vehicle/edit/${1}`, {
@@ -239,8 +258,15 @@ const UploadTest: PageWithSession<UploadTestPageProps> = (props) => {
     )
   }
 
+
   return (
     <>
+      <PhoneInput
+        placeholder="Enter phone number"
+        className="phone-number-input"
+        value={phoneNumber}
+        onChange={onPhoneNumChange}/>
+
       <Uploader
         multiple
         autoUpload={false}
