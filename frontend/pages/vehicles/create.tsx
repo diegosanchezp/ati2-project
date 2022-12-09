@@ -318,7 +318,7 @@ const VehicleEditPage: PageWithSession = () => {
       console.log(value);
     }
 
-    await createVehicle(vehicleFormData, false);
+    await createVehicle(vehicleFormData);
   }
 
   function onChangeVideosQuantity(_quantity: Number) {
