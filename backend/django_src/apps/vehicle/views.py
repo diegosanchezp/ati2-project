@@ -16,6 +16,7 @@ from .serializers import *
 from .forms import *
 from django.views import View
 from django.views.generic import UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
 class VehicleBrandView(APIView):
@@ -162,7 +163,7 @@ class VehicleView(APIView):
             return JsonResponse({'success': True})
 
 
-class VehicleUpdateView(UpdateView):
+class VehicleUpdateView(LoginRequiredMixin, UpdateView):
     # parser_classes = [FormParser, MultiPartParser]
     model = Vehicle
     queryset = Vehicle.objects.all()
@@ -191,7 +192,11 @@ class VehicleUpdateView(UpdateView):
             parent_form.save()
             images = image_form.save()
             videos = video_form.save()
-            telephone_form.save()
+            phoneNums = telephone_form.save(commit=False)
+
+            for phoneNum in phoneNums:
+                phoneNum.user = request.user
+                phoneNum.save()
 
             return JsonResponse(data={
                 "message": "success"
