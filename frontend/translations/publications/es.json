@@ -66,6 +66,7 @@
     "button": "Aceptar"
   },
   "headerButtons": {
+    "create": "Crear",
     "see": "Ver detalles",
     "edit": "Modificar",
     "disable": "Deshabilitar",

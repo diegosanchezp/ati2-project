@@ -9,7 +9,7 @@ const Home: PageWithSession<HomePageProps> = (props) => {
   const t = useTranslations('Index');
   return (
     <>
-      <p>{t('test')}</p>
+      <p style={{ textAlign: 'center', fontSize: '32px' }}>{'Bienvenido a tu PCarro.com' }</p>
     </>
   );
 };

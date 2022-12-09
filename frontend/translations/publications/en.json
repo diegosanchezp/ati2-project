@@ -66,6 +66,7 @@
     "button": "Accept"
   },
   "headerButtons": {
+    "create": "Create",
     "see": "See details",
     "edit": "Edit",
     "disable": "Disable",

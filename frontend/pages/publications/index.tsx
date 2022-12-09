@@ -308,11 +308,17 @@ function PublicationsPage() {
       <FilterVehicles setSubmit={setSubmit} queryFilter={queryFilter} />
       <Container id="publications">
         <Container className="options-buttons">
+        <Button
+            appearance="primary"
+            onClick={() => open(`vehicles/create`)}
+          >
+            {TheaderButtons("create")}
+          </Button>
           <Button
             color="blue"
             appearance="primary"
             disabled={optionsButtons[0]}
-            onClick={() => open(`vehicles/${lastCard}/edit`)}
+            onClick={() => open(`vehicles/edit/${lastCard}`)}
             //href={`vehicles/${lastCard}/edit`}
           >
             {TheaderButtons("see")}
@@ -321,7 +327,7 @@ function PublicationsPage() {
             color="green"
             appearance="primary"
             disabled={optionsButtons[1]}
-            onClick={() => open(`vehicles/${lastCard}/edit`)}
+            onClick={() => open(`vehicles/edit/${lastCard}`)}
             //href={`vehicles/${lastCard}/edit`}
           >
             {TheaderButtons("edit")}

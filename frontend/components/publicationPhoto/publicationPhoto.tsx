@@ -184,7 +184,7 @@ function PublicationPhoto(props) {
                     disabled={sessionUserId !== item.owner.id} ////solo  el dueño
                     circle
                     size="sm"
-                    onClick={() => open(`vehicles/${item.id}/edit`)}
+                    onClick={() => open(`vehicles/edit/${item.id}`)}
                     //href={`vehicles/${item.id}/edit`}
                   />
                   {item.publication_enabled ? (

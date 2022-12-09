@@ -133,7 +133,7 @@ function PublicationList(props: any) {
             <Container className="publication-list-photo-see-all">
               {isLogin ? (
                 sessionUserId === item.owner.id ? (
-                  <a href={`vehicles/${item.id}/edit`}>
+                  <a href={`vehicles/edit/${item.id}`}>
                     {TCard("buttons.seeAllInfo")}
                   </a>
                 ) : (
@@ -147,7 +147,7 @@ function PublicationList(props: any) {
           {isLogin ? (
             <Container className="publications-authenticated-buttons">
               <IconButton
-                onClick={() => open(`vehicles/${item.id}/edit`)}
+                onClick={() => open(`vehicles/edit/${item.id}`)}
                 //href={`vehicles/${item.id}/edit`}
                 icon={<EditIcon />}
                 disabled={sessionUserId !== item.owner.id} ////solo  el dueño

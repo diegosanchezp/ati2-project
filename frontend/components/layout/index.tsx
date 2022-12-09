@@ -53,7 +53,7 @@ export function Layout(props: LayoutProps){
         <Navbar appearance="inverse">
           <Nav>
             <Nav.Item as={NavLink} href={routes.home}>{t('inicio')}</Nav.Item>
-            <Nav.Item as={NavLink} href="">{t('vehiculos')}</Nav.Item>
+            <Nav.Item as={NavLink} href={routes.vehicleList}>{t('vehiculos')}</Nav.Item>
             <Nav.Item as={NavLink} href="">{t('servicios')}</Nav.Item>
             <Nav.Item as={NavLink} href="">{t('empleo')}</Nav.Item>
             <Nav.Item as={NavLink} href="">{t('ayuda')}</Nav.Item>
