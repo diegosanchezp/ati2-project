@@ -26,7 +26,7 @@ export const getVehiclesModelsByBrand = async (_id: string) => {
 export const createVehicle = async (_vehicleData: any) => {
   const { csrfToken, csrfRes } = await getCSRF();
 
-  const response = await fetch("http://127.0.0.1:8000/api/vehicle", {
+  const response = await fetch("http://127.0.0.1:8000/api/vehicle/create", {
     method: "POST",
     headers: {
       "X-CSRFToken": csrfToken as string,
