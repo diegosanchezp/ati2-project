@@ -16,7 +16,7 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from .serializers import *
 from .forms import *
 from django.views import View
-from django.views.generic import UpdateView
+from django.views.generic import UpdateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
@@ -96,91 +96,60 @@ class VehicleGetView(generics.RetrieveAPIView):
         }
         return Response({**initial_data, **new_data})
 
-class VehicleView(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
+class VehicleCreateView(LoginRequiredMixin, CreateView):
+    model = Vehicle
+    success_url = "/"
+    form_class = VehicleForm
+    def post(self, request,*args, **kwargs):
+        vehicle_form = self.get_form()
+        if not vehicle_form.is_valid():
+            return JsonResponse(data={
+                "imageErrors": [],
+                "videoErrors": [],
+                "vehicleErrors": parent_form.errors.get_json_data(),
+                "telephoneErrors": []
+            }, status=400)
 
-    @staticmethod
-    def post(request):
-        vehicle = request.data.get('vehicle')
-        createVehicleSerializer = VehicleSerializer(data=vehicle)
-        # Currency(name=)
-        if createVehicleSerializer.is_valid(raise_exception=True):
-            createVehicleSerializer.save()
+        vehicle = vehicle_form.save(commit=False)
+        vehicle.brand = vehicle.model.brand
+        vehicle.owner = request.user
+        vehicle.save()
 
-        vehicleImages = vehicle['vehicle_images']
-        for image in vehicleImages:
-            imageData = {
-                'vehicle': createVehicleSerializer.data['id'],
-                'image': base64ToImageField(image)
-            }
-            vehicleImageSerializer = VehicleImageSerializer(data=imageData)
-            if vehicleImageSerializer.is_valid():
-                vehicleImageSerializer.save()
+        image_form = VehicleImageFormSet(request.POST, request.FILES, instance=vehicle)
+        video_form = VehicleVideosFormSet(request.POST, request.FILES, instance=vehicle)
+        telephone_form = VehicleTelephoneNumber(request.POST, instance=vehicle)
 
-        return JsonResponse({'success': True})
+        if not all([
+            image_form.is_valid(),
+            video_form.is_valid(),
+            telephone_form.is_valid()
+        ]):
+            return JsonResponse(data={
+                "imageErrors": image_form.errors,
+                "videoErrors": video_form.errors,
+                "vehicleErrors": vehicle_form.errors.get_json_data(),
+                "telephoneErrors": telephone_form.errors
+            }, status=400)
 
-    # @staticmethod
-    # def get(request, id=None):
-    #     if id:
-    #         vehicle = Vehicle.objects.filter(id=id).first()
-    #         vehicleSerializer = VehicleSerializer(vehicle)
-    #
-    #
-    #         vehicleImages = VehicleImages.objects.filter(vehicle=id)
-    #         vehicleImagesSerializer = VehicleImageSerializer(
-    #             vehicleImages, many=True)
-    #
-    #         vehicleVideos = VehicleVideos.objects.filter(vehicle=id)
-    #         vehicleVideosSerializer = VehicleImageSerializer(
-    #             vehicleVideos, many=True)
-    #
-    #         _vehicleData = vehicleSerializer.data
-    #         _vehicleData['location_state'] = vehicle.location_city.state.id
-    #         _vehicleData['location_country'] = vehicle.location_city.state.country.id
-    #         _vehicleData['location_continent'] = vehicle.location_city.state.country.continent
-    #
-    #         countries = Country.objects.all()
-    #         countriesSerializer = CountriesSerializer(countries, many=True)
-    #
-    #         states = State.objects.filter(
-    #             country=vehicle.location_city.state.country.id)
-    #         statesSerializer = StatesSerializer(states, many=True)
-    #
-    #         cities = City.objects.filter(state=vehicle.location_city.state.id)
-    #         citiesSerializer = CitiesSerializer(cities, many=True)
-    #
-    #
-    #         return JsonResponse({
-    #             'vehicle': _vehicleData,
-    #             'images': vehicleImagesSerializer.data,
-    #             'videos': vehicleVideosSerializer.data,
-    #             'countries': countriesSerializer.data,
-    #             'states': statesSerializer.data,
-    #             'cities': citiesSerializer.data
-    #         })
+        images = image_form.save(commit=False)
+        for image in images:
+            image.vehicle = vehicle
+            image.save()
 
-        @staticmethod
-        def put(request):
-            vehicle = request.data.get('vehicle')
-            vehicleId = request.data.get('vehicle_id')
-            editVehicleSerializer = VehicleSerializer(id=vehicleId, data=vehicle)
-            if editVehicleSerializer.is_valid(raise_exception=True):
-                editVehicleSerializer.save()
+        videos = video_form.save(commit=False)
+        for video in videos:
+            video.vehicle = vehicle
+            video.save()
 
-            vehicleImages = vehicle['vehicle_images']
-            for image in vehicleImages:
-                imageData = {
-                    'vehicle': editVehicleSerializer.data['id'],
-                    'image': base64ToImageField(image)
-                }
-                vehicleImageSerializer = VehicleImageSerializer(data=imageData)
-                if vehicleImageSerializer.is_valid():
-                    vehicleImageSerializer.save()
+        phoneNums = telephone_form.save(commit=False)
 
-            return JsonResponse({'success': True})
+        for phoneNum in phoneNums:
+            phoneNum.user = request.user
+            phoneNum.save()
 
-
+        return JsonResponse(data={
+            "message": "success"
+        })
 class VehicleUpdateView(LoginRequiredMixin, UpdateView):
     # parser_classes = [FormParser, MultiPartParser]
     model = Vehicle

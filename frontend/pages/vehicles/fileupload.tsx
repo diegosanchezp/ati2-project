@@ -258,6 +258,84 @@ const UploadTest: PageWithSession<UploadTestPageProps> = (props) => {
     )
   }
 
+  // Test for vehicle creation
+  async function createVehicle(){
+
+    const formData = new FormData();
+
+    // Core vehicle fields
+    formData.append("location_city", "149261");
+    formData.append("model", "7");
+    formData.append("type_vehicle", "CAR");
+    formData.append("contact_days", JSON.stringify(["friday", "saturday"]))
+    formData.append("contract_type", "");
+    formData.append("status", "NEW");
+    formData.append("details", "fancycar");
+    formData.append("accessories", "electric accessories");
+    formData.append("publication_enabled", "on");
+    formData.append("init_publication_date", "2022-11-30")
+    formData.append("finish_publication_date", "2022-11-30")
+    formData.append("location_zone", "d")
+    formData.append("exact_location", "e")
+    formData.append("rental_price", "10.0")
+    formData.append("sale_price", "10.0")
+    formData.append("contact_first_name", "Diego")
+    formData.append("contact_last_name", "Sanchez")
+    formData.append("contact_email", "dsanchez@gmail.com")
+    formData.append("currency", "2");
+    formData.append("contact_hour_from", "15:30:39")
+    formData.append("contact_hour_to", "15:30:41")
+    formData.append("year", "2022-11-25")
+    formData.append("contract_type", "RENTAL")
+
+    // Telephone phone numbers
+    formData.append(`${telephoneFormPrefix}-0-number`, "123213122")
+    formData.append(`${telephoneFormPrefix}-0-country_number`, "58")
+    formData.append(`${telephoneFormPrefix}-0-ext`, "")
+    formData.append(`${telephoneFormPrefix}-0-ptype`, "MOBILE")
+    formData.append(`${telephoneFormPrefix}-TOTAL_FORMS`, "1")
+    formData.append(`${telephoneFormPrefix}-INITIAL_FORMS`, "0")
+
+    // Images
+    // Requires at least one image in the <Uploader /> Component,
+    // To test delete all the images in <Uploader /> Component and add them again
+    // Otherwise the fileType wont have its blobFile property set
+
+    for (let i=0 ; i<fileList.length; i++){
+      const file = fileList[i];
+      formData.append(`${imagePrefix}-${i}-image`, file.blobFile as File);
+      // No se le pone el vehicle-id, porque estamos creando
+      // Ya en el backend se le asocia, cuando se cree.
+    }
+
+    formData.set(`${imagePrefix}-TOTAL_FORMS`,String(fileList.length));
+    formData.set(`${imagePrefix}-INITIAL_FORMS`,String(0));
+
+    // Videos
+    // Requires at least one video in the <Uploader /> Component,
+    // To test delete all the videos in <Uploader /> Component and add them again
+    // Otherwise the fileType wont have its blobFile property set
+    for (let i=0 ; i<videoFileList.length; i++){
+      const file = videoFileList[i];
+      formData.append(`${videoPrefix}-${i}-video`, file.blobFile as File);
+    }
+
+    formData.set(`${videoPrefix}-TOTAL_FORMS`,String(videoFileList.length));
+    formData.set(`${videoPrefix}-INITIAL_FORMS`,String(0));
+
+    const {csrfToken} = await getCSRF();
+
+    const res = await fetch(
+          `http://localhost:8000/api/vehicle/create`, {
+          method: 'POST',
+          body: formData,
+          credentials: "include",
+          headers: {
+            "X-CSRFToken": csrfToken as string,
+          }
+        }
+    )
+  }
 
   return (
     <>
@@ -296,6 +374,9 @@ const UploadTest: PageWithSession<UploadTestPageProps> = (props) => {
 
       <Button onClick={uploadFile}>
         Upload Files
+      </Button>
+      <Button onClick={createVehicle}>
+        Create Vehicle
       </Button>
     </>
   );
