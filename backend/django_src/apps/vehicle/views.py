@@ -74,7 +74,7 @@ class VehicleGetView(generics.RetrieveAPIView):
         statesSerializer = StatesSerializer(states, many=True)
 
         models = VehicleModel.objects.filter(
-            brand=instance.brand.id
+            brand=instance.model.brand.id
         )
         modelsSerializer = VehicleModelSerializer(models, many=True)
 

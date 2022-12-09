@@ -197,7 +197,6 @@ const VehicleCreatePage: PageWithSession = () => {
       );
       return;
     }
-    console.log(vehicleRef?.current);
     if (!vehicleRef?.current?.check()) return;
 
     let _vehicleState = vehicleState;
@@ -391,10 +390,6 @@ const VehicleCreatePage: PageWithSession = () => {
       "finish_publication_date",
       dayjs().format("YYYY-MM-DD")
     );
-
-    /*for (const value of vehicleFormData.entries()) {
-      console.log(value);
-    }*/
 
     const response = await createVehicle(vehicleFormData);
 

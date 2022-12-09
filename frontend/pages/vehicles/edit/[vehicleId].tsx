@@ -209,7 +209,6 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       );
       return;
     }
-    console.log(vehicleRef?.current);
     if (!vehicleRef?.current?.check()) return;
 
     let _vehicleState = vehicleState;
@@ -631,10 +630,6 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       "finish_publication_date",
       dayjs().format("YYYY-MM-DD")
     );
-
-    /*for (const value of vehicleFormData.entries()) {
-      console.log(value);
-    }*/
 
     const response = await editVehicle(vehicleFormData, String(vehicleData.id));
 

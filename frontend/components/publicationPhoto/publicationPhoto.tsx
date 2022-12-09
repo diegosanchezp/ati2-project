@@ -221,7 +221,7 @@ function PublicationPhoto(props) {
           <Container className="publication-card-photo-see-all">
             {isLogin ? (
               sessionUserId === item.owner.id ? (
-                <a href={`vehicles/${item.id}/edit`}>
+                <a href={`vehicles/edit/${item.id}`}>
                   {TCard("buttons.seeAllInfo")}
                 </a>
               ) : (
