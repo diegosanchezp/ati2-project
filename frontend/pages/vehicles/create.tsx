@@ -75,7 +75,7 @@ const Textarea = React.forwardRef((props, ref) => (
   />
 ));
 
-const VehicleEditPage: PageWithSession = () => {
+const VehicleCreatePage: PageWithSession = () => {
   const toaster = useToaster();
   const vehicleModel = Schema.Model({
     continent: Schema.Types.StringType().isRequired("This field is required."),
@@ -288,56 +288,38 @@ const VehicleEditPage: PageWithSession = () => {
 
     if (_vehicleState.contact_phone) {
       vehicleFormData.append(
-        `misc-telephone-content_type-object_id-${
-          _vehicleState.contact_mobile ? 1 : 0
-        }-number`,
+        `misc-telephone-content_type-object_id-0-number`,
         _vehicleState.contact_phone
       );
       vehicleFormData.append(
-        `misc-telephone-content_type-object_id-${
-          _vehicleState.contact_mobile ? 1 : 0
-        }-country_number`,
+        `misc-telephone-content_type-object_id-0-country_number`,
         "123"
       );
       vehicleFormData.append(
-        `misc-telephone-content_type-object_id-${
-          _vehicleState.contact_mobile ? 1 : 0
-        }-ptype`,
+        `misc-telephone-content_type-object_id-0-ptype`,
         "FIXED"
       );
       if (_vehicleState.contact_phone_ext)
         vehicleFormData.append(
-          `misc-telephone-content_type-object_id-${
-            _vehicleState.contact_mobile ? 1 : 0
-          }-ext`,
+          `misc-telephone-content_type-object_id-0-ext`,
           String(_vehicleState.contact_phone_ext)
         );
     }
 
     if (_vehicleState.contact_mobile) {
       vehicleFormData.append(
-        `misc-telephone-content_type-object_id-${
-          _vehicleState.contact_phone ? 1 : 0
-        }-number`,
+        `misc-telephone-content_type-object_id-1-number`,
         _vehicleState.contact_mobile
       );
       vehicleFormData.append(
-        `misc-telephone-content_type-object_id-${
-          _vehicleState.contact_phone ? 1 : 0
-        }-country_number`,
+        `misc-telephone-content_type-object_id-1-country_number`,
         "123"
       );
       vehicleFormData.append(
-        `misc-telephone-content_type-object_id-${
-          _vehicleState.contact_phone ? 1 : 0
-        }-ptype`,
+        `misc-telephone-content_type-object_id-1-ptype`,
         "MOBILE"
       );
     }
-
-    let numberCount = 0;
-    if (_vehicleState.contact_phone) numberCount++;
-    if (_vehicleState.contact_mobile) numberCount++;
 
     vehicleFormData.append(
       `misc-telephone-content_type-object_id-INITIAL_FORMS`,
@@ -353,7 +335,7 @@ const VehicleEditPage: PageWithSession = () => {
     );
     vehicleFormData.append(
       `misc-telephone-content_type-object_id-TOTAL_FORMS`,
-      String(numberCount)
+      "2"
     );
 
     if (_vehicleState.year) {
@@ -396,7 +378,6 @@ const VehicleEditPage: PageWithSession = () => {
     );
     vehicleFormData.append("currency", String(_vehicleState.currency));
     vehicleFormData.append("model", String(_vehicleState.model));
-    vehicleFormData.append("brand", _vehicleState.model.brand);
     vehicleFormData.append("status", _vehicleState.status);
     vehicleFormData.append("exact_location", _vehicleState.exact_location);
     vehicleFormData.append("details", _vehicleState.details);
@@ -442,12 +423,14 @@ const VehicleEditPage: PageWithSession = () => {
             label={"Phone"}
             style={{ marginBottom: 16, flex: 1, marginRight: 16 }}
             className="phone-number-input"
+            value={ vehicleState.contact_phone ?? '' }
             onChange={(_value: any) =>
               onChangeCreateVehicleRequest(_value, "contact_phone")
             }
           />
           <Input
             className="phone-text-input"
+            value={ vehicleState.contact_phone_ext ?? '' }
             onChange={(_value: any) => {
               onChangeCreateVehicleRequest(_value, "contact_phone_ext");
             }}
@@ -464,6 +447,7 @@ const VehicleEditPage: PageWithSession = () => {
         <PhoneInput
           label={"Mobile"}
           className="phone-number-input"
+          value={ vehicleState.contact_mobile ?? '' }
           onChange={(_value: any) => {
             onChangeCreateVehicleRequest(_value, "contact_mobile");
           }}
@@ -1297,10 +1281,10 @@ const VehicleEditPage: PageWithSession = () => {
   );
 };
 
-export default VehicleEditPage;
+export default VehicleCreatePage;
 
 export const getServerSideProps = withAuth({
-  async getServerSideProps({ params, djRequest }) {
+  async getServerSideProps({ }) {
     return {
       props: {},
     };

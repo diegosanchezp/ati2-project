@@ -24,19 +24,20 @@ export const getVehiclesModelsByBrand = async (_id: string) => {
 };
 
 export const createVehicle = async (_vehicleData: any) => {
-  const { csrfToken, csrfRes } = await getCSRF();
+  const { csrfToken } = await getCSRF();
 
-  const response = await fetch("http://127.0.0.1:8000/api/vehicle/create", {
+  const response = await fetch("http://localhost:8000/api/vehicle/create", {
     method: "POST",
+    body: _vehicleData,
+    credentials: "include",
     headers: {
       "X-CSRFToken": csrfToken as string,
     },
-    body: _vehicleData,
   });
 
   if (response.ok) {
-    const { success } = await response.json();
-    return success;
+    const { message } = await response.json();
+    return { success: message === "success" };
   } else {
     return { success: false };
   }
@@ -70,7 +71,7 @@ export const editVehicle = async (_vehicleData: any, _id: string) => {
 
   if (response.ok) {
     const { message } = await response.json();
-    return { success: message === 'success' };
+    return { success: message === "success" };
   } else {
     return { success: false };
   }
