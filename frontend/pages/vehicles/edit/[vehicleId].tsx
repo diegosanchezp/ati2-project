@@ -447,28 +447,20 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
         }
       } else {
         vehicleFormData.append(
-          `${vehicleData.contact_phone_numbers.prefix}-${
-            _vehicleState.contact_mobile ? 1 : 0
-          }-number`,
+          `${vehicleData.contact_phone_numbers.prefix}-0-number`,
           _vehicleState.contact_phone
         );
         vehicleFormData.append(
-          `${vehicleData.contact_phone_numbers.prefix}-${
-            _vehicleState.contact_mobile ? 1 : 0
-          }-country_number`,
+          `${vehicleData.contact_phone_numbers.prefix}-0-country_number`,
           "123"
         );
         vehicleFormData.append(
-          `${vehicleData.contact_phone_numbers.prefix}-${
-            _vehicleState.contact_mobile ? 1 : 0
-          }-ptype`,
+          `${vehicleData.contact_phone_numbers.prefix}-0-ptype`,
           "FIXED"
         );
         if (_vehicleState.contact_phone_ext)
           vehicleFormData.append(
-            `${vehicleData.contact_phone_numbers.prefix}-${
-              _vehicleState.contact_mobile ? 1 : 0
-            }-ext`,
+            `${vehicleData.contact_phone_numbers.prefix}-0-ext`,
             String(_vehicleState.contact_phone_ext)
           );
       }
@@ -523,21 +515,15 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
         );
       } else {
         vehicleFormData.append(
-          `${vehicleData.contact_phone_numbers.prefix}-${
-            _vehicleState.contact_phone ? 1 : 0
-          }-number`,
+          `${vehicleData.contact_phone_numbers.prefix}-1-number`,
           _vehicleState.contact_mobile
         );
         vehicleFormData.append(
-          `${vehicleData.contact_phone_numbers.prefix}-${
-            _vehicleState.contact_phone ? 1 : 0
-          }-country_number`,
+          `${vehicleData.contact_phone_numbers.prefix}-1-country_number`,
           "123"
         );
         vehicleFormData.append(
-          `${vehicleData.contact_phone_numbers.prefix}-${
-            _vehicleState.contact_phone ? 1 : 0
-          }-ptype`,
+          `${vehicleData.contact_phone_numbers.prefix}-1-ptype`,
           "MOBILE"
         );
       }
@@ -568,10 +554,6 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
       }
     }
 
-    let numberCount = 0;
-    if (_vehicleState.contact_phone) numberCount++;
-    if (_vehicleState.contact_mobile) numberCount++;
-
     vehicleFormData.append(
       `${vehicleData.contact_phone_numbers.prefix}-INITIAL_FORMS`,
       vehicleData.contact_phone_numbers[
@@ -592,7 +574,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     );
     vehicleFormData.append(
       `${vehicleData.contact_phone_numbers.prefix}-TOTAL_FORMS`,
-      String(numberCount)
+      "2"
     );
 
     if (_vehicleState.year) {
@@ -1569,9 +1551,11 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                     <Form.Control
                       name="price"
                       value={
-                        vehicleState
-                          ? vehicleState.sale_price || vehicleState.rental_price
-                          : null
+                        vehicleState.contract_type
+                          ? vehicleState.contract_type === "RENTAL"
+                            ? vehicleState.rental_price
+                            : vehicleState.rental_price
+                          : vehicleState.rental_price || vehicleState.sale_price
                       }
                       onChange={(_value: any) => {
                         if (vehicleState.contract_type === "RENTAL_SALE") {
