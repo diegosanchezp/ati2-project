@@ -85,21 +85,21 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   const toaster = useToaster();
   const { vehicleData, user } = props;
   const vehicleModel = Schema.Model({
-    continent: Schema.Types.StringType().isRequired("This field is required."),
-    country: Schema.Types.NumberType().isRequired("This field is required."),
-    state: Schema.Types.NumberType().isRequired("This field is required."),
-    city: Schema.Types.NumberType().isRequired("This field is required."),
+    location_city: Schema.Types.ObjectType().addRule((value) => {
+      return Boolean(value.id)
+    }, "This field is required."),
     contract_type: Schema.Types.StringType().isRequired(
       "This field is required."
     ),
-    brand: Schema.Types.NumberType().isRequired("This field is required."),
-    model: Schema.Types.NumberType().isRequired("This field is required."),
+    model: Schema.Types.ObjectType().addRule((value) => {
+      return Boolean(value.id);
+    }, "This field is required."),
     location_zone: Schema.Types.StringType().isRequired(
       "This field is required."
     ),
-    year: Schema.Types.NumberType().isRequired("This field is required."),
+    year: Schema.Types.StringType().isRequired("This field is required."),
     status: Schema.Types.StringType().isRequired("This field is required."),
-    type: Schema.Types.StringType().isRequired("This field is required."),
+    type_vehicle: Schema.Types.StringType().isRequired("This field is required."),
     details: Schema.Types.StringType().isRequired("This field is required."),
     exact_location: Schema.Types.StringType().isRequired(
       "This field is required."
@@ -702,7 +702,6 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   }
 
   async function getInitialData() {
-    vehicleRef?.current?.cleanErrors();
     let _vehicleImagesList = Array(20);
     let _vehicleVideosList = Array(5);
 
@@ -744,9 +743,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
 
       setVehicleState((prevState: any) => ({
         ...prevState,
-        year: vehicleData
-          ? parseInt(dayjs(vehicleData.year).format("YYYY"))
-          : "",
+        year: vehicleData ? dayjs(vehicleData.year).format("YYYY") : "",
         contact_hour_from: vehicleData
           ? dayjs(`2022-01-01 ${vehicleData.contact_hour_from}`).format("hh")
           : "",
@@ -763,6 +760,10 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
         contact_phone_ext: contactPhone ? contactPhone.ext : "",
         contact_mobile: contactMobile ? contactMobile.number : "",
         currency: vehicleData.currency ? vehicleData.currency.id : null,
+        country: vehicleData.location_city.state.country
+          ? vehicleData.location_city.state.country.id
+          : null,
+        price: vehicleData.contract_type === 'RENTAL' ? vehicleData.rental_price : vehicleData.sale_price
       }));
       setCountriesState(() =>
         vehicleData.countries
@@ -824,7 +825,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
           18,
           19,
         ];
-        let videosIndexes = [0, 1, 2, 3, 4, 5];
+        let videosIndexes = [0, 1, 2, 3, 4];
 
         indexes.forEach((imageIndex) => {
           if (
@@ -892,41 +893,39 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   async function onChangeCountry(_countryId: number) {
     const _vehicleState = vehicleState;
     _vehicleState.location_city.state.country.id = _countryId;
-    _vehicleState.location_city.state.id = undefined;
-    _vehicleState.location_city.id = undefined;
+    _vehicleState.location_city.state.id = '';
+    _vehicleState.location_city.id = '';
 
     setVehicleState((prevState: any) => ({ ...prevState, ..._vehicleState }));
     setStatesState(() => []);
     setCitiesState(() => []);
 
-    if (_countryId) {
-      const states = await getStates(_countryId);
-      setStatesState(
-        states.map((state: any) => ({
-          label: state.name,
-          value: state.id,
-        }))
-      );
-    }
+    if (!_countryId) return;
+    const states = await getStates(_countryId);
+    setStatesState(
+      states.map((state: any) => ({
+        label: state.name,
+        value: state.id,
+      }))
+    );
   }
 
   async function onChangeState(_stateId: number) {
     const _vehicleState = vehicleState;
     _vehicleState.location_city.state.id = _stateId;
-    _vehicleState.location_city.id = undefined;
+    _vehicleState.location_city.id = '';
 
     setVehicleState((prevState: any) => ({ ...prevState, ..._vehicleState }));
     setCitiesState(() => []);
 
-    if (_stateId) {
-      const cities = await getCities(_stateId);
-      setCitiesState(
-        cities.map((city: any) => ({
-          label: city.name,
-          value: city.id,
-        }))
-      );
-    }
+    if (!_stateId) return;
+    const cities = await getCities(_stateId);
+    setCitiesState(
+      cities.map((city: any) => ({
+        label: city.name,
+        value: city.id,
+      }))
+    );
   }
 
   async function onChangeCity(_cityId: number) {
@@ -939,6 +938,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
   async function onChangeBrand(_brandId: number) {
     const _vehicleState = vehicleState;
     _vehicleState.model.brand.id = _brandId;
+    _vehicleState.model.id = '';
     setVehicleState((prevState: any) => ({ ...prevState, ..._vehicleState }));
     setVehicleModelsState(() => []);
 
@@ -979,7 +979,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
     let _yearList = [];
 
     for (let _minYear = _from; _minYear <= _maxYear; _minYear++) {
-      _yearList.push({ label: _minYear, value: _minYear });
+      _yearList.push({ label: String(_minYear), value: String(_minYear) });
     }
 
     setYearsState(() => _yearList);
@@ -1061,6 +1061,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
           <Form
             ref={vehicleRef}
             model={vehicleModel}
+            formValue={vehicleState}
             onSubmit={onSubmitEditVehicle}
           >
             <Grid>
@@ -1121,7 +1122,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           value={
                             vehicleState
                               ? vehicleState.location_city.state.country.id
-                              : null
+                              : ""
                           }
                           onChange={onChangeCountry}
                         />
@@ -1144,7 +1145,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           value={
                             vehicleState
                               ? vehicleState.location_city.state.id
-                              : null
+                              : ""
                           }
                           onChange={onChangeState}
                         />
@@ -1160,7 +1161,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           Ciudad
                         </Form.ControlLabel>
                         <Form.Control
-                          name="city"
+                          name="location_city"
                           accepter={SelectPicker}
                           placeholder="Selecciona una ciudad"
                           data={citiesState}
@@ -1333,7 +1334,7 @@ const VehicleEditPage: PageWithSession<EditVehiclePageProps> = (props) => {
                           Tipo de vehículo
                         </Form.ControlLabel>
                         <Form.Control
-                          name="type"
+                          name="type_vehicle"
                           placeholder="Selecciona un tipo"
                           accepter={SelectPicker}
                           data={vehicleTypesState}
