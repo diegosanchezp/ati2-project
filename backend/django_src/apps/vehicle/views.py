@@ -202,3 +202,14 @@ class VehicleUpdateView(LoginRequiredMixin, UpdateView):
     #
     # def form_invalid(self, form):
     #     return self.render_to_response(self.get_context_data(form=form))
+
+class VehicleDeleteView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def post(request):
+        ids = request.data.get('ids')
+        vehicles_to_delete = Vehicle.objects.filter(pk__in=ids)
+        vehicles_to_delete.delete()
+        return JsonResponse({'success': True})

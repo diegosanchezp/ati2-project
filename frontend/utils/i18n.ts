@@ -13,9 +13,9 @@ export async function getTransMessages(params: getTransMessagesParams){
   const globalMessages = (
     await import(`../translations/${locale}.json`)
   ).default
-
+  console.log(folderPath);
   const messages = (
-    await import(`../translations/${path.join(folderPath, `${locale}.json`)}`)
+    folderPath ? await import(`../translations/${folderPath}/${locale}.json`) : await import(`../translations/${locale}.json`)
   ).default
 
   return {...globalMessages, ...messages};

@@ -6,7 +6,7 @@ SCRIPT_FILE_PATH=$(realpath "${BASH_SOURCE[0]:-$0}")
 SCRIPT_DIR=$(dirname "$SCRIPT_FILE_PATH")
 # ../../
 ROOT_DIR=$(dirname "$SCRIPT_DIR")
-COMPOSE_FILE=$ROOT_DIR/docker/dev/docker-compose.yml
+COMPOSE_FILE=./docker/dev/docker-compose.yml
 WORKDIR="/app/backend" # Docker container working directory
 
 export COMPOSE_FILE

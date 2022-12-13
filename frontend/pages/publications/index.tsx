@@ -212,7 +212,7 @@ function PublicationsPage() {
   //efect para seleccion de vehiculo
   useEffect(() => {
     //console.log("en effect ", cardsSelected);
-    let isOwner = false;
+    let isOwner = true;
     const len = cardsSelected.length;
     //console.log("leeen ", len);
     //console.log("cards selected ", cardsSelected);
@@ -231,7 +231,6 @@ function PublicationsPage() {
         isOwner = vehicleSelected.owner.id !== sessionUserId ? false : isOwner;
       }
     }
-
     //Relacion botones-session
     const seeButton = isLogin && isOwner;
     const editButton = isLogin && isOwner;
